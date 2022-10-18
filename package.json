@@ -2,13 +2,14 @@
     "name": "webbmobilapp-ks1",
     "private": true,
     "version": "0.0.0",
+    "type": "module",
     "scripts": {
         "dev-server": "npx json-server --watch db.json",
         "dev": "vite --host 0.0.0.0 --port 5000",
-        "build": "vite build",
+        "build": "tsc && vite build",
         "preview": "vite preview",
         "format": "npx prettier --write src",
-        "lint": "npx eslint src --ext .js,.jsx",
+        "lint": "npx eslint src --ext .ts,.tsx,.js,.jsx",
         "init-db": "node init-db.js",
         "prepare": "husky install"
     },
@@ -21,17 +22,19 @@
         "x-is-type": "^1.1.6"
     },
     "devDependencies": {
+        "@types/node": "latest",
         "@types/react": "latest",
         "@types/react-dom": "latest",
+        "@typescript-eslint/eslint-plugin": "latest",
+        "@typescript-eslint/parser": "latest",
         "@vitejs/plugin-react": "latest",
         "eslint": "latest",
         "eslint-plugin-react": "latest",
-        "husky": "^8.0.0",
+        "husky": "^8.0.1",
         "json-server": "^0.17.0",
-        "kolorist": "^1.6.0",
         "prettier": "latest",
         "pretty-quick": "latest",
-        "prompts": "^2.4.2",
+        "typescript": "latest",
         "vite": "latest"
     }
 }
