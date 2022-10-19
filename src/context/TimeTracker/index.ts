@@ -1,5 +1,6 @@
-export { default as TimeTrackerContext, useTimeTracker } from './Context';
-export { default as TimeTrackerProvider } from './Provider';
-
-import type { TimeTracker } from './types';
-export type { TimeTracker };
+export * as TimeTracker from './types';
+export {
+    default as TimeTrackerContext,
+    defaultValue,
+    useTimeTracker,
+} from './Context';

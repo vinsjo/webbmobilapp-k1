@@ -1,10 +1,10 @@
 import { createContext, useContext } from 'react';
-import type { TimeTracker } from './types';
+import type { Project, Task, Timelog } from './types';
 
 export const defaultValue: {
-    projects: TimeTracker.Project[];
-    tasks: TimeTracker.Task[];
-    timelogs: TimeTracker.Timelog[];
+    projects: Project[];
+    tasks: Task[];
+    timelogs: Timelog[];
     error?: string | null;
 } = {
     projects: [],
@@ -15,6 +15,5 @@ export const defaultValue: {
 
 const TimeTrackerContext = createContext(defaultValue);
 const useTimeTracker = () => useContext(TimeTrackerContext);
-
 export default TimeTrackerContext;
 export { useTimeTracker };
