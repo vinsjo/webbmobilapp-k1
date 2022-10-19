@@ -2,31 +2,32 @@ const uuid = require('uuid');
 const fs = require('fs');
 const path = require('path');
 const prompts = require('prompts');
-const kolorist = require('kolorist');
 const { isObj, isArr } = require('x-is-type/callbacks');
 
 /**
  * @typedef {{id:string,name:string,color:string|null}} Project
- * @typedef {{id:string,projectId:string,title:string}} Task
- * @typedef {{id:string,taskId:string,start:number,end:number}} Timelog
+ * @typedef {{id:string,projectId:string,title:string,start:number,end:number|null}} Task
  */
 
 /**
  *
  * @param  {{project:{name:string,color?:string},tasks:string[]}[]} [dummyData]
- * @returns {{projects:Project[],tasks?:Task[],timelogs:Timelog[]}}
+ * @returns {{projects:Project[],tasks?:Task[]}}
  */
 const createOutput = (dummyData) => {
-    const end = Date.now();
-
     const output = {
         projects: [],
         tasks: [],
-        timelogs: [],
     };
-    if (!isArr(dummyData)) return output;
+    if (!Array.isArray(dummyData)) return output;
+    const getRandomStartTime = (maxOffset = 12) => {
+        return Date.now() - Math.floor(Math.random() * maxOffset * 3600 * 1000);
+    };
     dummyData
-        .filter((entry) => isObj(entry) && isObj(entry.project))
+        .filter(
+            (entry) =>
+                entry instanceof Object && entry.project instanceof Object
+        )
         .forEach(({ project: { name, color }, tasks }) => {
             if (!name) return;
             const projectId = uuid.v4();
@@ -35,22 +36,19 @@ const createOutput = (dummyData) => {
                 name,
                 color: color || null,
             });
-            if (!isArr(tasks)) return;
+            if (!Array.isArray(tasks)) return;
             tasks.forEach((title) => {
                 if (!title) return;
-                const taskId = uuid.v4();
-                output.tasks.push({ id: taskId, projectId, title });
-                const start =
-                    end - (3600 * 1000 * Math.floor(Math.random() * 12) + 1);
-                output.timelogs.push({
+                output.tasks.push({
                     id: uuid.v4(),
-                    taskId,
-                    start,
-                    end,
+                    projectId,
+                    title,
+                    start: getRandomStartTime(),
+                    end: null,
                 });
             });
         });
-
+    output.tasks.sort((a, b) => a.start - b.start);
     return output;
 };
 
@@ -59,15 +57,14 @@ const createOutput = (dummyData) => {
         const dbPath = path.resolve(__dirname, 'db.json');
         const dbExists = fs.existsSync(dbPath);
         const onCancel = () => {
-            throw new Error(`${kolorist.red('✖')} Operation cancelled`);
+            throw new Error('✖ Operation cancelled');
         };
         const { dummyData } = await prompts(
             [
                 {
                     type: !dbExists ? null : 'toggle',
                     name: 'overwrite',
-                    message:
-                        'db.json already exists, overwrite with an empty one?',
+                    message: 'db.json already exists, overwrite it?',
                     initial: false,
                     active: 'yes',
                     inactive: 'no',
@@ -100,6 +97,7 @@ const createOutput = (dummyData) => {
                           tasks: [
                               'Läsa instruktioner',
                               'Fixa db.json',
+                              'Göra alla api-funktioner',
                               'Fixa frontend',
                           ],
                       },

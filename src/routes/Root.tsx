@@ -1,10 +1,6 @@
 import { useCallback, useMemo, useState, useEffect, useReducer } from 'react';
-import useAxios from '@vinsjo/use-axios';
-import {
-    TimeTrackerContext,
-    defaultValue,
-    type TimeTracker,
-} from '@/context/TimeTracker';
+import { TimeTrackerContext, defaultValue } from '@/context/TimeTracker';
+import type { Project, Task } from '@/context/TimeTracker/types';
 import { Outlet } from 'react-router-dom';
 
 import api from '@/utils/api';
@@ -12,10 +8,9 @@ import api from '@/utils/api';
 type Action =
     | {
           type: 'projects';
-          data: TimeTracker.Project[];
+          data: Project[];
       }
-    | { type: 'tasks'; data: TimeTracker.Task[] }
-    | { type: 'timelogs'; data: TimeTracker.Timelog[] }
+    | { type: 'tasks'; data: Task[] }
     | { type: 'error'; data: string | null };
 
 type State = typeof defaultValue;
@@ -28,8 +23,6 @@ const Root = () => {
                 return { ...prevState, projects: data };
             case 'tasks':
                 return { ...prevState, tasks: data };
-            case 'timelogs':
-                return { ...prevState, timelogs: data };
             case 'error':
                 return { ...prevState, error: data };
             default:
@@ -39,28 +32,41 @@ const Root = () => {
 
     useEffect(() => {
         const controller = new AbortController();
-        api.get<TimeTracker.Project[]>('/projects', controller).then((res) => {
-            if (!res) return;
-            dispatch({ type: 'projects', data: res.data });
-        });
+        api.projects
+            .getWithTasks('1', controller.signal)
+            .then((res) => {
+                console.log(res);
+            })
+            .catch((err) => {
+                console.error(err);
+            });
         return () => controller.abort();
     }, []);
-    useEffect(() => {
-        const controller = new AbortController();
-        api.get<TimeTracker.Task[]>('/tasks', controller).then((res) => {
-            if (!res) return;
-            dispatch({ type: 'tasks', data: res.data });
-        });
-        return () => controller.abort();
-    }, []);
-    useEffect(() => {
-        const controller = new AbortController();
-        api.get<TimeTracker.Timelog[]>('/timelog', controller).then((res) => {
-            if (!res) return;
-            dispatch({ type: 'timelogs', data: res.data });
-        });
-        return () => controller.abort();
-    }, []);
+
+    // useEffect(() => {
+    //     const controller = new AbortController();
+    //     api.get<Project[]>('/projects', controller).then((res) => {
+    //         if (!res) return;
+    //         dispatch({ type: 'projects', data: res.data });
+    //     });
+    //     return () => controller.abort();
+    // }, []);
+    // useEffect(() => {
+    //     const controller = new AbortController();
+    //     api.get<Task[]>('/tasks', controller).then((res) => {
+    //         if (!res) return;
+    //         dispatch({ type: 'tasks', data: res.data });
+    //     });
+    //     return () => controller.abort();
+    // }, []);
+    // useEffect(() => {
+    //     const controller = new AbortController();
+    //     api.get<Timelog[]>('/timelog', controller).then((res) => {
+    //         if (!res) return;
+    //         dispatch({ type: 'timelogs', data: res.data });
+    //     });
+    //     return () => controller.abort();
+    // }, []);
 
     return (
         <TimeTrackerContext.Provider value={state}>
