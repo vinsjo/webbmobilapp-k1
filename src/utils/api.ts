@@ -1,90 +1,93 @@
-import type {
-    Project,
-    Task,
-    ProjectWithTasks,
-    RequestError,
-} from '@/context/TimeTracker/types';
-import axios, { AxiosError, AxiosRequestConfig, AxiosResponse } from 'axios';
+import type { Project, Task, Timelog } from '@/context/TimeTracker/types';
+import axios, { AxiosError } from 'axios';
+import { v4 as uuidv4 } from 'uuid';
 import { isStr } from 'x-is-type/callbacks';
 
-function handleError(err: AxiosError | any): { error: RequestError } | null {
-    if (!axios.isAxiosError(err) || err.code === 'ERR_CANCELED') return null;
-    const status = (err.request?.status || err.response?.status || 0) as number;
-    const statusText = (err.request?.statusText || err.response?.statusText) as
-        | string
-        | undefined;
-    return { error: { status, statusText, message: err.message } };
-}
+export type ApiRoute = 'projects' | 'tasks' | 'timelogs';
+export type ApiReturnType<T extends ApiRoute> = T extends 'projects'
+    ? Project
+    : T extends 'tasks'
+    ? Task
+    : Timelog;
 
-async function makeRequest<T = unknown, D = unknown>(
-    config: AxiosRequestConfig<D>
+export type ApiRouteHandler = ReturnType<typeof createRouteHandler>;
+
+const API_BASE_URL = 'http://localhost:3000';
+
+function createRouteHandler<R extends ApiRoute, T extends ApiReturnType<R>>(
+    route: R
 ) {
-    try {
-        const res = await axios<T>(config);
-        return res;
-    } catch (err: AxiosError | any) {
-        return handleError(err);
-    }
+    const baseURL = `${API_BASE_URL}/${route}`;
+
+    const handleError = <D>(err: AxiosError<T, D> | unknown) => {
+        if (!axios.isAxiosError(err) || err.code === 'ERR_CANCELED') {
+            return null;
+        }
+        console.log(err);
+        const status = (err.request?.status ||
+            err.response?.status ||
+            0) as number;
+        throw `${status} - ${err.message}`;
+    };
+
+    return {
+        async get<ID = T['id'] | null | undefined>(
+            id?: ID,
+            signal?: AbortSignal
+        ) {
+            try {
+                const res = await axios.get<ID extends T['id'] ? T : T[]>(
+                    isStr(id) ? `${baseURL}/${id}` : baseURL,
+                    {
+                        signal,
+                    }
+                );
+                return res?.data || null;
+            } catch (err: AxiosError<T> | unknown) {
+                return handleError(err);
+            }
+        },
+        async post(data: Omit<T, 'id'>, signal?: AbortSignal) {
+            try {
+                const res = await axios.post<T>(
+                    baseURL,
+                    { id: uuidv4(), ...data } as T,
+                    { signal }
+                );
+                return res?.data || null;
+            } catch (err: AxiosError<T, T> | unknown) {
+                return handleError(err);
+            }
+        },
+        async patch(
+            id: T['id'],
+            data: Partial<Omit<T, 'id'>>,
+            signal?: AbortSignal
+        ) {
+            try {
+                const res = await axios.patch<T>(`${baseURL}/${id}`, data, {
+                    signal,
+                });
+                return res?.data || null;
+            } catch (err: AxiosError<T, T> | unknown) {
+                return handleError(err);
+            }
+        },
+        async delete(id: T['id'], signal?: AbortSignal) {
+            try {
+                const res = await axios.delete(`${baseURL}/${id}`, { signal });
+                return res.statusText === 'OK';
+            } catch (err: AxiosError<T> | unknown) {
+                return !!handleError(err);
+            }
+        },
+    };
 }
 
-const baseURL = 'http://localhost:3000';
-
-const [GET, DELETE] = ['get', 'delete'].map((method) => {
-    return <T = unknown>(url: string, signal?: AbortSignal) => {
-        return makeRequest<T>({ method, baseURL, url, signal });
-    };
-});
-
-const [POST, PUT, PATCH] = ['post', 'put', 'patch'].map((method) => {
-    return <T = unknown, D = unknown>(
-        url: string,
-        data: D,
-        signal?: AbortSignal
-    ) => {
-        return makeRequest<T, D>({
-            method,
-            baseURL,
-            url,
-            data,
-            signal,
-        });
-    };
-});
-
-const projects = (() => {
-    const basePath = `/projects`;
-    const getURL = <I>(id?: I, query?: string) => {
-        let url = basePath;
-        if (typeof id === 'string') url += `/${id}`;
-        if (typeof query === 'string') url += `?${query}`;
-        return url;
-    };
-    return {
-        async get<I = unknown>(id?: I, signal?: AbortSignal) {
-            const res = await GET<
-                I extends Project['id'] ? Project : Project[]
-            >(getURL(id), signal);
-            if (!res) return null;
-            if ('error' in res) {
-                throw res.error;
-            }
-            return res.data;
-        },
-        async getWithTasks<I = null>(id?: I, signal?: AbortSignal) {
-            const res = await GET<
-                I extends Project['id'] ? ProjectWithTasks : ProjectWithTasks[]
-            >(getURL(id, '_embed=tasks'), signal);
-            if (!res) return null;
-            if ('error' in res) {
-                throw res.error;
-            }
-            return res.data;
-        },
-    };
-})();
-
-const api = {
-    projects,
+const api: Record<ApiRoute, ApiRouteHandler> = {
+    projects: createRouteHandler('projects'),
+    tasks: createRouteHandler('tasks'),
+    timelogs: createRouteHandler('timelogs'),
 };
 
 export default api;

@@ -26,6 +26,7 @@
         "@types/node": "latest",
         "@types/react": "latest",
         "@types/react-dom": "latest",
+        "@types/uuid": "^8.3.4",
         "@typescript-eslint/eslint-plugin": "latest",
         "@typescript-eslint/parser": "latest",
         "@vitejs/plugin-react": "latest",

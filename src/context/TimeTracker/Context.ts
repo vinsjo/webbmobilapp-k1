@@ -1,13 +1,15 @@
 import { createContext, useContext } from 'react';
-import type { Project, Task } from './types';
+import type { Project, Task, Timelog } from './types';
 
 export const defaultValue: {
     projects: Project[];
     tasks: Task[];
-    error?: string | null;
+    timelogs: Timelog[];
+    error: string | null;
 } = {
     projects: [],
     tasks: [],
+    timelogs: [],
     error: null,
 };
 

@@ -6,18 +6,20 @@ const { isObj, isArr } = require('x-is-type/callbacks');
 
 /**
  * @typedef {{id:string,name:string,color:string|null}} Project
- * @typedef {{id:string,projectId:string,title:string,start:number,end:number|null}} Task
+ * @typedef {{id:string,projectId:string,title:string}} Task
+ * @typedef {{id:string,taskId:string,start:number,end:number|null}} Timelog
  */
 
 /**
  *
  * @param  {{project:{name:string,color?:string},tasks:string[]}[]} [dummyData]
- * @returns {{projects:Project[],tasks?:Task[]}}
+ * @returns {{projects:Project[],tasks:Task[], timelogs:Timelog[]}}
  */
 const createOutput = (dummyData) => {
     const output = {
         projects: [],
         tasks: [],
+        timelogs: [],
     };
     if (!Array.isArray(dummyData)) return output;
     const getRandomStartTime = (maxOffset = 12) => {
@@ -39,10 +41,15 @@ const createOutput = (dummyData) => {
             if (!Array.isArray(tasks)) return;
             tasks.forEach((title) => {
                 if (!title) return;
+                const taskId = uuid.v4();
                 output.tasks.push({
-                    id: uuid.v4(),
+                    id: taskId,
                     projectId,
                     title,
+                });
+                output.timelogs.push({
+                    id: uuid.v4(),
+                    taskId,
                     start: getRandomStartTime(),
                     end: null,
                 });
