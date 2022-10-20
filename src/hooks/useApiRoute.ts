@@ -12,6 +12,12 @@ export default function useApiRoute<
     const handler = useRef(api[route]);
     const [data, setData] = useState<T[]>([]);
     const [error, setError] = useState<string | null>(null);
+    const [selectedId, setSelectedId] = useState<null | T['id']>(null);
+
+    const selected = useMemo(() => {
+        if (!selectedId) return null;
+        return data.find(({ id }) => id === selectedId) || null;
+    }, [data, selectedId]);
 
     const add = useCallback(async (data: Omit<T, 'id'>) => {
         if (!handler.current || !isObj(data) || !Object.keys(data).length) {
@@ -78,7 +84,15 @@ export default function useApiRoute<
     }, []);
 
     return useMemo<TimeTrackerValue<T>>(
-        () => ({ data, error, add, update, delete: remove }),
-        [data, error, add, update, remove]
+        () => ({
+            data,
+            error,
+            add,
+            update,
+            delete: remove,
+            selected,
+            setSelected: setSelectedId,
+        }),
+        [data, error, add, update, remove, selected]
     );
 }
