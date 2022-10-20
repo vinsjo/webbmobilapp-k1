@@ -2,21 +2,8 @@ import { useState, useEffect, useRef, useMemo, useCallback } from 'react';
 import { isObj } from 'x-is-type/callbacks';
 import { replaceAtIndex } from '@/utils';
 import api from '@/utils/api';
-import type {
-    Project,
-    Task,
-    Timelog,
-    ApiRoute,
-    ApiReturnType,
-} from '@/utils/api';
-
-export interface UseApiReturnType<T extends Project | Task | Timelog> {
-    data: T[];
-    error: string | null;
-    add: (data: Omit<T, 'id'>) => Promise<boolean>;
-    update: (id: T['id'], data: Partial<Omit<T, 'id'>>) => Promise<boolean>;
-    delete: (id: T['id']) => Promise<boolean>;
-}
+import type { ApiRoute, ApiReturnType } from '@/utils/api';
+import type { TimeTrackerValue } from '@/context/TimeTracker/Context';
 
 export default function useApiRoute<
     R extends ApiRoute,
@@ -90,7 +77,7 @@ export default function useApiRoute<
         return () => controller.abort();
     }, []);
 
-    return useMemo<UseApiReturnType<T>>(
+    return useMemo<TimeTrackerValue<T>>(
         () => ({ data, error, add, update, delete: remove }),
         [data, error, add, update, remove]
     );
