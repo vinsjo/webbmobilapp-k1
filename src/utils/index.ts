@@ -5,7 +5,7 @@ export const classNames = (...names: unknown[]) => {
 };
 
 export function pick<
-    T extends Record<string | number | symbol, any>,
+    T extends Record<string | number | symbol, unknown>,
     K extends keyof T
 >(obj: T, ...keys: K[]) {
     return (
@@ -24,7 +24,7 @@ export function replaceAtIndex<T = unknown>(arr: T[], index: number, value: T) {
 }
 
 export function omit<
-    T extends Record<string | number | symbol, any>,
+    T extends Record<string | number | symbol, unknown>,
     K extends keyof T
 >(obj: T, ...keys: K[]) {
     return (

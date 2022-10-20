@@ -1,7 +1,24 @@
-import type { Project, Task, Timelog } from '@/context/TimeTracker/types';
 import axios, { AxiosError } from 'axios';
-import { v4 as uuidv4 } from 'uuid';
+import * as uuid from 'uuid';
 import { isStr } from 'x-is-type/callbacks';
+
+export interface Project {
+    id: string;
+    name: string;
+    color: string | null;
+}
+export interface Task {
+    id: string;
+    projectId: Project['id'];
+    title: string;
+}
+export interface Timelog {
+    id: string;
+    taskId: Task['id'];
+    projectId: Project['id'];
+    start: number;
+    end: number;
+}
 
 export type ApiRoute = 'projects' | 'tasks' | 'timelogs';
 export type ApiReturnType<T extends ApiRoute> = T extends 'projects'
@@ -19,7 +36,7 @@ function createRouteHandler<R extends ApiRoute, T extends ApiReturnType<R>>(
 ) {
     const baseURL = `${API_BASE_URL}/${route}`;
 
-    const handleError = <D>(err: AxiosError<T, D> | unknown) => {
+    const handleError = (err: AxiosError | unknown) => {
         if (!axios.isAxiosError(err) || err.code === 'ERR_CANCELED') {
             return null;
         }
@@ -31,6 +48,12 @@ function createRouteHandler<R extends ApiRoute, T extends ApiReturnType<R>>(
     };
 
     return {
+        get baseURL() {
+            return baseURL;
+        },
+        get errorHandler() {
+            return handleError;
+        },
         async get<ID = T['id'] | null | undefined>(
             id?: ID,
             signal?: AbortSignal
@@ -43,7 +66,7 @@ function createRouteHandler<R extends ApiRoute, T extends ApiReturnType<R>>(
                     }
                 );
                 return res?.data || null;
-            } catch (err: AxiosError<T> | unknown) {
+            } catch (err: AxiosError | unknown) {
                 return handleError(err);
             }
         },
@@ -51,11 +74,11 @@ function createRouteHandler<R extends ApiRoute, T extends ApiReturnType<R>>(
             try {
                 const res = await axios.post<T>(
                     baseURL,
-                    { id: uuidv4(), ...data } as T,
+                    { id: uuid.v4(), ...data } as T,
                     { signal }
                 );
                 return res?.data || null;
-            } catch (err: AxiosError<T, T> | unknown) {
+            } catch (err: AxiosError | unknown) {
                 return handleError(err);
             }
         },
@@ -69,7 +92,7 @@ function createRouteHandler<R extends ApiRoute, T extends ApiReturnType<R>>(
                     signal,
                 });
                 return res?.data || null;
-            } catch (err: AxiosError<T, T> | unknown) {
+            } catch (err: AxiosError | unknown) {
                 return handleError(err);
             }
         },
@@ -77,8 +100,22 @@ function createRouteHandler<R extends ApiRoute, T extends ApiReturnType<R>>(
             try {
                 const res = await axios.delete(`${baseURL}/${id}`, { signal });
                 return res.statusText === 'OK';
-            } catch (err: AxiosError<T> | unknown) {
-                return !!handleError(err);
+            } catch (err: AxiosError | unknown) {
+                handleError(err);
+                return false;
+            }
+        },
+        async where<K extends keyof T, V extends T[K]>(
+            key: K,
+            value: V,
+            signal?: AbortSignal
+        ) {
+            try {
+                const url = `${baseURL}?${key as string}=${value}`;
+                const res = await axios.get(url, { signal });
+                return res?.data || null;
+            } catch (err: AxiosError | unknown) {
+                return handleError(err);
             }
         },
     };

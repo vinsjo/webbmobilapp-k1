@@ -1,7 +1,7 @@
 export interface Project {
     id: string;
     name: string;
-    color?: string;
+    color: string | null;
 }
 export interface Task {
     id: string;
@@ -11,6 +11,7 @@ export interface Task {
 export interface Timelog {
     id: string;
     taskId: Task['id'];
+    projectId: Project['id'];
     start: number;
-    end: number | null;
+    end: number;
 }

@@ -8,19 +8,13 @@ const Root = () => {
     const tasks = useApiRoute('tasks');
     const timelogs = useApiRoute('timelogs');
 
-    const error = useMemo(
-        () => projects.error || tasks.error || timelogs.error || null,
-        [projects.error, tasks.error, timelogs.error]
-    );
-
     const value = useMemo(
         () => ({
-            projects: projects.data,
-            tasks: tasks.data,
-            timelogs: timelogs.data,
-            error,
+            projects,
+            tasks,
+            timelogs,
         }),
-        [projects.data, tasks.data, timelogs.data, error]
+        [projects, tasks, timelogs]
     );
 
     return (

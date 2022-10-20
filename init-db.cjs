@@ -2,12 +2,11 @@ const uuid = require('uuid');
 const fs = require('fs');
 const path = require('path');
 const prompts = require('prompts');
-const { isObj, isArr } = require('x-is-type/callbacks');
 
 /**
  * @typedef {{id:string,name:string,color:string|null}} Project
  * @typedef {{id:string,projectId:string,title:string}} Task
- * @typedef {{id:string,taskId:string,start:number,end:number|null}} Timelog
+ * @typedef {{id:string,taskId:string,projectId:string,start:number,end:number|null}} Timelog
  */
 
 /**
@@ -50,6 +49,7 @@ const createOutput = (dummyData) => {
                 output.timelogs.push({
                     id: uuid.v4(),
                     taskId,
+                    projectId,
                     start: getRandomStartTime(),
                     end: null,
                 });
