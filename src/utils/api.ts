@@ -5,13 +5,11 @@ export interface Project {
     id: number;
     name: string;
     color: string | null;
-    created_at: number;
 }
 export interface Task {
     id: number;
     projectId: Project['id'];
     title: string;
-    created_at: number;
 }
 export interface Timelog {
     id: number;
@@ -67,30 +65,15 @@ function createRouteHandler<R extends ApiRoute, T extends ApiRouteType<R>>(
                 return handleError(err);
             }
         },
-        async post(
-            data: Omit<T, T extends Timelog ? 'id' : 'id' | 'created_at'>,
-            signal?: AbortSignal
-        ) {
+        async post(data: Omit<T, 'id'>, signal?: AbortSignal) {
             try {
-                const res = await axios.post<T>(
-                    baseURL,
-                    route === 'timelogs'
-                        ? data
-                        : { ...data, created_at: Date.now() },
-                    { signal }
-                );
+                const res = await axios.post<T>(baseURL, data, { signal });
                 return res?.data || null;
             } catch (err: AxiosError | unknown) {
                 return handleError(err);
             }
         },
-        async patch(
-            id: T['id'],
-            data: Partial<
-                Omit<T, T extends Timelog ? 'id' : 'id' | 'created_at'>
-            >,
-            signal?: AbortSignal
-        ) {
+        async patch(id: T['id'], data: Partial<T>, signal?: AbortSignal) {
             try {
                 const res = await axios.patch<T>(`${baseURL}/${id}`, data, {
                     signal,

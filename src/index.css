@@ -1,7 +1,7 @@
 :root {
     --main-font: Arial, Helvetica, sans-serif;
-    --body-bg: white;
-    --text-color: black;
+    --body-bg: #1a1b1e;
+    --text-color: #c1c2c5;
 }
 
 * {
@@ -14,6 +14,7 @@ body {
     font-family: var(--main-font);
     background-color: var(--body-bg);
     color: var(--text-color);
+    transition: background-color 0.2s ease;
 }
 
 body,

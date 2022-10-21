@@ -1,7 +1,7 @@
 import React from 'react';
 import ReactDOM from 'react-dom/client';
 import { createBrowserRouter, RouterProvider } from 'react-router-dom';
-import { Root, Home } from './routes';
+import { Root, Home, Timelog, Calendar } from './routes';
 import './index.css';
 
 const router = createBrowserRouter([
@@ -13,6 +13,11 @@ const router = createBrowserRouter([
                 index: true,
                 element: <Home />,
             },
+            {
+                path: '/timelog',
+                element: <Timelog />,
+            },
+            { path: '/calendar', element: <Calendar /> },
         ],
     },
 ]);

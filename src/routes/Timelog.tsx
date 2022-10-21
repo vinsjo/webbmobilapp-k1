@@ -1,16 +1,15 @@
 // import { useEffect, useMemo } from 'react';
 import { useCallback, useEffect, useMemo } from 'react';
 import { useProjects, useTasks, useTimelogs } from '@/context/TimeTracker';
-import { Button, Text, Box } from '@mantine/core';
+import Timer from '@/components/Timer';
+import { Text, Box } from '@mantine/core';
 import dayjs from 'dayjs';
-import useTimer from '@/hooks/useTimer';
 import { convertElapsedTime } from '@/utils';
 
 const Home = () => {
     const projects = useProjects();
     const tasks = useTasks();
     const timelogs = useTimelogs();
-    const timer = useTimer();
 
     const taskTotal = useMemo(() => {
         if (!tasks.selected) return null;
@@ -47,43 +46,53 @@ const Home = () => {
         };
     }, [timelogs.selected]);
 
-    const handleTimerStart = useCallback(async () => {
-        if (!projects.selected || !tasks.selected) return;
-        const start = timer.start();
-        if (!start) return;
-        const id = await timelogs.add({
-            projectId: projects.selected.id,
-            taskId: tasks.selected.id,
-            start,
-            end: null,
-        });
-        timelogs.setSelected(id);
-    }, [
-        projects.selected,
-        tasks.selected,
-        timelogs.add,
-        timelogs.setSelected,
-        timelogs.selected,
-    ]);
-    const handleTimerStop = useCallback(() => {
-        const { start, end } = timer.stop();
-        if (!timelogs.selected || !start || !end) return;
-        timelogs.update(timelogs.selected.id, { end });
-    }, [timelogs.selected, timelogs.update]);
+    const handleStart = useCallback(
+        (start: number | null) => {
+            if (!projects.selected || !tasks.selected) return;
+            if (!start) return;
+            timelogs
+                .add({
+                    projectId: projects.selected.id,
+                    taskId: tasks.selected.id,
+                    start,
+                    end: null,
+                })
+                .then((added) => {
+                    if (!added) return;
+                    timelogs.setSelected(added.id);
+                });
+        },
+        [
+            projects.selected,
+            tasks.selected,
+            timelogs.add,
+            timelogs.setSelected,
+            timelogs.selected,
+        ]
+    );
+    const handleStop = useCallback(
+        ({ start, end }: { start: number; end: number }) => {
+            if (!timelogs.selected || !start || !end) return;
+            timelogs.update(timelogs.selected.id, { end });
+        },
+        [timelogs.selected, timelogs.update]
+    );
+
+    useEffect(() => {
+        if (!projects.data.length) return;
+        projects.setSelected(projects.data[0].id);
+    }, [projects.data, projects.setSelected]);
+    useEffect(() => {
+        if (!projects.selected || !tasks.data.length) return;
+        tasks.setSelected(
+            tasks.data.find((task) => task.projectId === projects.selected?.id)
+                ?.id || null
+        );
+    }, [projects.selected, tasks.data, tasks.setSelected]);
 
     return (
         <Box>
-            <Box>
-                <Text>{timer.output}</Text>
-            </Box>
-            <Box>
-                <Button size="md" onClick={handleTimerStart}>
-                    Start
-                </Button>
-                <Button size="md" onClick={handleTimerStop}>
-                    Stop
-                </Button>
-            </Box>
+            <Timer onStart={handleStart} onStop={handleStop} />
             <Box>
                 {projects.selected && (
                     <Box
