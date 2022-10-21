@@ -57,11 +57,21 @@ const createOutput = (dummyData) => {
 
 (async () => {
     try {
+        const skipPrompts = process.argv.slice(2)[0] === '-y';
         const dbPath = path.resolve(__dirname, 'db.json');
-        const dbExists = fs.existsSync(dbPath);
+        if (skipPrompts) {
+            await fs.promises.writeFile(
+                dbPath,
+                JSON.stringify(createOutput(), undefined, 4),
+                'utf-8'
+            );
+            console.log('initialized empty db.json');
+            return;
+        }
         const onCancel = () => {
             throw new Error('✖ Operation cancelled');
         };
+        const dbExists = fs.existsSync(dbPath);
         const { dummyData } = await prompts(
             [
                 {
