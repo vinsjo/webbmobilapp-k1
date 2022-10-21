@@ -1,45 +1,34 @@
-import { useState, useMemo, useEffect, useCallback, useRef } from 'react';
-import dayjs, { type Dayjs } from 'dayjs';
-import { isNum } from 'x-is-type/callbacks';
+import { useState, useMemo, useCallback, useRef } from 'react';
+import { formatElapsedTime } from '@/utils';
 
-export default function useTimer(refreshRate = 200) {
-    const [startTime, setStartTime] = useState<Dayjs | null>(null);
-    const [currentTime, setCurrentTime] = useState<Dayjs | null>(null);
-
-    const elapsed = useMemo(() => {
-        return dayjs.isDayjs(startTime) && dayjs.isDayjs(currentTime)
-            ? currentTime.diff(startTime)
-            : 0;
-    }, [startTime, currentTime]);
-
-    const interval = useRef<number>(0);
-
-    const stop = useCallback(() => {
-        if (!interval.current) return;
-        window.clearInterval(interval.current);
-        interval.current = 0;
-    }, []);
+export default function useTimer(refreshRate = 500) {
+    const startTime = useRef(0);
+    const interval = useRef(0);
+    const [elapsed, setElapsed] = useState(0);
 
     const start = useCallback(() => {
         if (interval.current) return;
-        setStartTime(dayjs());
+        if (!startTime.current) startTime.current = Date.now();
         interval.current = window.setInterval(
-            () => setCurrentTime(dayjs()),
+            () => setElapsed(Date.now() - startTime.current),
             refreshRate
         );
+        return startTime.current;
     }, [refreshRate]);
 
-    const toggle = useCallback(() => {
-        interval.current ? stop() : start();
+    const stop = useCallback(() => {
+        if (!interval.current || !startTime.current) {
+            return { start: 0, end: 0 };
+        }
+        window.clearInterval(interval.current);
+        const output = { start: startTime.current, end: Date.now() };
+        interval.current = 0;
+        startTime.current = 0;
+        setElapsed(0);
+        return output;
     }, []);
 
-    const output = useMemo(() => {
-        if (!elapsed) return '00:00:00';
-        return dayjs(elapsed).format('HH:mm:ss');
-    }, [elapsed]);
+    const output = useMemo(() => formatElapsedTime(elapsed), [elapsed]);
 
-    return useMemo(
-        () => ({ output, start, stop, toggle }),
-        [output, start, stop, toggle]
-    );
+    return useMemo(() => ({ output, start, stop }), [output, start, stop]);
 }

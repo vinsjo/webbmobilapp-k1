@@ -6,22 +6,26 @@ export interface Project {
     id: string;
     name: string;
     color: string | null;
+    created_at: number;
 }
 export interface Task {
     id: string;
     projectId: Project['id'];
     title: string;
+    created_at: number;
 }
 export interface Timelog {
     id: string;
     taskId: Task['id'];
     projectId: Project['id'];
     start: number;
-    end: number;
+    end: number | null;
 }
 
+export type ApiType = Project | Task | Timelog;
+
 export type ApiRoute = 'projects' | 'tasks' | 'timelogs';
-export type ApiReturnType<T extends ApiRoute> = T extends 'projects'
+export type ApiRouteType<T extends ApiRoute> = T extends 'projects'
     ? Project
     : T extends 'tasks'
     ? Task
@@ -29,9 +33,9 @@ export type ApiReturnType<T extends ApiRoute> = T extends 'projects'
 
 export type ApiRouteHandler = ReturnType<typeof createRouteHandler>;
 
-const API_BASE_URL = 'http://localhost:3000';
+const API_BASE_URL = 'http://localhost:4000';
 
-function createRouteHandler<R extends ApiRoute, T extends ApiReturnType<R>>(
+function createRouteHandler<R extends ApiRoute, T extends ApiRouteType<R>>(
     route: R
 ) {
     const baseURL = `${API_BASE_URL}/${route}`;
@@ -48,12 +52,6 @@ function createRouteHandler<R extends ApiRoute, T extends ApiReturnType<R>>(
     };
 
     return {
-        get baseURL() {
-            return baseURL;
-        },
-        get errorHandler() {
-            return handleError;
-        },
         async get<ID = T['id'] | null | undefined>(
             id?: ID,
             signal?: AbortSignal
@@ -70,11 +68,17 @@ function createRouteHandler<R extends ApiRoute, T extends ApiReturnType<R>>(
                 return handleError(err);
             }
         },
-        async post(data: Omit<T, 'id'>, signal?: AbortSignal) {
+        async post(
+            data: Omit<T, T extends Timelog ? 'id' : 'id' | 'created_at'>,
+            signal?: AbortSignal
+        ) {
             try {
+                const entry = { id: uuid.v4(), ...data };
                 const res = await axios.post<T>(
                     baseURL,
-                    { id: uuid.v4(), ...data } as T,
+                    route === 'timelogs'
+                        ? entry
+                        : { ...entry, created_at: Date.now() },
                     { signal }
                 );
                 return res?.data || null;
@@ -84,7 +88,9 @@ function createRouteHandler<R extends ApiRoute, T extends ApiReturnType<R>>(
         },
         async patch(
             id: T['id'],
-            data: Partial<Omit<T, 'id'>>,
+            data: Partial<
+                Omit<T, T extends Timelog ? 'id' : 'id' | 'created_at'>
+            >,
             signal?: AbortSignal
         ) {
             try {
@@ -99,7 +105,7 @@ function createRouteHandler<R extends ApiRoute, T extends ApiReturnType<R>>(
         async delete(id: T['id'], signal?: AbortSignal) {
             try {
                 const res = await axios.delete(`${baseURL}/${id}`, { signal });
-                return res.statusText === 'OK';
+                return res.status === 200;
             } catch (err: AxiosError | unknown) {
                 handleError(err);
                 return false;

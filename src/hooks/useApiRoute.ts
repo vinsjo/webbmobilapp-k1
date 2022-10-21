@@ -2,12 +2,12 @@ import { useState, useEffect, useRef, useMemo, useCallback } from 'react';
 import { isObj } from 'x-is-type/callbacks';
 import { replaceAtIndex } from '@/utils';
 import api from '@/utils/api';
-import type { ApiRoute, ApiReturnType } from '@/utils/api';
-import type { TimeTrackerValue } from '@/context/TimeTracker/Context';
+import type { ApiRoute, ApiRouteType } from '@/utils/api';
+import type { TimeTrackerValue } from '@/context/TimeTracker';
 
 export default function useApiRoute<
     R extends ApiRoute,
-    T extends ApiReturnType<R>
+    T extends ApiRouteType<R>
 >(route: R) {
     const handler = useRef(api[route]);
     const [data, setData] = useState<T[]>([]);

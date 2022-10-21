@@ -1,38 +1,51 @@
-import { useEffect, useMemo } from 'react';
-import { useTimeTracker } from '@/context/TimeTracker';
+// import { useEffect, useMemo } from 'react';
+import { useProjects, useTasks, useTimelogs } from '@/context/TimeTracker';
 import useTimer from '@/hooks/useTimer';
-import { Grid, Button, Text } from '@mantine/core';
-import dayjs from 'dayjs';
+import { Button, Text, Box } from '@mantine/core';
+import { useEffect } from 'react';
+
 const Home = () => {
-    // const { projects, tasks, timelogs } = useTimeTracker();
+    const projects = useProjects();
+    const tasks = useTasks();
+    const timelogs = useTimelogs();
+
     const timer = useTimer();
+    useEffect(() => {
+        if (!projects.data.length) return;
+        projects.setSelected(projects.data[0].id);
+    }, [projects.data, projects.setSelected]);
+    useEffect(() => {
+        if (!projects.selected || !tasks.data.length) return;
+        const selected = tasks.data.find(
+            (task) => task.projectId === projects.selected?.id
+        );
+        tasks.setSelected(selected?.id || null);
+    }, [projects.selected, tasks.data, tasks.setSelected]);
+
     // useEffect(() => {
-    //     console.log('projects: ', projects);
-    //     console.log('tasks: ', tasks);
-    //     console.log('timelogs: ', timelogs);
-    // }, [projects, tasks, timelogs]);
+    //     if (!tasks.selected || !timelogs.data.length) return;
+    //     const selected =
+    // }, [tasks.selected, timelogs.data, timelogs.setSelected])
 
     return (
-        <Grid grow gutter="lg" align="center" justify="center">
-            <Grid.Col span={12}>
+        <Box>
+            <Box>
                 <Text>{timer.output}</Text>
-            </Grid.Col>
-            <Grid.Col span="auto">
+            </Box>
+            <Box>
                 <Button size="md" onClick={timer.start}>
                     Start
                 </Button>
-            </Grid.Col>
-            <Grid.Col span="auto">
-                <Button size="md" onClick={timer.stop}>
+                <Button
+                    size="md"
+                    onClick={() => {
+                        console.log(timer.stop());
+                    }}
+                >
                     Stop
                 </Button>
-            </Grid.Col>
-            <Grid.Col span="auto">
-                <Button size="md" onClick={timer.toggle}>
-                    Toggle
-                </Button>
-            </Grid.Col>
-        </Grid>
+            </Box>
+        </Box>
     );
 };
 

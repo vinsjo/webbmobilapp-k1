@@ -1,46 +1,44 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 import { createContext, useContext } from 'react';
-import type { Project, Task, Timelog } from '@/utils/api';
+import type { ApiType, Project, Task, Timelog } from '@/utils/api';
+import type { TimeTrackerValue } from './types';
 
-export interface TimeTrackerValue<T extends Project | Task | Timelog> {
-    data: T[];
-    error: string | null;
-    selected: T | null;
-    setSelected: (id: T['id'] | null) => void;
-    add: (data: Omit<T, 'id'>) => Promise<boolean>;
-    update: (id: T['id'], data: Partial<Omit<T, 'id'>>) => Promise<boolean>;
-    delete: (id: T['id']) => Promise<boolean>;
-}
-
-export interface TimeTrackerContext {
-    projects: TimeTrackerValue<Project>;
-    tasks: TimeTrackerValue<Task>;
-    timelogs: TimeTrackerValue<Timelog>;
-}
-
-const dummyContextValue = <
-    T extends Project | Task | Timelog
->(): TimeTrackerValue<T> => {
-    return {
-        data: [] as T[],
+const createTimeTrackerContext = <T extends ApiType>(): [
+    React.Context<TimeTrackerValue<T>>,
+    () => TimeTrackerValue<T>
+] => {
+    const context = createContext<TimeTrackerValue<T>>({
+        data: [],
         error: null,
         selected: null,
-        setSelected: () => {
-            return;
+        setSelected: function (id: T['id'] | null): void {
+            throw new Error('Function not implemented.');
         },
-        add: async () => false,
-        update: async () => false,
-        delete: async () => false,
-    };
+        add: function (data: Omit<T, 'id'>): Promise<boolean> {
+            throw new Error('Function not implemented.');
+        },
+        update: function (
+            id: T['id'],
+            data: Partial<Omit<T, 'id'>>
+        ): Promise<boolean> {
+            throw new Error('Function not implemented.');
+        },
+        delete: function (id: T['id']): Promise<boolean> {
+            throw new Error('Function not implemented.');
+        },
+    });
+    return [context, () => useContext(context)];
 };
 
-const initialValue: TimeTrackerContext = {
-    projects: dummyContextValue<Project>(),
-    tasks: dummyContextValue<Task>(),
-    timelogs: dummyContextValue<Timelog>(),
+const [ProjectsContext, useProjects] = createTimeTrackerContext<Project>();
+const [TasksContext, useTasks] = createTimeTrackerContext<Task>();
+const [TimelogsContext, useTimelogs] = createTimeTrackerContext<Timelog>();
+
+export {
+    ProjectsContext,
+    TasksContext,
+    TimelogsContext,
+    useProjects,
+    useTasks,
+    useTimelogs,
 };
-
-const TimeTrackerContext = createContext<TimeTrackerContext>(initialValue);
-
-export const useTimeTracker = () => useContext(TimeTrackerContext);
-
-export default TimeTrackerContext;
