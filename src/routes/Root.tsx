@@ -1,6 +1,7 @@
 import { useEffect, useMemo } from 'react';
 import { Outlet } from 'react-router-dom';
 import { TimeTrackerContext } from '@/context/TimeTracker';
+import Layout from '@/components/Layout';
 import useApiRoute from '@/hooks/useApiRoute';
 
 const Root = () => {
@@ -29,7 +30,9 @@ const Root = () => {
 
     return (
         <TimeTrackerContext.Provider value={value}>
-            <Outlet />
+            <Layout>
+                <Outlet />
+            </Layout>
         </TimeTrackerContext.Provider>
     );
 };

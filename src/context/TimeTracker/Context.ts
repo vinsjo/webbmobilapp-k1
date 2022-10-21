@@ -1,6 +1,5 @@
 import { createContext, useContext } from 'react';
 import type { Project, Task, Timelog } from '@/utils/api';
-import { TimeTracker } from '.';
 
 export interface TimeTrackerValue<T extends Project | Task | Timelog> {
     data: T[];
@@ -25,18 +24,22 @@ const dummyContextValue = <
         data: [] as T[],
         error: null,
         selected: null,
-        setSelected: () => {},
+        setSelected: () => {
+            return;
+        },
         add: async () => false,
         update: async () => false,
         delete: async () => false,
     };
 };
 
-const TimeTrackerContext = createContext<TimeTrackerContext>({
+const initialValue: TimeTrackerContext = {
     projects: dummyContextValue<Project>(),
     tasks: dummyContextValue<Task>(),
     timelogs: dummyContextValue<Timelog>(),
-});
+};
+
+const TimeTrackerContext = createContext<TimeTrackerContext>(initialValue);
 
 export const useTimeTracker = () => useContext(TimeTrackerContext);
 
