@@ -43,12 +43,10 @@ export function addLeadingZeroes(num: number, length = 2) {
     return [...Array(length - str.length).fill(0), str].join('');
 }
 
-export function formatElapsedTime(milliseconds: number) {
-    if (milliseconds <= 0) return '00:00:00';
-    let s = Math.floor(milliseconds / 1000);
-    let m = 0;
-    let h = 0;
-
+export function convertElapsedTime(milliseconds: number) {
+    let [s, m, h] = Array(4).fill(0) as number[];
+    if (milliseconds <= 0) return { h, m, s };
+    s = Math.floor(milliseconds / 1000);
     if (s >= 60) {
         m = Math.floor(s / 60);
         s -= m * 60;
@@ -57,5 +55,5 @@ export function formatElapsedTime(milliseconds: number) {
         h = Math.floor(m / 60);
         m -= h * 60;
     }
-    return [h, m, s].map((v) => addLeadingZeroes(v, 2)).join(':');
+    return { h, m, s };
 }

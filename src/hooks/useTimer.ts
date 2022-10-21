@@ -1,5 +1,5 @@
 import { useState, useMemo, useCallback, useRef } from 'react';
-import { formatElapsedTime } from '@/utils';
+import { addLeadingZeroes, convertElapsedTime } from '@/utils';
 
 export default function useTimer(refreshRate = 500) {
     const startTime = useRef(0);
@@ -7,7 +7,7 @@ export default function useTimer(refreshRate = 500) {
     const [elapsed, setElapsed] = useState(0);
 
     const start = useCallback(() => {
-        if (interval.current) return;
+        if (interval.current) return null;
         if (!startTime.current) startTime.current = Date.now();
         interval.current = window.setInterval(
             () => setElapsed(Date.now() - startTime.current),
@@ -28,7 +28,10 @@ export default function useTimer(refreshRate = 500) {
         return output;
     }, []);
 
-    const output = useMemo(() => formatElapsedTime(elapsed), [elapsed]);
+    const output = useMemo(() => {
+        const { h, m, s } = convertElapsedTime(elapsed);
+        return [h, m, s].map((v) => addLeadingZeroes(v, 2)).join(':');
+    }, [elapsed]);
 
     return useMemo(() => ({ output, start, stop }), [output, start, stop]);
 }

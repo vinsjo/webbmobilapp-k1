@@ -7,26 +7,27 @@ const createTimeTrackerContext = <T extends ApiType>(): [
     React.Context<TimeTrackerValue<T>>,
     () => TimeTrackerValue<T>
 ] => {
-    const context = createContext<TimeTrackerValue<T>>({
+    const initialValue: TimeTrackerValue<T> = {
         data: [],
         error: null,
         selected: null,
         setSelected: function (id: T['id'] | null): void {
             throw new Error('Function not implemented.');
         },
-        add: function (data: Omit<T, 'id'>): Promise<boolean> {
+        add: function (data: Omit<T, 'id'>): Promise<T['id'] | null> {
             throw new Error('Function not implemented.');
         },
         update: function (
             id: T['id'],
             data: Partial<Omit<T, 'id'>>
-        ): Promise<boolean> {
+        ): Promise<T['id'] | null> {
             throw new Error('Function not implemented.');
         },
-        delete: function (id: T['id']): Promise<boolean> {
+        delete: function (id: T['id']): Promise<T['id'] | null> {
             throw new Error('Function not implemented.');
         },
-    });
+    };
+    const context = createContext(initialValue);
     return [context, () => useContext(context)];
 };
 

@@ -1,4 +1,3 @@
-const uuid = require('uuid');
 const fs = require('fs');
 const path = require('path');
 const prompts = require('prompts');
@@ -6,13 +5,12 @@ const prompts = require('prompts');
 /**
  * @typedef {{id:string,name:string,color:string|null,created_at:number}} Project
  * @typedef {{id:string,projectId:string,title:string,created_at:number}} Task
- * @typedef {{id:string,taskId:string,projectId:string,start:number,end:number|null}} Timelog
  */
 
 /**
  *
  * @param  {{project:{name:string,color?:string},tasks:string[]}[]} [dummyData]
- * @returns {{projects:Project[],tasks:Task[], timelogs:Timelog[]}}
+ * @returns {{projects:Project[],tasks:Task[], timelogs:[]}}
  */
 const createOutput = (dummyData) => {
     const output = {
@@ -21,10 +19,6 @@ const createOutput = (dummyData) => {
         timelogs: [],
     };
     if (!Array.isArray(dummyData)) return output;
-
-    const getRandomCreationTime = (maxOffset = 24) => {
-        return Date.now() - Math.floor(Math.random() * maxOffset * 3600 * 1000);
-    };
     const now = Date.now();
     const maxOffset = 24 * 3600 * 1000;
     dummyData
@@ -34,37 +28,26 @@ const createOutput = (dummyData) => {
         )
         .forEach(({ project: { name, color }, tasks }) => {
             if (!name) return;
-            const projectId = uuid.v4();
+            const projectId = output.projects.length + 1;
             const projectCreated = now - Math.floor(Math.random() * maxOffset);
             output.projects.push({
-                id: projectId,
                 name,
                 color: color || null,
                 created_at: projectCreated,
+                id: projectId,
             });
             if (!Array.isArray(tasks)) return;
             tasks.forEach((title) => {
                 if (!title) return;
-                const taskId = uuid.v4();
                 const taskCreated = Math.min(
-                    projectCreated + Math.random() * maxOffset,
+                    projectCreated + Math.floor(Math.random() * maxOffset),
                     now
                 );
                 output.tasks.push({
-                    id: taskId,
                     projectId,
                     title,
                     created_at: taskCreated,
-                });
-                output.timelogs.push({
-                    id: uuid.v4(),
-                    taskId,
-                    projectId,
-                    start: Math.min(
-                        taskCreated + Math.random() * maxOffset,
-                        now
-                    ),
-                    end: null,
+                    id: output.tasks.length + 1,
                 });
             });
         });

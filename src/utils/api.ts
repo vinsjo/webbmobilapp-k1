@@ -1,21 +1,20 @@
 import axios, { AxiosError } from 'axios';
-import * as uuid from 'uuid';
-import { isStr } from 'x-is-type/callbacks';
+import { isNum } from 'x-is-type/callbacks';
 
 export interface Project {
-    id: string;
+    id: number;
     name: string;
     color: string | null;
     created_at: number;
 }
 export interface Task {
-    id: string;
+    id: number;
     projectId: Project['id'];
     title: string;
     created_at: number;
 }
 export interface Timelog {
-    id: string;
+    id: number;
     taskId: Task['id'];
     projectId: Project['id'];
     start: number;
@@ -58,7 +57,7 @@ function createRouteHandler<R extends ApiRoute, T extends ApiRouteType<R>>(
         ) {
             try {
                 const res = await axios.get<ID extends T['id'] ? T : T[]>(
-                    isStr(id) ? `${baseURL}/${id}` : baseURL,
+                    isNum(id) ? `${baseURL}/${id}` : baseURL,
                     {
                         signal,
                     }
@@ -73,12 +72,11 @@ function createRouteHandler<R extends ApiRoute, T extends ApiRouteType<R>>(
             signal?: AbortSignal
         ) {
             try {
-                const entry = { id: uuid.v4(), ...data };
                 const res = await axios.post<T>(
                     baseURL,
                     route === 'timelogs'
-                        ? entry
-                        : { ...entry, created_at: Date.now() },
+                        ? data
+                        : { ...data, created_at: Date.now() },
                     { signal }
                 );
                 return res?.data || null;
