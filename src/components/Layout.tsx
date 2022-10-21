@@ -1,5 +1,6 @@
 import { useMemo } from 'react';
-import { MantineProvider, Box, type MantineTheme } from '@mantine/core';
+import { MantineProvider, Box } from '@mantine/core';
+import type { MantineTheme } from '@mantine/core';
 import { useColorScheme } from '@mantine/hooks';
 
 const Layout = (props: React.PropsWithChildren) => {

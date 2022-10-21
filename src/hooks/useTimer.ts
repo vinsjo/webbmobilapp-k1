@@ -7,7 +7,7 @@ export default function useTimer(refreshRate = 500) {
     const [elapsed, setElapsed] = useState(0);
 
     const start = useCallback(() => {
-        if (interval.current) return null;
+        if (interval.current) return 0;
         if (!startTime.current) startTime.current = Date.now();
         interval.current = window.setInterval(
             () => setElapsed(Date.now() - startTime.current),
