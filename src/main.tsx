@@ -1,7 +1,7 @@
 import React from 'react';
 import ReactDOM from 'react-dom/client';
 import { createBrowserRouter, RouterProvider } from 'react-router-dom';
-import { Root, Home, Timelog, Calendar } from './routes';
+import { Root, Home, Overview, Timelog, Calendar } from './routes';
 import './index.css';
 
 const router = createBrowserRouter([
@@ -12,6 +12,10 @@ const router = createBrowserRouter([
             {
                 index: true,
                 element: <Home />,
+            },
+            {
+                path: '/overview/:activeTab',
+                element: <Overview />,
             },
             {
                 path: '/timelog',

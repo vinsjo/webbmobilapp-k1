@@ -1,11 +1,7 @@
-import { Text, Box } from '@mantine/core';
+import { Navigate } from 'react-router-dom';
 
 const Home = () => {
-    return (
-        <Box>
-            <Text>Home</Text>
-        </Box>
-    );
+    return <Navigate to="/overview/projects" replace />;
 };
 
 export default Home;
