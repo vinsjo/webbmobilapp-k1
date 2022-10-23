@@ -1,4 +1,4 @@
-export type { TimeTracker } from './types';
+export * as TimeTracker from './types';
 export {
     ProjectsContext,
     TasksContext,

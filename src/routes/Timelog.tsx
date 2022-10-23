@@ -6,7 +6,7 @@ import { Text, Box } from '@mantine/core';
 import dayjs from 'dayjs';
 import { convertElapsedTime } from '@/utils';
 
-const Home = () => {
+const Timelog = () => {
     const projects = useProjects();
     const tasks = useTasks();
     const timelogs = useTimelogs();
@@ -47,9 +47,8 @@ const Home = () => {
     }, [timelogs.selected]);
 
     const handleStart = useCallback(
-        (start: number | null) => {
-            if (!projects.selected || !tasks.selected) return;
-            if (!start) return;
+        (start: number) => {
+            if (!projects.selected?.id || !tasks.selected?.id || !start) return;
             timelogs
                 .add({
                     projectId: projects.selected.id,
@@ -62,25 +61,21 @@ const Home = () => {
                     timelogs.setSelected(added.id);
                 });
         },
-        [
-            projects.selected,
-            tasks.selected,
-            timelogs.add,
-            timelogs.setSelected,
-            timelogs.selected,
-        ]
+        [projects.selected?.id, tasks.selected?.id, timelogs]
     );
     const handleStop = useCallback(
         ({ start, end }: { start: number; end: number }) => {
-            if (!timelogs.selected || !start || !end) return;
+            if (!timelogs.selected?.id || !start || !end) return;
             timelogs.update(timelogs.selected.id, { end });
         },
-        [timelogs.selected, timelogs.update]
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+        [timelogs.selected?.id, timelogs.update]
     );
 
     useEffect(() => {
         if (!projects.data.length) return;
         projects.setSelected(projects.data[0].id);
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [projects.data, projects.setSelected]);
     useEffect(() => {
         if (!projects.selected || !tasks.data.length) return;
@@ -88,6 +83,7 @@ const Home = () => {
             tasks.data.find((task) => task.projectId === projects.selected?.id)
                 ?.id || null
         );
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [projects.selected, tasks.data, tasks.setSelected]);
 
     return (
@@ -135,4 +131,4 @@ const Home = () => {
     );
 };
 
-export default Home;
+export default Timelog;

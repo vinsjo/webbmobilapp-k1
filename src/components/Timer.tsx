@@ -1,31 +1,30 @@
 import { useCallback } from 'react';
 import { Text, Box, Button } from '@mantine/core';
-import useTimer from '@/hooks/useTimer';
+import useTimer, { type Timer as UseTimer } from '@/hooks/useTimer';
 
-interface TimerProps {
-    onStart?: (start: number | null) => unknown;
-    onStop?: (stop: { start: number; end: number }) => unknown;
+export interface TimerProps {
+    onStart?: (start: ReturnType<UseTimer['start']>) => unknown;
+    onStop?: (result: ReturnType<UseTimer['stop']>) => unknown;
+    refreshRate?: number;
 }
 
-const Timer = ({ onStart, onStop }: TimerProps) => {
-    const timer = useTimer();
+const Timer = ({ onStart, onStop, refreshRate }: TimerProps) => {
+    const { start, stop, output } = useTimer(refreshRate);
 
     const handleStart = useCallback(() => {
-        const start = timer.start();
-        if (typeof onStart !== 'function') return;
-        onStart(start);
-    }, [onStart, timer.start]);
+        const startTime = start();
+        typeof onStart === 'function' && onStart(startTime);
+    }, [onStart, start]);
 
     const handleStop = useCallback(() => {
-        const stop = timer.stop();
-        if (typeof onStop !== 'function') return;
-        onStop(stop);
-    }, [onStop, timer.stop]);
+        const result = stop();
+        typeof onStop === 'function' && onStop(result);
+    }, [onStop, stop]);
 
     return (
         <Box>
             <Box>
-                <Text>{timer.output}</Text>
+                <Text>{output}</Text>
             </Box>
             <Box>
                 <Button size="md" onClick={handleStart}>

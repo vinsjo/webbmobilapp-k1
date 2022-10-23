@@ -1,17 +1,20 @@
 import { useCallback } from 'react';
-import { Text, Tabs, type TabsValue } from '@mantine/core';
-import { useNavigate, useParams } from 'react-router-dom';
+import { useNavigate, useParams, Navigate } from 'react-router-dom';
+import { Tabs, List } from '@mantine/core';
+import { useProjects, useTasks } from '@/context/TimeTracker';
 
 const Overview = () => {
+    const projects = useProjects();
+    const tasks = useTasks();
     const navigate = useNavigate();
     const { activeTab } = useParams();
     const handleTabChange = useCallback(
-        (tab: TabsValue) => {
-            navigate(`/overview/${tab || 'projects'}`);
-        },
+        (tab: string) => navigate(`/overview/${tab}`),
         [navigate]
     );
-    return (
+    return !activeTab ? (
+        <Navigate to={'/overview/projects'} replace />
+    ) : (
         <Tabs
             defaultValue="projects"
             value={activeTab}
@@ -22,8 +25,29 @@ const Overview = () => {
                 <Tabs.Tab value="tasks">Tasks</Tabs.Tab>
             </Tabs.List>
 
-            <Tabs.Panel value="projects">Projects</Tabs.Panel>
-            <Tabs.Panel value="tasks">Tasks</Tabs.Panel>
+            <Tabs.Panel value="projects">
+                <List>
+                    {projects.data.map(({ id, name, color }) => {
+                        return (
+                            <List.Item
+                                key={`project-${id}`}
+                                color={color || undefined}
+                            >
+                                {name}
+                            </List.Item>
+                        );
+                    })}
+                </List>
+            </Tabs.Panel>
+            <Tabs.Panel value="tasks">
+                <List>
+                    {tasks.data.map(({ id, title }) => {
+                        return (
+                            <List.Item key={`project-${id}`}>{title}</List.Item>
+                        );
+                    })}
+                </List>
+            </Tabs.Panel>
         </Tabs>
     );
 };

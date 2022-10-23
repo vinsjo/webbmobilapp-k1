@@ -1,40 +1,13 @@
 import axios, { AxiosError } from 'axios';
 import { isNum } from 'x-is-type/callbacks';
-
-export interface Project {
-    id: number;
-    name: string;
-    color: string | null;
-}
-export interface Task {
-    id: number;
-    projectId: Project['id'];
-    title: string;
-}
-export interface Timelog {
-    id: number;
-    taskId: Task['id'];
-    projectId: Project['id'];
-    start: number;
-    end: number | null;
-}
-
-export type ApiType = Project | Task | Timelog;
-
-export type ApiRoute = 'projects' | 'tasks' | 'timelogs';
-export type ApiRouteType<T extends ApiRoute> = T extends 'projects'
-    ? Project
-    : T extends 'tasks'
-    ? Task
-    : Timelog;
-
-export type ApiRouteHandler = ReturnType<typeof createRouteHandler>;
+import * as Api from './types';
+export type { Api };
 
 const API_BASE_URL = 'http://localhost:4000';
 
-function createRouteHandler<R extends ApiRoute, T extends ApiRouteType<R>>(
+function createRouteHandler<R extends Api.Route, T extends Api.RouteType<R>>(
     route: R
-) {
+): Api.RouteHandler<T> {
     const baseURL = `${API_BASE_URL}/${route}`;
 
     const handleError = (err: AxiosError | unknown) => {
@@ -99,7 +72,7 @@ function createRouteHandler<R extends ApiRoute, T extends ApiRouteType<R>>(
         ) {
             try {
                 const url = `${baseURL}?${key as string}=${value}`;
-                const res = await axios.get(url, { signal });
+                const res = await axios.get<T[]>(url, { signal });
                 return res?.data || null;
             } catch (err: AxiosError | unknown) {
                 return handleError(err);
@@ -108,7 +81,7 @@ function createRouteHandler<R extends ApiRoute, T extends ApiRouteType<R>>(
     };
 }
 
-const api: Record<ApiRoute, ApiRouteHandler> = {
+const api = {
     projects: createRouteHandler('projects'),
     tasks: createRouteHandler('tasks'),
     timelogs: createRouteHandler('timelogs'),

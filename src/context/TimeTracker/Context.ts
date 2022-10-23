@@ -1,12 +1,9 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
-import { createContext, useContext } from 'react';
-import type { ApiType, Project, Task, Timelog } from '@/utils/api';
-import type { TimeTracker } from './types';
+import { createContext, useContext, useMemo } from 'react';
+import type { DataType, Project, Task, Timelog } from '@/utils/api/types';
+import * as TimeTracker from './types';
 
-const createTimeTrackerContext = <T extends ApiType>(): [
-    React.Context<TimeTracker.Value<T>>,
-    () => TimeTracker.Value<T>
-] => {
+const createTimeTrackerContext = <T extends DataType>() => {
     const initialValue: TimeTracker.Value<T> = {
         data: [],
         error: null,
@@ -24,8 +21,21 @@ const createTimeTrackerContext = <T extends ApiType>(): [
             throw new Error('Function not implemented.');
         },
     };
-    const context = createContext(initialValue);
-    return [context, () => useContext(context)];
+    const TimeTrackerContext = createContext(initialValue);
+    const useTimeTrackerContext = <R = TimeTracker.Value<T>>(
+        selector?: (state: TimeTracker.Value<T>) => R
+    ) => {
+        const state = useContext(TimeTrackerContext);
+        return useMemo(() => {
+            return (
+                typeof selector !== 'function' ? state : selector(state)
+            ) as R;
+        }, [state, selector]);
+    };
+    return [TimeTrackerContext, useTimeTrackerContext] as [
+        typeof TimeTrackerContext,
+        typeof useTimeTrackerContext
+    ];
 };
 
 const [ProjectsContext, useProjects] = createTimeTrackerContext<Project>();

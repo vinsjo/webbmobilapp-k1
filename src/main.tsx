@@ -1,13 +1,13 @@
 import React from 'react';
 import ReactDOM from 'react-dom/client';
 import { createBrowserRouter, RouterProvider } from 'react-router-dom';
-import { Root, Home, Overview, Timelog, Calendar } from './routes';
-import './index.css';
+import { Root, Home, Overview, Timelog, Calendar, RouteError } from './routes';
 
 const router = createBrowserRouter([
     {
         path: '/',
         element: <Root />,
+        errorElement: <RouteError />,
         children: [
             {
                 index: true,
@@ -18,7 +18,11 @@ const router = createBrowserRouter([
                 element: <Overview />,
             },
             {
-                path: '/timelog',
+                path: '/overview',
+                element: <Overview />,
+            },
+            {
+                path: '/timer',
                 element: <Timelog />,
             },
             { path: '/calendar', element: <Calendar /> },

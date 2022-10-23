@@ -1,13 +1,14 @@
 import React, { useEffect, useMemo } from 'react';
 import { ProjectsContext, TasksContext, TimelogsContext } from './Context';
 import useApiRoute from '@/hooks/useApiRoute';
-import { Timelog } from '@/utils/api';
-import type { TimeTracker } from './types';
+import { Timelog } from '@/utils/api/types';
+import * as TimeTracker from './types';
+import api from '@/utils/api';
 
 export default function TimeTrackerProvider(props: React.PropsWithChildren) {
-    const projects = useApiRoute('projects');
-    const tasks = useApiRoute('tasks');
-    const timelogs = useApiRoute('timelogs');
+    const projects = useApiRoute(api.projects);
+    const tasks = useApiRoute(api.tasks);
+    const timelogs = useApiRoute(api.timelogs);
 
     // useEffect(() => {
     //     if (projects.selected) return;
@@ -22,7 +23,7 @@ export default function TimeTrackerProvider(props: React.PropsWithChildren) {
     useEffect(() => {
         if (!projects.data.length) return;
         projects.setSelected(projects.data[0].id);
-    }, [projects.data]);
+    }, [projects]);
 
     useEffect(() => {
         tasks.setSelected(
@@ -32,7 +33,7 @@ export default function TimeTrackerProvider(props: React.PropsWithChildren) {
                       (task) => task.projectId === projects.selected?.id
                   )?.id || null
         );
-    }, [projects.selected, tasks.data]);
+    }, [projects, tasks]);
 
     // "Special treatment" for timelogs in order to "end" selected timelog
     // before selecting another one
