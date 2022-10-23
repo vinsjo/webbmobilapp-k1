@@ -35,6 +35,15 @@ export default function TimeTrackerProvider(props: React.PropsWithChildren) {
         );
     }, [projects, tasks]);
 
+    useEffect(() => {
+        const controller = new AbortController();
+        [projects, tasks, timelogs].forEach(({ load }) =>
+            load(controller.signal)
+        );
+        return () => controller.abort();
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, []);
+
     // "Special treatment" for timelogs in order to "end" selected timelog
     // before selecting another one
     const timelogsValue = useMemo(() => {
@@ -48,7 +57,7 @@ export default function TimeTrackerProvider(props: React.PropsWithChildren) {
                 }
                 setSelected(id);
             },
-        } as TimeTracker.Value<Timelog>;
+        } as TimeTracker.Context<Timelog>;
     }, [timelogs]);
 
     return (

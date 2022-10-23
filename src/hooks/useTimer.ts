@@ -20,8 +20,7 @@ export interface Timer {
     stop: () => TimerResult;
     /** Elapsed time converted to a string in format HH:mm:ss */
     output: string;
-    /** Elapsed time in milliseconds, or 0 if timer is not active */
-    elapsed: number;
+    active: boolean;
 }
 
 export default function useTimer(refreshRate = 500) {
@@ -29,15 +28,12 @@ export default function useTimer(refreshRate = 500) {
     const interval = useRef(0);
     const [elapsed, setElapsed] = useState(0);
 
-    const reset = useCallback(() => {
-        interval.current = 0;
-        startTime.current = 0;
-        setElapsed(0);
-    }, []);
+    const active = useMemo(() => !!elapsed, [elapsed]);
 
     const start = useCallback<Timer['start']>(() => {
         if (interval.current) return 0;
-        if (!startTime.current) startTime.current = Date.now();
+        startTime.current = Date.now();
+        setElapsed(1);
         interval.current = window.setInterval(
             () => setElapsed(Date.now() - startTime.current),
             refreshRate
@@ -49,12 +45,14 @@ export default function useTimer(refreshRate = 500) {
         if (!interval.current || !startTime.current) {
             return { start: 0, end: 0, elapsed: 0 };
         }
-        window.clearInterval(interval.current);
         const start = startTime.current;
         const end = Date.now();
-        reset();
+        window.clearInterval(interval.current);
+        interval.current = 0;
+        startTime.current = 0;
+        setElapsed(0);
         return { start, end };
-    }, [reset]);
+    }, []);
 
     const output = useMemo(() => {
         const { h, m, s } = convertElapsedTime(elapsed);
@@ -62,7 +60,7 @@ export default function useTimer(refreshRate = 500) {
     }, [elapsed]);
 
     return useMemo<Timer>(
-        () => ({ output, start, stop, elapsed }),
-        [output, start, stop, elapsed]
+        () => ({ output, start, stop, active }),
+        [output, start, stop, active]
     );
 }

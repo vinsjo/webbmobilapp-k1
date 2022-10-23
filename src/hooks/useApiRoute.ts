@@ -9,11 +9,13 @@ export default function useApiRoute<T extends Api.DataType>(
 ) {
     const [data, setData] = useState<T[]>([]);
     const [error, setError] = useState<string | null>(null);
+
     const [selectedId, setSelectedId] = useState<null | T['id']>(null);
     const selected = useMemo(() => {
         if (!selectedId) return null;
         return data.find(({ id }) => id === selectedId) || null;
     }, [data, selectedId]);
+
     const validHandler = useMemo(() => {
         if (!isObj(handler)) return false;
         return (
@@ -25,7 +27,7 @@ export default function useApiRoute<T extends Api.DataType>(
         });
     }, [handler]);
 
-    const load = useCallback(
+    const load = useCallback<TimeTracker.Load<T>>(
         async (signal?: AbortSignal) => {
             if (!validHandler) return null;
             try {
@@ -95,7 +97,7 @@ export default function useApiRoute<T extends Api.DataType>(
         [validHandler, handler]
     );
 
-    return useMemo<TimeTracker.Value<T>>(
+    return useMemo<TimeTracker.Context<T>>(
         () => ({
             data,
             error,

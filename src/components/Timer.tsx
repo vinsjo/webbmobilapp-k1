@@ -1,6 +1,7 @@
 import { useCallback } from 'react';
 import { Text, Box, Button } from '@mantine/core';
 import useTimer, { type Timer as UseTimer } from '@/hooks/useTimer';
+import useWindowEvent from '@/hooks/useWindowEvent';
 
 export interface TimerProps {
     onStart?: (start: ReturnType<UseTimer['start']>) => unknown;
@@ -9,7 +10,7 @@ export interface TimerProps {
 }
 
 const Timer = ({ onStart, onStop, refreshRate }: TimerProps) => {
-    const { start, stop, output } = useTimer(refreshRate);
+    const { start, stop, output, active } = useTimer(refreshRate);
 
     const handleStart = useCallback(() => {
         const startTime = start();
@@ -21,16 +22,18 @@ const Timer = ({ onStart, onStop, refreshRate }: TimerProps) => {
         typeof onStop === 'function' && onStop(result);
     }, [onStop, stop]);
 
+    useWindowEvent('beforeunload', handleStop);
+
     return (
         <Box>
             <Box>
                 <Text>{output}</Text>
             </Box>
             <Box>
-                <Button size="md" onClick={handleStart}>
+                <Button size="md" onClick={handleStart} disabled={active}>
                     Start
                 </Button>
-                <Button size="md" onClick={handleStop}>
+                <Button size="md" onClick={handleStop} disabled={!active}>
                     Stop
                 </Button>
             </Box>

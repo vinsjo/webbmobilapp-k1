@@ -4,11 +4,14 @@ import type { DataType, Project, Task, Timelog } from '@/utils/api/types';
 import * as TimeTracker from './types';
 
 const createTimeTrackerContext = <T extends DataType>() => {
-    const initialValue: TimeTracker.Value<T> = {
+    const initialValue: TimeTracker.Context<T> = {
         data: [],
         error: null,
         selected: null,
         setSelected: function (id: T['id'] | null): void {
+            throw new Error('Function not implemented.');
+        },
+        load: function (signal?: AbortSignal | undefined): Promise<T[] | null> {
             throw new Error('Function not implemented.');
         },
         add: function (data: Omit<T, 'id'>): Promise<T | null> {
@@ -22,16 +25,7 @@ const createTimeTrackerContext = <T extends DataType>() => {
         },
     };
     const TimeTrackerContext = createContext(initialValue);
-    const useTimeTrackerContext = <R = TimeTracker.Value<T>>(
-        selector?: (state: TimeTracker.Value<T>) => R
-    ) => {
-        const state = useContext(TimeTrackerContext);
-        return useMemo(() => {
-            return (
-                typeof selector !== 'function' ? state : selector(state)
-            ) as R;
-        }, [state, selector]);
-    };
+    const useTimeTrackerContext = () => useContext(TimeTrackerContext);
     return [TimeTrackerContext, useTimeTrackerContext] as [
         typeof TimeTrackerContext,
         typeof useTimeTrackerContext
