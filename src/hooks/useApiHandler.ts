@@ -4,7 +4,7 @@ import { replaceAtIndex } from '@/utils';
 import type { Api } from '@/utils/api';
 import type { TimeTracker } from '@/context/TimeTracker';
 
-export default function useApiRoute<T extends Api.DataType>(
+export default function useApiHandler<T extends Api.DataType>(
     handler: Api.RouteHandler<T>
 ) {
     const [data, setData] = useState<T[]>([]);

@@ -1,7 +1,6 @@
 import { useCallback } from 'react';
 import { Text, Box, Button } from '@mantine/core';
 import useTimer, { type Timer as UseTimer } from '@/hooks/useTimer';
-import useWindowEvent from '@/hooks/useWindowEvent';
 
 export interface TimerProps {
     onStart?: (start: ReturnType<UseTimer['start']>) => unknown;
@@ -21,8 +20,6 @@ const Timer = ({ onStart, onStop, refreshRate }: TimerProps) => {
         const result = stop();
         typeof onStop === 'function' && onStop(result);
     }, [onStop, stop]);
-
-    useWindowEvent('beforeunload', handleStop);
 
     return (
         <Box>
