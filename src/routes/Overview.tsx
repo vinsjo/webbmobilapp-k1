@@ -3,7 +3,7 @@ import { useNavigate, useParams, Navigate } from 'react-router-dom';
 import { Tabs, List } from '@mantine/core';
 import { useProjects, useTasks } from '@/context/TimeTracker';
 
-const Overview = () => {
+export default function Overview() {
     const projects = useProjects();
     const tasks = useTasks();
     const navigate = useNavigate();
@@ -50,6 +50,4 @@ const Overview = () => {
             </Tabs.Panel>
         </Tabs>
     );
-};
-
-export default Overview;
+}

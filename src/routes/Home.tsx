@@ -1,7 +1,5 @@
 import { Text } from '@mantine/core';
 
-const Home = () => {
+export default function Home() {
     return <Text>Home</Text>;
-};
-
-export default Home;
+}

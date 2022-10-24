@@ -1,6 +1,7 @@
-import { useCallback } from 'react';
-import { Text, Box, Button } from '@mantine/core';
+import { useCallback, useMemo } from 'react';
+import { Text, Box, Stack, Button, Group } from '@mantine/core';
 import useTimer, { type Timer as UseTimer } from '@/hooks/useTimer';
+import { addLeadingZeroes, convertElapsedTime } from '@/utils';
 
 export interface TimerProps {
     onStart?: (start: ReturnType<UseTimer['start']>) => unknown;
@@ -8,8 +9,8 @@ export interface TimerProps {
     refreshRate?: number;
 }
 
-const Timer = ({ onStart, onStop, refreshRate }: TimerProps) => {
-    const { start, stop, output, active } = useTimer(refreshRate);
+export default function Timer({ onStart, onStop, refreshRate }: TimerProps) {
+    const { start, stop, elapsed } = useTimer(refreshRate);
 
     const handleStart = useCallback(() => {
         const startTime = start();
@@ -21,21 +22,47 @@ const Timer = ({ onStart, onStop, refreshRate }: TimerProps) => {
         typeof onStop === 'function' && onStop(result);
     }, [onStop, stop]);
 
+    const output = useMemo(() => {
+        const { h, m, s, ms } = convertElapsedTime(elapsed);
+        return [h, m, s, ms].map((v) => addLeadingZeroes(v)).join(':');
+    }, [elapsed]);
+
     return (
-        <Box>
-            <Box>
-                <Text>{output}</Text>
+        <Stack
+            p="md"
+            sx={(theme) => ({
+                backgroundColor: theme.colors.dark[5],
+                maxWidth: 500,
+                borderRadius: theme.radius.sm,
+            })}
+        >
+            <Box
+                px="lg"
+                py="sm"
+                sx={(theme) => ({
+                    backgroundColor: theme.colors.dark[7],
+                    borderRadius: theme.radius.sm,
+                })}
+            >
+                <Text
+                    align="center"
+                    sx={(theme) => ({
+                        fontFamily: theme.fontFamilyMonospace,
+                        fontWeight: 500,
+                        color: theme.colors.gray[0],
+                    })}
+                >
+                    {output}
+                </Text>
             </Box>
-            <Box>
-                <Button size="md" onClick={handleStart} disabled={active}>
+            <Group sx={{ justifyContent: 'space-between' }}>
+                <Button size="md" onClick={handleStart} disabled={!!elapsed}>
                     Start
                 </Button>
-                <Button size="md" onClick={handleStop} disabled={!active}>
+                <Button size="md" onClick={handleStop} disabled={!elapsed}>
                     Stop
                 </Button>
-            </Box>
-        </Box>
+            </Group>
+        </Stack>
     );
-};
-
-export default Timer;
+}

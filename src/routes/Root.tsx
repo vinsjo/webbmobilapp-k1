@@ -1,15 +1,16 @@
 import { Outlet } from 'react-router-dom';
-import { TimeTrackerProvider } from '@/context/TimeTracker';
+import TimeTrackerProvider from '@/components/providers/TimeTrackerProvider';
 import Layout from '@/components/Layout';
+import ThemeProvider from '@/components/providers/ThemeProvider';
 
-const Root = () => {
+export default function Root() {
     return (
         <TimeTrackerProvider>
-            <Layout>
-                <Outlet />
-            </Layout>
+            <ThemeProvider>
+                <Layout>
+                    <Outlet />
+                </Layout>
+            </ThemeProvider>
         </TimeTrackerProvider>
     );
-};
-
-export default Root;
+}

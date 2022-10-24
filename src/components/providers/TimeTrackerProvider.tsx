@@ -1,20 +1,26 @@
-import React, { useCallback, useEffect, useMemo, useRef } from 'react';
-import { ProjectsContext, TasksContext, TimelogsContext } from './Context';
+import React, { useCallback, useEffect, useMemo } from 'react';
+import {
+    ProjectsContext,
+    TasksContext,
+    TimelogsContext,
+    type TimeTracker,
+} from '@/context/TimeTracker';
 import api, { type Api } from '@/utils/api';
-import * as TimeTracker from './types';
 import useApiHandler from '@/hooks/useApiHandler';
-import { useLocation } from 'react-router-dom';
 import useWindowEvent from '@/hooks/useWindowEvent';
+import usePathChange from '@/hooks/usePathChange';
 
 export default function TimeTrackerProvider(props: React.PropsWithChildren) {
     const projects = useApiHandler(api.projects);
     const tasks = useApiHandler(api.tasks);
     const timelogs = useApiHandler(api.timelogs);
 
-    //#region Timelog handling (to prevent timelogs without end-value in db)
+    const activeTimelogs = useMemo(
+        () => timelogs.data.filter(({ end }) => !end),
+        [timelogs.data]
+    );
 
-    const { pathname } = useLocation();
-    const prevPath = useRef(pathname);
+    //#region Timelog handling (to prevent timelogs without end-value in db)
 
     const endSelectedTimelog = useCallback(
         () => {
@@ -25,15 +31,18 @@ export default function TimeTrackerProvider(props: React.PropsWithChildren) {
         [timelogs.selected, timelogs.update]
     );
 
-    // End selected timelog before page unloads
-    useWindowEvent('beforeunload', endSelectedTimelog);
+    /** End all active timelogs (timelogs without an end value) */
+    const endActiveTimelogs = useCallback(() => {
+        activeTimelogs.forEach(({ id }) => {
+            timelogs.update(id, { end: Date.now() });
+        });
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [timelogs.update, activeTimelogs]);
 
-    // End selected timelog when pathname changes
-    useEffect(() => {
-        if (pathname === prevPath.current) return;
-        endSelectedTimelog();
-        prevPath.current = pathname;
-    }, [pathname, endSelectedTimelog]);
+    // End all active timelogs before window unloads
+    useWindowEvent('beforeunload', endActiveTimelogs);
+    // End all active timelogs when react router pathname changes
+    usePathChange(endActiveTimelogs);
 
     // End selected timelog before updating selected timelog
     const setSelectedTimelog = useCallback<TimeTracker.Select<Api.Timelog>>(
@@ -54,36 +63,27 @@ export default function TimeTrackerProvider(props: React.PropsWithChildren) {
 
     //#endregion
 
-    // useEffect(() => {
-    //     if (projects.selected) return;
-    //     tasks.setSelected(null);
-    // }, [projects.selected]);
-
-    // useEffect(() => {
-    //     if (tasks.selected) return;
-    //     timelogs.setSelected(null);
-    // }, [tasks.selected]);
-
     useEffect(() => {
         if (!projects.data.length) return;
         projects.setSelected(projects.data[0].id);
-    }, [projects]);
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [projects.data, projects.setSelected]);
 
     useEffect(() => {
+        if (!projects.selected?.id || tasks.selected) return;
         tasks.setSelected(
-            !projects.selected
-                ? null
-                : tasks.data.find(
-                      (task) => task.projectId === projects.selected?.id
-                  )?.id || null
+            tasks.data.find(
+                ({ projectId }) => projectId === projects.selected?.id
+            )?.id || null
         );
-    }, [projects, tasks]);
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [tasks.setSelected, tasks.selected, tasks.data, projects.selected?.id]);
 
     useEffect(() => {
         const controller = new AbortController();
-        [projects, tasks, timelogs].forEach(({ load }) =>
-            load(controller.signal)
-        );
+        projects.load(controller.signal);
+        tasks.load(controller.signal);
+        timelogs.load(controller.signal);
         return () => controller.abort();
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);

@@ -18,9 +18,10 @@ export default function useApiHandler<T extends Api.DataType>(
 
     const validHandler = useMemo(() => {
         if (!isObj(handler)) return false;
+        console.log(Object.keys(handler));
         return (
             ['get', 'post', 'patch', 'delete', 'where'] as Array<
-                keyof Api.RouteHandler<Api.DataType>
+                keyof Api.RouteHandler<T>
             >
         ).every((key) => {
             return key in handler && typeof handler[key] === 'function';
@@ -97,6 +98,11 @@ export default function useApiHandler<T extends Api.DataType>(
         [validHandler, handler]
     );
 
+    const filter = useCallback<TimeTracker.Filter<T>>(
+        (callback) => data.filter(callback),
+        [data]
+    );
+
     return useMemo<TimeTracker.Context<T>>(
         () => ({
             data,
@@ -105,9 +111,10 @@ export default function useApiHandler<T extends Api.DataType>(
             add,
             update,
             delete: remove,
+            filter,
             selected,
             setSelected: setSelectedId,
         }),
-        [data, error, add, update, remove, load, selected]
+        [data, error, add, update, remove, load, selected, filter]
     );
 }

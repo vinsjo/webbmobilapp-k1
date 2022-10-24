@@ -21,6 +21,9 @@ export type Delete<T extends DataType> = (
 ) => Promise<T['id'] | null>;
 
 export type Select<T extends DataType> = (id: T['id'] | null) => void;
+export type Filter<T extends DataType> = (
+    callback: (data: T) => boolean
+) => T[];
 export interface Context<T extends DataType> {
     data: T[];
     error: string | null;
@@ -30,4 +33,5 @@ export interface Context<T extends DataType> {
     add: Add<T>;
     update: Update<T>;
     delete: Delete<T>;
+    filter: Filter<T>;
 }

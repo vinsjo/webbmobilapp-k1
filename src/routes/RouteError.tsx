@@ -1,7 +1,8 @@
 import { useEffect, useState } from 'react';
 import { useRouteError, Navigate } from 'react-router-dom';
 import { Box, Text } from '@mantine/core';
-const RouteError = () => {
+
+export default function RouteError() {
     const error = useRouteError();
     const [countdown, setCountdown] = useState(15);
 
@@ -26,6 +27,4 @@ const RouteError = () => {
             </Text>
         </Box>
     );
-};
-
-export default RouteError;
+}

@@ -24,6 +24,7 @@
         "dayjs": "^1.11.5",
         "react": "latest",
         "react-dom": "latest",
+        "react-icons": "^4.6.0",
         "react-router-dom": "^6.4.2",
         "uuid": "^9.0.0",
         "x-is-type": "^1.1.6"

@@ -1,5 +1,4 @@
 import { useState, useMemo, useCallback, useRef } from 'react';
-import { addLeadingZeroes, convertElapsedTime } from '@/utils';
 
 export interface TimerResult {
     /**
@@ -18,17 +17,15 @@ export interface Timer {
      */
     start: () => number;
     stop: () => TimerResult;
-    /** Elapsed time converted to a string in format HH:mm:ss */
-    output: string;
+    /** Elapsed time in milliseconds */
+    elapsed: number;
     active: boolean;
 }
 
-export default function useTimer(refreshRate = 500) {
+export default function useTimer(refreshRate = 10) {
     const startTime = useRef(0);
     const interval = useRef(0);
     const [elapsed, setElapsed] = useState(0);
-
-    const active = useMemo(() => !!elapsed, [elapsed]);
 
     const start = useCallback<Timer['start']>(() => {
         if (interval.current) return 0;
@@ -36,7 +33,7 @@ export default function useTimer(refreshRate = 500) {
         setElapsed(1);
         interval.current = window.setInterval(
             () => setElapsed(Date.now() - startTime.current),
-            refreshRate
+            refreshRate || 10
         );
         return startTime.current;
     }, [refreshRate]);
@@ -54,13 +51,8 @@ export default function useTimer(refreshRate = 500) {
         return { start, end };
     }, []);
 
-    const output = useMemo(() => {
-        const { h, m, s } = convertElapsedTime(elapsed);
-        return [h, m, s].map((v) => addLeadingZeroes(v, 2)).join(':');
-    }, [elapsed]);
-
     return useMemo<Timer>(
-        () => ({ output, start, stop, active }),
-        [output, start, stop, active]
+        () => ({ start, stop, elapsed, active: !!elapsed }),
+        [start, stop, elapsed]
     );
 }
