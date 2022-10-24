@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import useTimer from '@/hooks/useTimer';
 import { Task, Timelog } from '@/utils/api/types';
-import { ActionIcon, Group, Text } from '@mantine/core';
+import { ActionIcon, Group, Text, useMantineTheme } from '@mantine/core';
 import { FaPlay, FaStop } from 'react-icons/fa';
 import { addLeadingZeroes, convertElapsedTime } from '@/utils';
 
@@ -20,6 +20,7 @@ export default function TaskTime({
     onStop,
     selected,
 }: Props) {
+    const theme = useMantineTheme();
     const { start, stop, elapsed, active } = useTimer();
     const [output, setOutput] = useState('');
 
@@ -31,6 +32,14 @@ export default function TaskTime({
                     return !start || !end ? sum : sum + (end - start);
                 }, 0),
         [timelogs, task.id]
+    );
+
+    const colors = useMemo(
+        () => ({
+            background: theme.colors.gray[selected ? 7 : 9],
+            text: theme.colors.gray[selected ? 0 : 5],
+        }),
+        [selected, theme]
     );
 
     const handleStart = useCallback(() => {
@@ -52,22 +61,36 @@ export default function TaskTime({
     }, [selected, stop]);
 
     useEffect(() => {
-        const { h, m, s } = convertElapsedTime(timelogsElapsed + elapsed);
+        const { h, m, s } = convertElapsedTime(
+            Math.round(timelogsElapsed + elapsed)
+        );
         setOutput([h, m, s].map((v) => addLeadingZeroes(v)).join(':'));
     }, [timelogsElapsed, elapsed]);
 
     return (
         <Group
-            px="md"
-            py="sm"
-            sx={(theme) => ({
-                backgroundColor: theme.colors.gray[selected ? 7 : 9],
+            p="sm"
+            spacing="sm"
+            sx={{
+                backgroundColor: colors.background,
                 borderRadius: theme.radius.sm,
                 justifyContent: 'space-between',
-            })}
+            }}
         >
-            <Text>{task.title}</Text>
-            <Text sx={(theme) => ({ fontFamily: theme.fontFamilyMonospace })}>
+            <Text
+                sx={{
+                    color: colors.text,
+                }}
+            >
+                {task.title}
+            </Text>
+            <Text
+                sx={{
+                    fontFamily: theme.fontFamilyMonospace,
+                    marginLeft: 'auto',
+                    color: colors.text,
+                }}
+            >
                 {output}
             </Text>
             <ActionIcon onClick={active ? handleStop : handleStart}>
