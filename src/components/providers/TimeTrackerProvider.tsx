@@ -20,7 +20,7 @@ export default function TimeTrackerProvider(props: React.PropsWithChildren) {
     const endSelectedTimelog = useCallback(
         async () => {
             if (!timelogs.selected || timelogs.selected.end) return;
-            timelogs.update(timelogs.selected.id, { end: Date.now() });
+            await timelogs.update(timelogs.selected.id, { end: Date.now() });
         },
         // eslint-disable-next-line react-hooks/exhaustive-deps
         [timelogs.selected, timelogs.update]
