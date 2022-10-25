@@ -8,10 +8,12 @@ export default function Overview() {
     const tasks = useTasks();
     const navigate = useNavigate();
     const { activeTab } = useParams();
+
     const handleTabChange = useCallback(
         (tab: string) => navigate(`/overview/${tab}`),
         [navigate]
     );
+
     return !activeTab ? (
         <Navigate to={'/overview/projects'} replace />
     ) : (
@@ -26,7 +28,7 @@ export default function Overview() {
             </Tabs.List>
 
             <Tabs.Panel value="projects">
-                <List>
+                <List listStyleType="none">
                     {projects.data.map(({ id, name, color }) => {
                         return (
                             <List.Item

@@ -23,7 +23,7 @@ export default function TimeTrackerProvider(props: React.PropsWithChildren) {
     //#region Timelog handling (to prevent timelogs without end-value in db)
 
     const endSelectedTimelog = useCallback(
-        () => {
+        async () => {
             if (!timelogs.selected || timelogs.selected.end) return;
             timelogs.update(timelogs.selected.id, { end: Date.now() });
         },
@@ -47,8 +47,7 @@ export default function TimeTrackerProvider(props: React.PropsWithChildren) {
     // End selected timelog before updating selected timelog
     const setSelectedTimelog = useCallback<TimeTracker.Select<Api.Timelog>>(
         (id) => {
-            endSelectedTimelog();
-            timelogs.setSelected(id);
+            endSelectedTimelog().then(() => timelogs.setSelected(id));
         },
         // eslint-disable-next-line react-hooks/exhaustive-deps
         [timelogs.setSelected, endSelectedTimelog]
@@ -70,14 +69,13 @@ export default function TimeTrackerProvider(props: React.PropsWithChildren) {
     }, [projects.data, projects.setSelected]);
 
     useEffect(() => {
-        if (!projects.selected?.id || tasks.selected) return;
+        if (!projects.selected || tasks.selected) return;
+        const id = projects.selected.id;
         tasks.setSelected(
-            tasks.data.find(
-                ({ projectId }) => projectId === projects.selected?.id
-            )?.id || null
+            tasks.data.find(({ projectId }) => projectId === id)?.id || null
         );
         // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [tasks.setSelected, tasks.selected, tasks.data, projects.selected?.id]);
+    }, [tasks.setSelected, tasks.selected, tasks.data, projects.selected]);
 
     useEffect(() => {
         const controller = new AbortController();

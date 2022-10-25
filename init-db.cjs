@@ -19,8 +19,6 @@ const createOutput = (dummyData) => {
         timelogs: [],
     };
     if (!Array.isArray(dummyData)) return output;
-    const now = Date.now();
-    const maxOffset = 24 * 3600 * 1000;
     dummyData
         .filter(
             (entry) =>
@@ -29,24 +27,17 @@ const createOutput = (dummyData) => {
         .forEach(({ project: { name, color }, tasks }) => {
             if (!name) return;
             const projectId = output.projects.length + 1;
-            const projectCreated = now - Math.floor(Math.random() * maxOffset);
             output.projects.push({
                 name,
                 color: color || null,
-                created_at: projectCreated,
                 id: projectId,
             });
             if (!Array.isArray(tasks)) return;
             tasks.forEach((title) => {
                 if (!title) return;
-                const taskCreated = Math.min(
-                    projectCreated + Math.floor(Math.random() * maxOffset),
-                    now
-                );
                 output.tasks.push({
                     projectId,
                     title,
-                    created_at: taskCreated,
                     id: output.tasks.length + 1,
                 });
             });
@@ -112,6 +103,7 @@ const createOutput = (dummyData) => {
                               'Fixa db.json',
                               'Göra alla api-funktioner',
                               'Fixa frontend',
+                              'Laborum dolor Lorem excepteur est non consequat nostrud Lorem ex reprehenderit. Nostrud ad reprehenderit velit cupidatat. In id ullamco labore eu occaecat non.',
                           ],
                       },
                   ]

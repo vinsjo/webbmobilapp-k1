@@ -18,7 +18,6 @@ export default function useApiHandler<T extends Api.DataType>(
 
     const validHandler = useMemo(() => {
         if (!isObj(handler)) return false;
-        console.log(Object.keys(handler));
         return (
             ['get', 'post', 'patch', 'delete', 'where'] as Array<
                 keyof Api.RouteHandler<T>

@@ -1,7 +1,14 @@
 import React from 'react';
 import ReactDOM from 'react-dom/client';
 import { createBrowserRouter, RouterProvider } from 'react-router-dom';
-import { Root, Home, Overview, Timer, Calendar, RouteError } from './routes';
+import {
+    Root,
+    Home,
+    Overview,
+    ProjectTimer,
+    Calendar,
+    RouteError,
+} from './routes';
 
 const router = createBrowserRouter([
     {
@@ -23,7 +30,7 @@ const router = createBrowserRouter([
             },
             {
                 path: '/timer',
-                element: <Timer />,
+                element: <ProjectTimer />,
             },
             { path: '/calendar', element: <Calendar /> },
         ],

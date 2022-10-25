@@ -1,4 +1,8 @@
 import { isStr } from 'x-is-type/callbacks';
+import { Timelog } from './api/types';
+import dayjs from 'dayjs';
+import duration from 'dayjs/plugin/duration';
+dayjs.extend(duration);
 
 export const classNames = (...names: unknown[]) => {
     return names.filter((name) => name && isStr(name)).join(' ');
@@ -62,4 +66,33 @@ export function convertElapsedTime(milliseconds: number) {
         m -= h * 60;
     }
     return { h, m, s, ms };
+}
+
+export function formatElapsedTime(
+    milliseconds: number,
+    includeMilliseconds = false
+) {
+    const { h, m, s, ms } = convertElapsedTime(milliseconds);
+    const values = [h, m, s];
+    if (includeMilliseconds) values.push(ms);
+    return values.map((v) => addLeadingZeroes(v, 2)).join(':');
+}
+
+export function timelogsTotalDuration(
+    timelogs: Timelog[],
+    ignoreMilliseconds = true
+) {
+    if (!timelogs.length) return 0;
+    return timelogs.reduce((sum, { start, end }) => {
+        if (!start || !end) return sum;
+        const diff = end - start;
+        return (
+            sum +
+            (ignoreMilliseconds && diff ? Math.floor(diff / 1000) * 1000 : diff)
+        );
+    }, 0);
+}
+
+export function formatDuration(milliseconds: number, format?: string) {
+    return dayjs.duration(milliseconds).format(format || 'HH:mm:ss');
 }
