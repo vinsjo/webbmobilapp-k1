@@ -15,11 +15,6 @@ export default function TimeTrackerProvider(props: React.PropsWithChildren) {
     const tasks = useApiHandler(api.tasks);
     const timelogs = useApiHandler(api.timelogs);
 
-    const activeTimelogs = useMemo(
-        () => timelogs.data.filter(({ end }) => !end),
-        [timelogs.data]
-    );
-
     //#region Timelog handling (to prevent timelogs without end-value in db)
 
     const endSelectedTimelog = useCallback(
@@ -31,18 +26,10 @@ export default function TimeTrackerProvider(props: React.PropsWithChildren) {
         [timelogs.selected, timelogs.update]
     );
 
-    /** End all active timelogs (timelogs without an end value) */
-    const endActiveTimelogs = useCallback(() => {
-        activeTimelogs.forEach(({ id }) => {
-            timelogs.update(id, { end: Date.now() });
-        });
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [timelogs.update, activeTimelogs]);
-
     // End all active timelogs before window unloads
-    useWindowEvent('beforeunload', endActiveTimelogs);
+    useWindowEvent('beforeunload', endSelectedTimelog);
     // End all active timelogs when react router pathname changes
-    usePathChange(endActiveTimelogs);
+    usePathChange(endSelectedTimelog);
 
     // End selected timelog before updating selected timelog
     const setSelectedTimelog = useCallback<TimeTracker.Select<Api.Timelog>>(
@@ -78,11 +65,9 @@ export default function TimeTrackerProvider(props: React.PropsWithChildren) {
     }, [tasks.setSelected, tasks.selected, tasks.data, projects.selected]);
 
     useEffect(() => {
-        const controller = new AbortController();
-        projects.load(controller.signal);
-        tasks.load(controller.signal);
-        timelogs.load(controller.signal);
-        return () => controller.abort();
+        projects.load();
+        tasks.load();
+        timelogs.load();
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
 
