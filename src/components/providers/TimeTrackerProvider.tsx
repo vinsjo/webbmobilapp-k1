@@ -15,8 +15,6 @@ export default function TimeTrackerProvider(props: React.PropsWithChildren) {
     const tasks = useApiHandler(api.tasks);
     const timelogs = useApiHandler(api.timelogs);
 
-    //#region Timelog handling (to prevent timelogs without end-value in db)
-
     const endSelectedTimelog = useCallback(
         async () => {
             if (!timelogs.selected || timelogs.selected.end) return;
@@ -26,29 +24,29 @@ export default function TimeTrackerProvider(props: React.PropsWithChildren) {
         [timelogs.selected, timelogs.update]
     );
 
-    // End all active timelogs before window unloads
+    // End active timelog before window unloads
     useWindowEvent('beforeunload', endSelectedTimelog);
-    // End all active timelogs when react router pathname changes
+    // End active timelogs when react router pathname changes
     usePathChange(endSelectedTimelog);
 
     // End selected timelog before updating selected timelog
     const setSelectedTimelog = useCallback<TimeTracker.Select<Api.Timelog>>(
-        (id) => {
-            endSelectedTimelog().then(() => timelogs.setSelected(id));
+        async (id) => {
+            await endSelectedTimelog();
+            await timelogs.setSelected(id);
         },
         // eslint-disable-next-line react-hooks/exhaustive-deps
         [timelogs.setSelected, endSelectedTimelog]
     );
 
-    const timelogsValue = useMemo(() => {
+    const timelogsValue = useMemo<TimeTracker.Context<Api.Timelog>>(() => {
         return {
             ...timelogs,
             setSelected: setSelectedTimelog,
-        } as TimeTracker.Context<Api.Timelog>;
+        };
     }, [timelogs, setSelectedTimelog]);
 
-    //#endregion
-
+    //#region TEMPORARY
     useEffect(() => {
         if (!projects.data.length) return;
         projects.setSelected(projects.data[0].id);
@@ -63,11 +61,10 @@ export default function TimeTrackerProvider(props: React.PropsWithChildren) {
         );
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [tasks.setSelected, tasks.selected, tasks.data, projects.selected]);
+    //#endregion
 
     useEffect(() => {
-        projects.load();
-        tasks.load();
-        timelogs.load();
+        [projects, tasks, timelogs].forEach(({ load }) => load());
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
 

@@ -70,26 +70,20 @@ export default function ProjectTimer() {
     const handleClick = useCallback(
         async (id: Task['id']) => {
             if (!selectedProject) return;
-            console.log('tasks.selected?.id: ', tasks.selected?.id);
-            console.log('id: ', id);
-            const s = timelogs.selected;
-            if (active && s && !s.end) {
-                await timelogs.update(s.id, { end: Date.now() });
-            }
             if (tasks.selected?.id === id && active) {
-                console.log('stopping');
+                await timelogs.setSelected(null);
                 stop();
                 return;
             }
-            tasks.setSelected(id);
+            await tasks.setSelected(id);
             const added = await timelogs.add({
                 projectId: selectedProject.id,
                 taskId: id,
                 start: Date.now(),
                 end: null,
             });
-            if (!added) return stop();
-            timelogs.setSelected(added.id);
+            if (!added) return;
+            await timelogs.setSelected(added.id);
             start();
         },
         // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -100,7 +94,7 @@ export default function ProjectTimer() {
             stop,
             tasks.selected,
             tasks.setSelected,
-            timelogs.selected,
+            timelogs.setSelected,
             timelogs.update,
             timelogs.add,
         ]

@@ -15,7 +15,7 @@ const createTimeTrackerContext = <T extends DataType>() => {
         data: [],
         error: null,
         selected: null,
-        setSelected: function (id: T['id'] | null): void {
+        setSelected: function (id: T['id'] | null): Promise<void> {
             throw new Error('Function not implemented.');
         },
         load: function (signal?: AbortSignal | undefined): Promise<T[] | null> {
@@ -28,9 +28,6 @@ const createTimeTrackerContext = <T extends DataType>() => {
             throw new Error('Function not implemented.');
         },
         delete: function (id: T['id']): Promise<T['id'] | null> {
-            throw new Error('Function not implemented.');
-        },
-        filter: function (callback: (data: T) => boolean): T[] {
             throw new Error('Function not implemented.');
         },
     };

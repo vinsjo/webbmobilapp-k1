@@ -1,4 +1,4 @@
-import { useState, useMemo, useCallback } from 'react';
+import { useState, useMemo, useCallback, useEffect } from 'react';
 import { isObj } from 'x-is-type/callbacks';
 import { replaceAtIndex } from '@/utils';
 import type { Api } from '@/utils/api';
@@ -11,25 +11,17 @@ export default function useApiHandler<T extends Api.DataType>(
     const [error, setError] = useState<string | null>(null);
 
     const [selectedId, setSelectedId] = useState<null | T['id']>(null);
-    const selected = useMemo(() => {
-        if (!selectedId) return null;
+
+    const selected = useMemo<T | null>(() => {
         return data.find(({ id }) => id === selectedId) || null;
     }, [data, selectedId]);
 
-    const validHandler = useMemo(() => {
-        if (!isObj(handler)) return false;
-        return (
-            ['get', 'post', 'patch', 'delete', 'where'] as Array<
-                keyof Api.RouteHandler<T>
-            >
-        ).every((key) => {
-            return key in handler && typeof handler[key] === 'function';
-        });
-    }, [handler]);
+    const setSelected = useCallback<TimeTracker.Select<T>>(async (id) => {
+        setSelectedId(id);
+    }, []);
 
     const load = useCallback<TimeTracker.Load<T>>(
         async (signal?: AbortSignal) => {
-            if (!validHandler) return null;
             try {
                 const data = ((await handler.get(null, signal)) as T[]) || null;
                 if (data) setData(data);
@@ -39,12 +31,12 @@ export default function useApiHandler<T extends Api.DataType>(
                 return null;
             }
         },
-        [handler, validHandler]
+        [handler]
     );
 
     const add = useCallback<TimeTracker.Add<T>>(
         async (data: Omit<T, 'id'>) => {
-            if (!validHandler || !isObj(data) || !Object.keys(data).length) {
+            if (!isObj(data) || !Object.keys(data).length) {
                 return null;
             }
             try {
@@ -53,16 +45,16 @@ export default function useApiHandler<T extends Api.DataType>(
                 setData((prev) => [...prev, added]);
                 return added;
             } catch (err) {
-                console.error(err);
+                if (typeof err === 'string') setError(err);
                 return null;
             }
         },
-        [handler, validHandler]
+        [handler]
     );
 
     const update = useCallback<TimeTracker.Update<T>>(
         async (id: T['id'], data: Partial<T>) => {
-            if (!validHandler || !isObj(data) || !Object.keys(data).length) {
+            if (!isObj(data) || !Object.keys(data).length) {
                 return null;
             }
             try {
@@ -74,33 +66,33 @@ export default function useApiHandler<T extends Api.DataType>(
                 });
                 return updated;
             } catch (err) {
-                console.error(err);
+                if (typeof err === 'string') setError(err);
                 return null;
             }
         },
-        [validHandler, handler]
+        [handler]
     );
 
     const remove = useCallback<TimeTracker.Delete<T>>(
         async (id: T['id']) => {
-            if (!validHandler) return null;
             try {
                 const success = await handler.delete(id);
                 if (!success) return null;
                 setData((prev) => prev.filter((data) => data.id !== id));
                 return id;
             } catch (err) {
-                console.error(err);
+                if (typeof err === 'string') setError(err);
                 return null;
             }
         },
-        [validHandler, handler]
+        [handler]
     );
 
-    const filter = useCallback<TimeTracker.Filter<T>>(
-        (callback) => data.filter(callback),
-        [data]
-    );
+    useEffect(() => {
+        if (error) console.error(error);
+    }, [error]);
+
+    useEffect(() => setError(null), [data]);
 
     return useMemo<TimeTracker.Context<T>>(
         () => ({
@@ -110,10 +102,9 @@ export default function useApiHandler<T extends Api.DataType>(
             add,
             update,
             delete: remove,
-            filter,
             selected,
-            setSelected: setSelectedId,
+            setSelected,
         }),
-        [data, error, add, update, remove, load, selected, filter]
+        [data, error, add, update, remove, load, selected, setSelected]
     );
 }
