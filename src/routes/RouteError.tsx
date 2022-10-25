@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useRouteError, Navigate } from 'react-router-dom';
-import { Box, Text } from '@mantine/core';
+import { Stack, Text } from '@mantine/core';
+import Layout from '@/components/Layout';
 
 export default function RouteError() {
     const error = useRouteError();
@@ -20,11 +21,23 @@ export default function RouteError() {
     return countdown <= 0 ? (
         <Navigate to="/" replace />
     ) : (
-        <Box>
-            <Text>An error occurred :(</Text>
-            <Text>
-                Navigating to homepage in <Text>{countdown}</Text> seconds
-            </Text>
-        </Box>
+        <Layout>
+            <Stack>
+                <Text>An error occurred...</Text>
+                <Text>
+                    Navigating to homepage in
+                    <Text
+                        align="center"
+                        sx={{
+                            display: 'inline-block',
+                            width: '4ch',
+                        }}
+                    >
+                        {countdown}
+                    </Text>{' '}
+                    seconds
+                </Text>
+            </Stack>
+        </Layout>
     );
 }

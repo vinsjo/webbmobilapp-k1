@@ -42,7 +42,7 @@ export default function Overview() {
                 </List>
             </Tabs.Panel>
             <Tabs.Panel value="tasks">
-                <List>
+                <List listStyleType="none">
                     {tasks.data.map(({ id, title }) => {
                         return (
                             <List.Item key={`project-${id}`}>{title}</List.Item>
