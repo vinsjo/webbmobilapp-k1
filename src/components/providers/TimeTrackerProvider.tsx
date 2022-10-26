@@ -1,19 +1,18 @@
-import React, { useCallback, useEffect, useMemo } from 'react';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import {
     ProjectsContext,
     TasksContext,
     TimelogsContext,
     type TimeTracker,
 } from '@/context/TimeTracker';
-import api, { type Api } from '@/utils/api';
-import useApiHandler from '@/hooks/useApiHandler';
-import useWindowEvent from '@/hooks/useWindowEvent';
-import usePathChange from '@/hooks/usePathChange';
+import { type Api } from '@/utils/api';
+import { useApiHandler } from '@/hooks';
 
 export default function TimeTrackerProvider(props: React.PropsWithChildren) {
-    const projects = useApiHandler(api.projects);
-    const tasks = useApiHandler(api.tasks);
-    const timelogs = useApiHandler(api.timelogs);
+    const [loaded, setLoaded] = useState(false);
+    const projects = useApiHandler('projects');
+    const tasks = useApiHandler('tasks');
+    const timelogs = useApiHandler('timelogs');
 
     const endSelectedTimelog = useCallback(
         async () => {
@@ -24,19 +23,20 @@ export default function TimeTrackerProvider(props: React.PropsWithChildren) {
         [timelogs.selected, timelogs.update]
     );
 
-    // End active timelog before window unloads
-    useWindowEvent('beforeunload', endSelectedTimelog);
-    // End active timelogs when react router pathname changes
-    usePathChange(endSelectedTimelog);
+    // // End active timelog before window unloads
+    // useWindowEvent('beforeunload', endSelectedTimelog);
+    // // End active timelogs when react router pathname changes
+    // usePathChange(endSelectedTimelog);
 
     // End selected timelog before updating selected timelog
     const setSelectedTimelog = useCallback<TimeTracker.Select<Api.Timelog>>(
         async (id) => {
+            if (timelogs.selected?.id === id) return;
             await endSelectedTimelog();
             await timelogs.setSelected(id);
         },
         // eslint-disable-next-line react-hooks/exhaustive-deps
-        [timelogs.setSelected, endSelectedTimelog]
+        [timelogs.selected, timelogs.setSelected, endSelectedTimelog]
     );
 
     const timelogsValue = useMemo<TimeTracker.Context<Api.Timelog>>(() => {
@@ -46,25 +46,25 @@ export default function TimeTrackerProvider(props: React.PropsWithChildren) {
         };
     }, [timelogs, setSelectedTimelog]);
 
-    //#region TEMPORARY
     useEffect(() => {
-        if (!projects.data.length) return;
-        projects.setSelected(projects.data[0].id);
+        if (!loaded || projects.selected?.id === tasks.selected?.projectId)
+            return;
+        tasks.setSelected(null);
         // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [projects.data, projects.setSelected]);
+    }, [loaded, projects.selected, tasks.selected, tasks.setSelected]);
 
     useEffect(() => {
-        if (!projects.selected || tasks.selected) return;
-        const id = projects.selected.id;
-        tasks.setSelected(
-            tasks.data.find(({ projectId }) => projectId === id)?.id || null
-        );
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [tasks.setSelected, tasks.selected, tasks.data, projects.selected]);
-    //#endregion
+        if (!loaded || tasks.selected?.id === timelogs.selected?.taskId) return;
+        setSelectedTimelog(null);
+    }, [loaded, tasks.selected, timelogs.selected, setSelectedTimelog]);
 
     useEffect(() => {
-        [projects, tasks, timelogs].forEach(({ load }) => load());
+        (async () => {
+            await projects.load();
+            await tasks.load();
+            await timelogs.load();
+            setLoaded(true);
+        })();
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
 

@@ -1,19 +1,18 @@
 import { useCallback, useMemo } from 'react';
 import { useProjects, useTasks, useTimelogs } from '@/context/TimeTracker';
 import useTimer from '@/hooks/useTimer';
-import useDurationOutput from '@/hooks/useDurationOutput';
 
-import { Text, Stack } from '@mantine/core';
+import { Stack } from '@mantine/core';
 import TaskTime from '@/components/TaskTime';
 import ProjectSelect from '@/components/ProjectSelect';
+import TimerDisplay from '@/components/TimerDisplay';
 
-import { getNestedTasks, getTotalDuration } from '@/utils/api';
+import { getNestedTasks } from '@/utils/api';
 
 import type { Task } from '@/utils/api/types';
 import { filterData } from '@/utils';
 
 export default function TimeTracker() {
-    const { start, stop, duration, active } = useTimer();
     const selectedProject = useProjects(
         useCallback(({ selected }) => {
             return selected;
@@ -50,18 +49,13 @@ export default function TimeTracker() {
         )
     );
 
+    const { start, stop, duration, active } = useTimer(
+        timelogs.selected?.start
+    );
+
     const nestedTasks = useMemo(
         () => getNestedTasks(tasks.data, timelogs.data),
         [tasks.data, timelogs.data]
-    );
-
-    const projectStoredDuration = useMemo(
-        () => getTotalDuration(timelogs.data),
-        [timelogs.data]
-    );
-
-    const projectDurationOutput = useDurationOutput(
-        projectStoredDuration + duration
     );
 
     const handleClick = useCallback(
@@ -101,15 +95,8 @@ export default function TimeTracker() {
         <Stack spacing="md">
             <Stack>
                 <ProjectSelect />
-                {!selectedProject ? (
-                    <Text>No project selected...</Text>
-                ) : (
-                    <Text>
-                        Total time spent on project: {projectDurationOutput}
-                    </Text>
-                )}
             </Stack>
-
+            <TimerDisplay mx="auto" duration={duration} />
             {nestedTasks.map(({ timelogs, ...task }) => {
                 const selected = tasks.selected?.id === task.id;
                 return (

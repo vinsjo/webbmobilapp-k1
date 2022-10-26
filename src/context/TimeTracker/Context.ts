@@ -1,14 +1,7 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
-import {
-    createContext,
-    useCallback,
-    useContext,
-    useEffect,
-    useMemo,
-} from 'react';
+import { createContext } from 'react';
 import type { DataType, Project, Task, Timelog } from '@/utils/api/types';
 import { Context } from './types';
-import { pick } from '@/utils';
 
 const createTimeTrackerContext = <T extends DataType>() => {
     const initialValue: Context<T> = {

@@ -44,36 +44,6 @@ const { fontSizes, headings } = (() => {
     };
 })();
 
-// const fontSizes = {
-//     xs: 10,
-//     sm: 12,
-//     md: 14,
-//     lg: 16,
-//     xl: 20,
-// };
-
-// const headings: MantineTheme['headings'] = {
-//     fontFamily: mainFont,
-//     fontWeight: 700,
-//     sizes: (
-//         Object.keys(DEFAULT_THEME.headings.sizes) as Array<
-//             keyof typeof DEFAULT_THEME.headings.sizes
-//         >
-//     ).reduce((sizes, key) => {
-//         const { fontSize, ...defaults } = DEFAULT_THEME.headings.sizes[key];
-//         return {
-//             ...sizes,
-//             [key]: {
-//                 ...defaults,
-//                 fontSize:
-//                     typeof fontSize === 'number'
-//                         ? Math.floor(fontSize * 0.8)
-//                         : fontSize,
-//             },
-//         };
-//     }, {}) as typeof DEFAULT_THEME.headings.sizes,
-// };
-
 const theme: Partial<MantineTheme> = {
     fontFamily: mainFont,
     fontFamilyMonospace: monoFont,
@@ -91,8 +61,6 @@ const theme: Partial<MantineTheme> = {
     fontSizes,
     headings,
 };
-
-console.log('DEFAULT_THEME: ', DEFAULT_THEME);
 
 export default function ThemeProvider({ children }: React.PropsWithChildren) {
     return (

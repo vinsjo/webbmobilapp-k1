@@ -4,9 +4,16 @@ import { Route, RouteType, RouteHandler } from './types';
 
 const API_BASE_URL = 'http://localhost:4000';
 
-function createRouteHandler<R extends Route, T extends RouteType<R>>(
+const validRoutes: Route[] = ['projects', 'tasks', 'timelogs'];
+
+export function createRouteHandler<R extends Route, T extends RouteType<R>>(
     route: R
 ): RouteHandler<T> {
+    if (!validRoutes.includes(route)) {
+        throw `Invalid route: ${route}, valid routes are ${validRoutes
+            .map((r) => `"${r}"`)
+            .join(' | ')}`;
+    }
     const baseURL = `${API_BASE_URL}/${route}`;
 
     const handleError = (err: AxiosError | unknown) => {

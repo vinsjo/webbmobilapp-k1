@@ -3,7 +3,7 @@ import { Task, Timelog } from '@/utils/api/types';
 import { ActionIcon, Group, Text, Title, useMantineTheme } from '@mantine/core';
 import { FaPlay, FaStop } from 'react-icons/fa';
 import { getTotalDuration } from '@/utils/api';
-import useDurationOutput from '@/hooks/useDurationOutput';
+import DurationOutput from './DurationOutput';
 
 export interface Props {
     task: Task;
@@ -31,8 +31,6 @@ export default function TaskTime({
         () => getTotalDuration(timelogs),
         [timelogs]
     );
-
-    const durationOutput = useDurationOutput(currentDuration + storedDuration);
 
     const colors = useMemo(
         () => ({
@@ -74,7 +72,7 @@ export default function TaskTime({
                     fontSize: theme.fontSizes.sm,
                 }}
             >
-                {durationOutput}
+                <DurationOutput duration={currentDuration + storedDuration} />
             </Text>
             <ActionIcon onClick={handleClick}>
                 {active ? <FaStop /> : <FaPlay />}
