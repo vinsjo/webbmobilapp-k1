@@ -1,8 +1,8 @@
 import { useCallback, useMemo } from 'react';
 import { Task, Timelog } from '@/utils/api/types';
-import { ActionIcon, Group, Text, useMantineTheme } from '@mantine/core';
+import { ActionIcon, Group, Text, Title, useMantineTheme } from '@mantine/core';
 import { FaPlay, FaStop } from 'react-icons/fa';
-import { timelogsTotalDuration } from '@/utils';
+import { getTotalDuration } from '@/utils/api';
 import useDurationOutput from '@/hooks/useDurationOutput';
 
 export interface Props {
@@ -28,7 +28,7 @@ export default function TaskTime({
 }: Props) {
     const theme = useMantineTheme();
     const storedDuration = useMemo(
-        () => timelogsTotalDuration(timelogs),
+        () => getTotalDuration(timelogs),
         [timelogs]
     );
 
@@ -58,14 +58,14 @@ export default function TaskTime({
                 justifyContent: 'space-between',
             }}
         >
-            <Text
+            <Title
+                order={4}
                 sx={{
                     color: colors.text,
-                    wordWrap: 'normal',
                 }}
             >
                 {task.title}
-            </Text>
+            </Title>
             <Text
                 sx={{
                     fontFamily: theme.fontFamilyMonospace,

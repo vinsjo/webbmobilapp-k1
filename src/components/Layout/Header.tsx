@@ -1,9 +1,9 @@
 import {
     Burger,
-    Text,
     Header as MantineHeader,
     MediaQuery,
     Group,
+    Title,
 } from '@mantine/core';
 
 type Props = { openBurger: boolean; toggleBurger: () => void };
@@ -21,7 +21,7 @@ function Header({ openBurger, toggleBurger }: Props) {
                     />
                 </MediaQuery>
 
-                <Text weight="bold">Time Tracker</Text>
+                <Title size="h1">Time Tracker</Title>
             </Group>
         </MantineHeader>
     );

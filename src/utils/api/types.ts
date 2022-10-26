@@ -12,9 +12,19 @@ export interface Timelog {
     id: number;
     taskId: Task['id'];
     projectId: Project['id'];
+    /** Timelog start time as a unix timestamp */
     start: number;
-    end: number | null;
+    /** Timelog end time as a unix timestamp, or 0 if Timelog is not ended */
+    end: number;
 }
+
+export interface NestedTask extends Task {
+    timelogs: Timelog[];
+}
+export interface NestedProject extends Project {
+    tasks: NestedTask[];
+}
+
 export type DataType = Project | Task | Timelog;
 export type Route = 'projects' | 'tasks' | 'timelogs';
 export type RouteType<T extends Route> = T extends 'projects'

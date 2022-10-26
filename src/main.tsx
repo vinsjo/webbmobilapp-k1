@@ -5,7 +5,7 @@ import {
     Root,
     Home,
     Overview,
-    ProjectTimer,
+    TimeTracker,
     Calendar,
     RouteError,
 } from './routes';
@@ -30,7 +30,7 @@ const router = createBrowserRouter([
             },
             {
                 path: '/timer',
-                element: <ProjectTimer />,
+                element: <TimeTracker />,
             },
             { path: '/calendar', element: <Calendar /> },
         ],

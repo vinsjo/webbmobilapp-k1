@@ -1,13 +1,18 @@
 import { useCallback, useMemo } from 'react';
 import { useProjects, useTasks, useTimelogs } from '@/context/TimeTracker';
-import { Text, Stack } from '@mantine/core';
-import TaskTime from '@/components/TaskTime';
-import type { Task, Timelog } from '@/utils/api/types';
-import { timelogsTotalDuration } from '@/utils';
 import useTimer from '@/hooks/useTimer';
 import useDurationOutput from '@/hooks/useDurationOutput';
 
-export default function ProjectTimer() {
+import { Text, Stack } from '@mantine/core';
+import TaskTime from '@/components/TaskTime';
+import ProjectSelect from '@/components/ProjectSelect';
+
+import { getNestedTasks, getTotalDuration } from '@/utils/api';
+
+import type { Task } from '@/utils/api/types';
+import { filterData } from '@/utils';
+
+export default function TimeTracker() {
     const { start, stop, duration, active } = useTimer();
     const selectedProject = useProjects(
         useCallback(({ selected }) => {
@@ -18,9 +23,9 @@ export default function ProjectTimer() {
         useCallback(
             ({ data, selected, setSelected }) => {
                 return {
-                    data: data.filter(
-                        ({ projectId }) => projectId === selectedProject?.id
-                    ),
+                    data: !selectedProject
+                        ? []
+                        : filterData(data, 'projectId', selectedProject.id),
                     selected,
                     setSelected,
                 };
@@ -32,9 +37,9 @@ export default function ProjectTimer() {
         useCallback(
             ({ data, selected, setSelected, add, update }) => {
                 return {
-                    data: data.filter(
-                        ({ projectId }) => projectId === selectedProject?.id
-                    ),
+                    data: !selectedProject
+                        ? []
+                        : filterData(data, 'projectId', selectedProject.id),
                     selected,
                     setSelected,
                     add,
@@ -45,21 +50,13 @@ export default function ProjectTimer() {
         )
     );
 
-    const tasksWithTimelogs = useMemo<{ task: Task; timelogs: Timelog[] }[]>(
-        () =>
-            tasks.data.map((task) => {
-                return {
-                    task,
-                    timelogs: timelogs.data.filter(
-                        ({ taskId }) => taskId === task.id
-                    ),
-                };
-            }),
+    const nestedTasks = useMemo(
+        () => getNestedTasks(tasks.data, timelogs.data),
         [tasks.data, timelogs.data]
     );
 
     const projectStoredDuration = useMemo(
-        () => timelogsTotalDuration(timelogs.data),
+        () => getTotalDuration(timelogs.data),
         [timelogs.data]
     );
 
@@ -80,7 +77,7 @@ export default function ProjectTimer() {
                 projectId: selectedProject.id,
                 taskId: id,
                 start: Date.now(),
-                end: null,
+                end: 0,
             });
             if (!added) return;
             await timelogs.setSelected(added.id);
@@ -103,19 +100,17 @@ export default function ProjectTimer() {
     return (
         <Stack spacing="md">
             <Stack>
+                <ProjectSelect />
                 {!selectedProject ? (
                     <Text>No project selected...</Text>
                 ) : (
-                    <>
-                        <Text>Selected Project: {selectedProject.name}</Text>
-                        <Text>
-                            Total time spent on project: {projectDurationOutput}
-                        </Text>
-                    </>
+                    <Text>
+                        Total time spent on project: {projectDurationOutput}
+                    </Text>
                 )}
             </Stack>
 
-            {tasksWithTimelogs.map(({ task, timelogs }) => {
+            {nestedTasks.map(({ timelogs, ...task }) => {
                 const selected = tasks.selected?.id === task.id;
                 return (
                     <TaskTime

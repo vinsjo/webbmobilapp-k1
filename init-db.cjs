@@ -103,7 +103,6 @@ const createOutput = (dummyData) => {
                               'Fixa db.json',
                               'Göra alla api-funktioner',
                               'Fixa frontend',
-                              'Laborum dolor Lorem excepteur est non consequat nostrud Lorem ex reprehenderit. Nostrud ad reprehenderit velit cupidatat. In id ullamco labore eu occaecat non.',
                           ],
                       },
                   ]
