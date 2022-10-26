@@ -1,7 +1,6 @@
 import React, { useState, useMemo, useEffect } from 'react';
 import { useLocation } from 'react-router-dom';
 import { AppShell } from '@mantine/core';
-import { ThemeProvider } from '@/components/providers';
 import Navbar from './Navbar';
 import Header from './Header';
 
@@ -17,25 +16,23 @@ export default function Layout(props: React.PropsWithChildren) {
     useEffect(() => setHiddenNav(true), [pathname]);
 
     return (
-        <ThemeProvider>
-            <AppShell
-                navbarOffsetBreakpoint="sm"
-                navbar={
-                    <Navbar
-                        activePath={activePath}
-                        hidden={hiddenNav}
-                        setHidden={setHiddenNav}
-                    />
-                }
-                header={
-                    <Header
-                        openBurger={!hiddenNav}
-                        toggleBurger={() => setHiddenNav(!hiddenNav)}
-                    />
-                }
-            >
-                {props.children}
-            </AppShell>
-        </ThemeProvider>
+        <AppShell
+            navbarOffsetBreakpoint="sm"
+            navbar={
+                <Navbar
+                    activePath={activePath}
+                    hidden={hiddenNav}
+                    setHidden={setHiddenNav}
+                />
+            }
+            header={
+                <Header
+                    openBurger={!hiddenNav}
+                    toggleBurger={() => setHiddenNav(!hiddenNav)}
+                />
+            }
+        >
+            {props.children}
+        </AppShell>
     );
 }

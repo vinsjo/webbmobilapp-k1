@@ -32,4 +32,5 @@ export interface Context<T extends Api.DataType> {
     add: Add<T>;
     update: Update<T>;
     delete: Delete<T>;
+    loaded: boolean;
 }

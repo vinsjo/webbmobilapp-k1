@@ -14,9 +14,22 @@ import { filterData } from '@/utils';
 
 export default function TimeTracker() {
     const selectedProject = useProjects(
-        useCallback(({ selected }) => {
-            return selected;
-        }, [])
+        useCallback(({ selected }) => selected, [])
+    );
+    const timelogs = useTimelogs(
+        useCallback(
+            ({ data, selected, setSelected, add }) => {
+                return {
+                    data: !selectedProject
+                        ? []
+                        : filterData(data, 'projectId', selectedProject.id),
+                    selected,
+                    setSelected,
+                    add,
+                };
+            },
+            [selectedProject]
+        )
     );
     const tasks = useTasks(
         useCallback(
@@ -25,24 +38,9 @@ export default function TimeTracker() {
                     data: !selectedProject
                         ? []
                         : filterData(data, 'projectId', selectedProject.id),
+
                     selected,
                     setSelected,
-                };
-            },
-            [selectedProject]
-        )
-    );
-    const timelogs = useTimelogs(
-        useCallback(
-            ({ data, selected, setSelected, add, update }) => {
-                return {
-                    data: !selectedProject
-                        ? []
-                        : filterData(data, 'projectId', selectedProject.id),
-                    selected,
-                    setSelected,
-                    add,
-                    update,
                 };
             },
             [selectedProject]
@@ -51,11 +49,6 @@ export default function TimeTracker() {
 
     const { start, stop, duration, active } = useTimer(
         timelogs.selected?.start
-    );
-
-    const nestedTasks = useMemo(
-        () => getNestedTasks(tasks.data, timelogs.data),
-        [tasks.data, timelogs.data]
     );
 
     const handleClick = useCallback(
@@ -77,6 +70,7 @@ export default function TimeTracker() {
             await timelogs.setSelected(added.id);
             start();
         },
+
         // eslint-disable-next-line react-hooks/exhaustive-deps
         [
             selectedProject,
@@ -85,10 +79,14 @@ export default function TimeTracker() {
             stop,
             tasks.selected,
             tasks.setSelected,
-            timelogs.setSelected,
-            timelogs.update,
             timelogs.add,
+            timelogs.setSelected,
         ]
+    );
+
+    const nestedTasks = useMemo(
+        () => getNestedTasks(tasks.data, timelogs.data),
+        [tasks, timelogs]
     );
 
     return (

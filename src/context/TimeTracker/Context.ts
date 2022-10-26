@@ -23,6 +23,7 @@ const createTimeTrackerContext = <T extends DataType>() => {
         delete: function (id: T['id']): Promise<T['id'] | null> {
             throw new Error('Function not implemented.');
         },
+        loaded: false,
     };
     return createContext(initialValue);
 };

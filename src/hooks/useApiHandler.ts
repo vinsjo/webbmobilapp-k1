@@ -10,45 +10,44 @@ export default function useApiHandler<
     T extends Api.RouteType<R>
 >(route: R) {
     const handler = useRef<Api.RouteHandler<T>>(createRouteHandler(route));
+    const [loaded, setLoaded] = useState(false);
     const [data, setData] = useState<T[]>([]);
     const [error, setError] = useState<string | null>(null);
-
     const [selectedId, setSelectedId] = useLocalStorage<T['id'] | null>({
         key: `vinsjo-webbmobilapp-ks1-${route}-selected-id`,
+        defaultValue: null,
     });
 
-    const selected = useMemo<T | null>(() => {
-        return data.find(({ id }) => id === selectedId) || null;
-    }, [data, selectedId]);
-
-    const setSelected = useCallback<TimeTracker.Select<T>>(
-        async (id) => {
-            setSelectedId(id);
-        },
-        [setSelectedId]
+    const selected = useMemo<T | null>(
+        () =>
+            !selectedId
+                ? null
+                : data.find(({ id }) => id === selectedId) || null,
+        [data, selectedId]
     );
 
-    const load = useCallback<TimeTracker.Load<T>>(
-        async (signal?: AbortSignal) => {
-            try {
-                const data =
-                    ((await handler.current.get(null, signal)) as T[]) || null;
-                if (data) setData(data);
-                return data;
-            } catch (err) {
-                if (typeof err === 'string') setError(err);
-                return null;
-            }
-        },
-        []
-    );
+    const load = useCallback<TimeTracker.Load<T>>(async (signal) => {
+        try {
+            const data =
+                ((await handler.current.get(null, signal)) as T[]) || null;
+            if (data) setData(data);
+            setLoaded(true);
+            return data;
+        } catch (err) {
+            if (typeof err === 'string') setError(err);
+            return null;
+        }
+    }, []);
 
-    const add = useCallback<TimeTracker.Add<T>>(async (data: Omit<T, 'id'>) => {
+    const add = useCallback<TimeTracker.Add<T>>(async (data, signal) => {
         if (!isObj(data) || !Object.keys(data).length) {
             return null;
         }
         try {
-            const added = (await handler.current.post(data)) as T | null;
+            const added = (await handler.current.post(
+                data,
+                signal
+            )) as T | null;
             if (!added) return null;
             setData((prev) => [...prev, added]);
             return added;
@@ -59,12 +58,12 @@ export default function useApiHandler<
     }, []);
 
     const update = useCallback<TimeTracker.Update<T>>(
-        async (id: T['id'], data: Partial<T>) => {
+        async (id, data, signal) => {
             if (!isObj(data) || !Object.keys(data).length) {
                 return null;
             }
             try {
-                const updated = await handler.current.patch(id, data);
+                const updated = await handler.current.patch(id, data, signal);
                 if (!updated) return null;
                 setData((prev) => {
                     const i = prev.findIndex((data) => data.id === id);
@@ -79,9 +78,9 @@ export default function useApiHandler<
         []
     );
 
-    const remove = useCallback<TimeTracker.Delete<T>>(async (id: T['id']) => {
+    const remove = useCallback<TimeTracker.Delete<T>>(async (id, signal) => {
         try {
-            const success = await handler.current.delete(id);
+            const success = await handler.current.delete(id, signal);
             if (!success) return null;
             setData((prev) => prev.filter((data) => data.id !== id));
             return id;
@@ -90,6 +89,13 @@ export default function useApiHandler<
             return null;
         }
     }, []);
+
+    const setSelected = useCallback<TimeTracker.Select<T>>(
+        async (id) => {
+            setSelectedId(id);
+        },
+        [setSelectedId]
+    );
 
     useEffect(() => {
         if (error) console.error(error);
@@ -101,6 +107,7 @@ export default function useApiHandler<
         () => ({
             data,
             error,
+            loaded,
             load,
             add,
             update,
@@ -108,6 +115,6 @@ export default function useApiHandler<
             selected,
             setSelected,
         }),
-        [data, error, add, update, remove, load, selected, setSelected]
+        [data, error, add, update, remove, load, selected, setSelected, loaded]
     );
 }
