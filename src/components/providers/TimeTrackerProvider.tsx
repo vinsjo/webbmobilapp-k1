@@ -19,37 +19,40 @@ export default function TimeTrackerProvider(props: React.PropsWithChildren) {
         [projects.loaded, tasks.loaded, timelogs.loaded]
     );
 
-    const endSelectedTimelog = useCallback(
-        async () => {
-            if (!timelogs.selected || timelogs.selected.end) return;
-            await timelogs.update(timelogs.selected.id, { end: Date.now() });
-        },
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-        [timelogs.selected, timelogs.update]
-    );
-
-    // // End active timelog before window unloads
-    // useWindowEvent('beforeunload', endSelectedTimelog);
-    // // End active timelogs when react router pathname changes
-    // usePathChange(endSelectedTimelog);
-
     // End selected timelog before updating selected timelog
     const setSelectedTimelog = useCallback<TimeTracker.Select<Api.Timelog>>(
         async (id) => {
             if (timelogs.selected?.id === id) return;
-            await endSelectedTimelog();
+            await (() =>
+                timelogs.selected &&
+                !timelogs.selected.end &&
+                timelogs.update(timelogs.selected.id, {
+                    end: Date.now(),
+                }))();
             await timelogs.setSelected(id);
         },
         // eslint-disable-next-line react-hooks/exhaustive-deps
-        [timelogs.selected, timelogs.setSelected, endSelectedTimelog]
+        [timelogs.selected, timelogs.setSelected, timelogs.update]
     );
 
-    const timelogsValue = useMemo<TimeTracker.Context<Api.Timelog>>(() => {
-        return {
+    const addTimelog = useCallback<TimeTracker.Add<Api.Timelog>>(
+        async (data, signal) => {
+            const added = await timelogs.add(data, signal);
+            if (added) await setSelectedTimelog(added.id);
+            return added;
+        },
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+        [timelogs.add, setSelectedTimelog]
+    );
+
+    const timelogsValue = useMemo<TimeTracker.Context<Api.Timelog>>(
+        () => ({
             ...timelogs,
             setSelected: setSelectedTimelog,
-        };
-    }, [timelogs, setSelectedTimelog]);
+            add: addTimelog,
+        }),
+        [timelogs, setSelectedTimelog, addTimelog]
+    );
 
     useEffect(() => {
         if (!loaded || projects.selected?.id === tasks.selected?.projectId) {
