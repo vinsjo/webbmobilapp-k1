@@ -82,7 +82,7 @@ export default function useApiHandler<
         []
     );
 
-    const remove = useCallback<TimeTracker.Delete<T>>(async (id, signal) => {
+    const remove = useCallback<TimeTracker.Remove<T>>(async (id, signal) => {
         try {
             const success = await handler.current.delete(id, signal);
             if (!success) return null;
@@ -115,7 +115,7 @@ export default function useApiHandler<
             load,
             add,
             update,
-            delete: remove,
+            remove,
             selected,
             setSelected,
         }),

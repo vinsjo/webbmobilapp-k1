@@ -15,7 +15,7 @@ export type Update<T extends Api.DataType> = (
     signal?: AbortSignal
 ) => Promise<T | null>;
 
-export type Delete<T extends Api.DataType> = (
+export type Remove<T extends Api.DataType> = (
     id: T['id'],
     signal?: AbortSignal
 ) => Promise<T['id'] | null>;
@@ -31,6 +31,6 @@ export interface Context<T extends Api.DataType> {
     load: Load<T>;
     add: Add<T>;
     update: Update<T>;
-    delete: Delete<T>;
+    remove: Remove<T>;
     loaded: boolean;
 }

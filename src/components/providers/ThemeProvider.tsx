@@ -23,7 +23,6 @@ const fontSizes: MantineSizes = {
 
 const headings = (() => {
     const { h1, h2, h3, h4, h5, h6 } = DEFAULT_THEME.headings.sizes;
-    console.log(DEFAULT_THEME.headings.sizes);
     const headings: MantineTheme['headings'] = {
         fontFamily: mainFont,
         fontWeight: 700,
@@ -38,8 +37,6 @@ const headings = (() => {
     };
     return headings;
 })();
-
-console.log(headings);
 
 const theme: Partial<MantineTheme> = {
     fontFamily: mainFont,

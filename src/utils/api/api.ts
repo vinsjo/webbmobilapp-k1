@@ -2,7 +2,7 @@ import axios, { AxiosError } from 'axios';
 import { isNum } from 'x-is-type/callbacks';
 import { Route, RouteType, RouteHandler } from './types';
 
-const API_BASE_URL = 'http://localhost:4000';
+const API_BASE_URL = 'http://localhost:3000';
 
 const validRoutes: Route[] = ['projects', 'tasks', 'timelogs'];
 

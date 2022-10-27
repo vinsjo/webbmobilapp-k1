@@ -18,8 +18,9 @@ export function getTotalDuration(timelogs: Api.Timelog[], onlySeconds = true) {
 export function getNestedTasks(
     tasks: Api.Task[],
     timelogs: Api.Timelog[],
-    filter?: (task: Api.NestedTask) => unknown
+    filter?: ((task: Api.NestedTask) => unknown) | false
 ): Api.NestedTask[] {
+    if (filter === false) return [];
     const nested = tasks.map((task) => {
         return {
             ...task,
@@ -34,19 +35,30 @@ export function getNestedProjects(
     tasks: Api.Task[],
     timelogs: Api.Timelog[],
     filters?: {
-        project?: (project: Api.NestedProject) => unknown;
-        task?: (task: Api.NestedTask) => unknown;
+        projects?: ((project: Api.NestedProject) => unknown) | false;
+        tasks?: ((task: Api.NestedTask) => unknown) | false;
+        timelogs?: ((timelog: Api.Timelog) => unknown) | false;
     }
 ): Api.NestedProject[] {
-    const nested = projects.map((project) => {
-        const projectTimelogs = filterData(timelogs, 'projectId', project.id);
+    if (filters?.projects === false) return [];
+
+    const logs =
+        filters?.timelogs === false
+            ? []
+            : typeof filters?.timelogs === 'function'
+            ? timelogs.filter(filters.timelogs)
+            : timelogs;
+
+    const output = projects.map((project) => {
+        const projectLogs = filterData(logs, 'projectId', project.id);
         const projectTasks = filterData(tasks, 'projectId', project.id);
         return {
             ...project,
-            tasks: getNestedTasks(projectTasks, projectTimelogs, filters?.task),
+            tasks: getNestedTasks(projectTasks, projectLogs, filters?.tasks),
         };
     });
-    return typeof filters?.project === 'function'
-        ? nested.filter(filters.project)
-        : nested;
+
+    return typeof filters?.projects === 'function'
+        ? output.filter(filters.projects)
+        : output;
 }

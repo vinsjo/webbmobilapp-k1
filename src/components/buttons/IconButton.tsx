@@ -1,5 +1,4 @@
 import { ActionIcon } from '@mantine/core';
-import type { IconType } from 'react-icons';
 import type { OmitProps } from '@/utils/types';
 
 export type IconButtonProps = OmitProps<
@@ -10,10 +9,10 @@ export type IconButtonProps = OmitProps<
 export default function IconButton({
     icon,
     ...props
-}: IconButtonProps & { icon: IconType }) {
+}: IconButtonProps & { icon: JSX.Element }) {
     return (
-        <ActionIcon p="s" component="button" {...props}>
-            {icon({ style: { width: '100%', height: '100%' } })}
+        <ActionIcon p="m" component="button" {...props}>
+            {icon}
         </ActionIcon>
     );
 }

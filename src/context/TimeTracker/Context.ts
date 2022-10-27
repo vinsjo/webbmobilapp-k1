@@ -20,7 +20,7 @@ const createTimeTrackerContext = <T extends DataType>() => {
         update: function (id: T['id'], data: Partial<T>): Promise<T | null> {
             throw new Error('Function not implemented.');
         },
-        delete: function (id: T['id']): Promise<T['id'] | null> {
+        remove: function (id: T['id']): Promise<T['id'] | null> {
             throw new Error('Function not implemented.');
         },
         loaded: false,

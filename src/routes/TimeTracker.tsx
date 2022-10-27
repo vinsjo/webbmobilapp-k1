@@ -4,14 +4,13 @@ import useTimer from '@/hooks/useTimer';
 
 import { Stack } from '@mantine/core';
 import TaskTime from '@/components/TaskTime';
-import ProjectSelect from '@/components/ProjectSelect';
+import SelectProject from '@/components/input/SelectProject';
 import TimerDisplay from '@/components/TimerDisplay';
 
 import { getNestedTasks } from '@/utils/api';
 
 import type { Task } from '@/utils/api/types';
 import { filterData } from '@/utils';
-import AddProject from '@/components/AddProject';
 
 export default function TimeTracker() {
     const selectedProject = useProjects(
@@ -93,8 +92,7 @@ export default function TimeTracker() {
     return (
         <Stack spacing="md">
             <Stack>
-                <AddProject />
-                <ProjectSelect />
+                <SelectProject />
             </Stack>
             <TimerDisplay mx="auto" duration={duration} />
             {nestedTasks.map(({ timelogs, ...task }) => {

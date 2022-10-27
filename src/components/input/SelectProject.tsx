@@ -1,7 +1,8 @@
 import { useMemo, useCallback } from 'react';
 import { useProjects } from '@/context/TimeTracker';
 import { Select } from '@mantine/core';
-export default function ProjectSelect() {
+
+export default function SelectProject() {
     const { data, selected, setSelected } = useProjects();
     const value = useMemo(
         () => (!selected ? null : `${selected.id}`),
@@ -25,10 +26,10 @@ export default function ProjectSelect() {
         <Select
             value={value}
             onChange={handleChange}
-            label="Select a project"
-            placeholder=""
+            label="Selected Project"
+            placeholder="No project selected"
             searchable
-            nothingFound="No options"
+            nothingFound="No projects with that name"
             data={selectData}
         />
     );
