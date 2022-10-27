@@ -6,7 +6,7 @@ const API_BASE_URL = 'http://localhost:4000';
 
 const validRoutes: Route[] = ['projects', 'tasks', 'timelogs'];
 
-export function createRouteHandler<R extends Route, T extends RouteType<R>>(
+export function createApiHandler<R extends Route, T extends RouteType<R>>(
     route: R
 ): RouteHandler<T> {
     if (!validRoutes.includes(route)) {
@@ -20,7 +20,6 @@ export function createRouteHandler<R extends Route, T extends RouteType<R>>(
         if (!axios.isAxiosError(err) || err.code === 'ERR_CANCELED') {
             return null;
         }
-        console.log(err);
         const status = (err.request?.status ||
             err.response?.status ||
             0) as number;
@@ -71,26 +70,5 @@ export function createRouteHandler<R extends Route, T extends RouteType<R>>(
                 return false;
             }
         },
-        async where<K extends keyof T, V extends T[K]>(
-            key: K,
-            value: V,
-            signal?: AbortSignal
-        ) {
-            try {
-                const url = `${baseURL}?${key as string}=${value}`;
-                const res = await axios.get<T[]>(url, { signal });
-                return res?.data || null;
-            } catch (err: AxiosError | unknown) {
-                return handleError(err);
-            }
-        },
     };
 }
-
-const api = {
-    projects: createRouteHandler('projects'),
-    tasks: createRouteHandler('tasks'),
-    timelogs: createRouteHandler('timelogs'),
-};
-
-export default api;

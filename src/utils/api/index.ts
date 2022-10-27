@@ -1,8 +1,7 @@
 import * as Api from './types';
-import api, { createRouteHandler } from './api';
-export default api;
+import { createApiHandler } from './api';
 export type { Api };
-export { createRouteHandler };
+export { createApiHandler as createRouteHandler };
 import { filterData } from '..';
 
 export function getTotalDuration(timelogs: Api.Timelog[], onlySeconds = true) {

@@ -1,9 +1,9 @@
-import { useMemo } from 'react';
+import { useMemo, useCallback } from 'react';
 import { Task, Timelog } from '@/utils/api/types';
 import { Group, Text, Title, useMantineTheme } from '@mantine/core';
 import { getTotalDuration } from '@/utils/api';
 import DurationOutput from './DurationOutput';
-import PlayButton from './PlayButton';
+import { PlayButton } from './buttons';
 
 export interface Props {
     task: Task;
@@ -12,7 +12,7 @@ export interface Props {
     /** Indicates if this TaskTime component represents the currently selected task */
     selected?: boolean;
     onClick?: (id: Task['id']) => unknown;
-    currentDuration?: number;
+    duration?: number;
 }
 
 export default function TaskTime({
@@ -20,7 +20,7 @@ export default function TaskTime({
     timelogs,
     onClick,
     selected,
-    currentDuration = 0,
+    duration = 0,
 }: Props) {
     const theme = useMantineTheme();
     const storedDuration = useMemo(
@@ -36,8 +36,11 @@ export default function TaskTime({
         [selected, theme]
     );
 
-    const active = useMemo(() => !!currentDuration, [currentDuration]);
+    const active = useMemo(() => !!duration, [duration]);
 
+    const handleClick = useCallback(() => {
+        typeof onClick === 'function' && onClick(task.id);
+    }, [onClick, task.id]);
     return (
         <Group
             p="sm"
@@ -64,14 +67,9 @@ export default function TaskTime({
                     fontSize: theme.fontSizes.sm,
                 }}
             >
-                <DurationOutput duration={currentDuration + storedDuration} />
+                <DurationOutput duration={duration + storedDuration} />
             </Text>
-            <PlayButton
-                active={active}
-                onClick={() =>
-                    typeof onClick === 'function' && onClick(task.id)
-                }
-            />
+            <PlayButton active={active} onClick={handleClick} />
         </Group>
     );
 }

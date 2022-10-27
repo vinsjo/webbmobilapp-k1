@@ -4,11 +4,11 @@ import { getNestedProjects, getTotalDuration } from '@/utils/api';
 import { filterData, formatDuration } from '@/utils';
 import dayjs from 'dayjs';
 
-import { List, Stack, ActionIcon, Text, Title } from '@mantine/core';
+import { List, Stack, Text, Title } from '@mantine/core';
 import { DatePicker } from '@mantine/dates';
-import { FaTimes } from 'react-icons/fa';
 
 import type { Timelog, NestedTask } from '@/utils/api/types';
+import { DeleteButton } from '@/components/buttons';
 
 export default function Calendar() {
     const [selectedDate, setSelectedDate] = useState<Date | null>(new Date());
@@ -51,12 +51,9 @@ export default function Calendar() {
                             return (
                                 <List.Item
                                     icon={
-                                        <ActionIcon
-                                            size="sm"
+                                        <DeleteButton
                                             onClick={() => timelogs.delete(id)}
-                                        >
-                                            <FaTimes />
-                                        </ActionIcon>
+                                        />
                                     }
                                     key={`timelog-${id}`}
                                 >

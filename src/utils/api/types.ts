@@ -45,9 +45,4 @@ export interface RouteHandler<T extends DataType> {
         signal?: AbortSignal
     ): Promise<T | null>;
     delete(id: T['id'], signal?: AbortSignal): Promise<boolean>;
-    where<K extends keyof T, V extends T[K]>(
-        key: K,
-        value: V,
-        signal?: AbortSignal
-    ): Promise<T[] | null>;
 }

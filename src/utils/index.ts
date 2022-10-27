@@ -2,6 +2,7 @@ import { isStr } from 'x-is-type/callbacks';
 import dayjs from 'dayjs';
 import duration from 'dayjs/plugin/duration';
 dayjs.extend(duration);
+export * as TypeUtils from './types';
 
 export const classNames = (...names: unknown[]) => {
     return names.filter((name) => name && isStr(name)).join(' ');

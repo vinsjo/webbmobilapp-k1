@@ -6,43 +6,40 @@ import {
     type MantineSizes,
 } from '@mantine/core';
 
-import { objectEntries } from '@/utils';
-
 const mainFont = 'Roboto, sans-serif';
 const monoFont = 'Roboto Mono, monospace';
 
-const { fontSizes, headings } = (() => {
-    const sizes = [8, 10, 12, 14, 18];
-    const fontSizes = objectEntries(DEFAULT_THEME.fontSizes)
-        .sort((a, b) => a[1] - b[1])
-        .reduce((fontSizes, [key], i) => {
-            return { ...fontSizes, [key]: sizes[i] };
-        }, {}) as MantineSizes;
+const spacing: MantineSizes = {
+    xs: 4,
+    sm: 8,
+    md: 12,
+    lg: 16,
+    xl: 24,
+};
 
+const fontSizes: MantineSizes = {
+    ...DEFAULT_THEME.fontSizes,
+};
+
+const headings = (() => {
+    const { h1, h2, h3, h4, h5, h6 } = DEFAULT_THEME.headings.sizes;
+    console.log(DEFAULT_THEME.headings.sizes);
     const headings: MantineTheme['headings'] = {
         fontFamily: mainFont,
         fontWeight: 700,
-        sizes: [...sizes, Math.round(sizes[sizes.length - 1] * 1.3)]
-            .sort((a, b) => b - a)
-            .reduce((sizes, size, i) => {
-                const key = `h${
-                    i + 1
-                }` as keyof MantineTheme['headings']['sizes'];
-                return {
-                    ...sizes,
-                    [key]: {
-                        ...DEFAULT_THEME.headings.sizes,
-                        fontSize: size,
-                    },
-                };
-            }, {}) as typeof DEFAULT_THEME.headings.sizes,
+        sizes: {
+            h1: { ...h1, fontSize: Math.round(fontSizes.xl * 1.3) },
+            h2: { ...h2, fontSize: fontSizes.xl },
+            h3: { ...h3, fontSize: fontSizes.lg },
+            h4: { ...h4, fontSize: fontSizes.md },
+            h5: { ...h5, fontSize: fontSizes.sm },
+            h6: { ...h6, fontSize: fontSizes.xs },
+        },
     };
-
-    return {
-        headings,
-        fontSizes,
-    };
+    return headings;
 })();
+
+console.log(headings);
 
 const theme: Partial<MantineTheme> = {
     fontFamily: mainFont,
@@ -59,6 +56,7 @@ const theme: Partial<MantineTheme> = {
         },
     },
     fontSizes,
+    spacing,
     headings,
 };
 

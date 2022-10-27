@@ -11,6 +11,7 @@ import { getNestedTasks } from '@/utils/api';
 
 import type { Task } from '@/utils/api/types';
 import { filterData } from '@/utils';
+import AddProject from '@/components/AddProject';
 
 export default function TimeTracker() {
     const selectedProject = useProjects(
@@ -92,6 +93,7 @@ export default function TimeTracker() {
     return (
         <Stack spacing="md">
             <Stack>
+                <AddProject />
                 <ProjectSelect />
             </Stack>
             <TimerDisplay mx="auto" duration={duration} />
@@ -104,7 +106,7 @@ export default function TimeTracker() {
                         timelogs={timelogs}
                         selected={selected}
                         onClick={handleClick}
-                        currentDuration={!selected ? 0 : duration}
+                        duration={!selected ? 0 : duration}
                     />
                 );
             })}
