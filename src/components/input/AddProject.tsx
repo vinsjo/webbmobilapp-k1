@@ -1,9 +1,10 @@
 import React, { useCallback, useMemo, useState } from 'react';
-import { Box, ColorSwatch, Group, Stack, useMantineTheme } from '@mantine/core';
-import AddInput from './AddInput';
 import { useProjects } from '@/context/TimeTracker';
-import { OmitProps } from '@/utils/type-utils';
-import { objectKeys } from '@/utils';
+import { Box, Stack } from '@mantine/core';
+import AddInput from './AddInput';
+import type { OmitProps } from '@/utils/type-utils';
+
+import ColorSwatches from './ColorSwatches';
 
 type Props = OmitProps<typeof AddInput, 'value' | 'onChange' | 'error'>;
 
@@ -12,13 +13,6 @@ export default function AddProject(props: Props) {
     const [input, setInput] = useState('');
     const [selectedColor, setSelectedColor] = useState<string | null>(null);
     const trimmed = useMemo(() => input.trim(), [input]);
-
-    const theme = useMantineTheme();
-    const colors = useMemo(() => {
-        return objectKeys(theme.colors)
-            .filter((key) => !['gray', 'dark'].includes(key))
-            .map((key) => ({ key, value: theme.colors[key][6] }));
-    }, [theme]);
 
     const nameExists = useMemo(() => {
         return !!data.find(({ name }) =>
@@ -60,28 +54,7 @@ export default function AddProject(props: Props) {
                     {...props}
                 />
             </Box>
-            <Group position="apart" spacing="xs">
-                {colors.map(({ key, value }) => {
-                    const selected = selectedColor === value;
-                    return (
-                        <ColorSwatch
-                            key={key}
-                            component="button"
-                            color={value}
-                            onClick={() => setSelectedColor(value)}
-                            title={key}
-                            sx={{
-                                border: selected
-                                    ? `2px solid ${theme.colors.gray[0]}`
-                                    : 'none',
-                                cursor: 'pointer',
-                                height: theme.fontSizes.lg,
-                                width: theme.fontSizes.lg,
-                            }}
-                        />
-                    );
-                })}
-            </Group>
+            <ColorSwatches onChange={(c) => setSelectedColor(c)} />
         </Stack>
     );
 }

@@ -1,27 +1,15 @@
-import {
-    Burger,
-    Header as MantineHeader,
-    MediaQuery,
-    Group,
-    Title,
-} from '@mantine/core';
+import { OmitProps } from '@/utils/type-utils';
+import { Header as MantineHeader, Group, Title } from '@mantine/core';
 
-type Props = { openBurger: boolean; toggleBurger: () => void };
+type Props = OmitProps<typeof MantineHeader, 'children'> & {
+    title?: string;
+};
 
-function Header({ openBurger, toggleBurger }: Props) {
+function Header({ title, ...props }: Props) {
     return (
-        <MantineHeader height={70} p="md">
+        <MantineHeader p="md" {...props}>
             <Group spacing="md">
-                <MediaQuery largerThan="sm" styles={{ display: 'none' }}>
-                    <Burger
-                        opened={openBurger}
-                        onClick={toggleBurger}
-                        size="sm"
-                        mr="xl"
-                    />
-                </MediaQuery>
-
-                <Title size="h1">Time Tracker</Title>
+                <Title size="h1">{title || 'Time Tracker'}</Title>
             </Group>
         </MantineHeader>
     );

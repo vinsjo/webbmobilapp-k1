@@ -3,7 +3,7 @@ import { Task, Timelog } from '@/utils/api/types';
 import { Group, Text, Title, useMantineTheme } from '@mantine/core';
 import { getTotalDuration } from '@/utils/api';
 import DurationOutput from './DurationOutput';
-import { PlayButton } from './buttons';
+import { PlayButton } from './buttons/IconButtons';
 
 export interface Props {
     task: Task;

@@ -16,7 +16,8 @@ export default function CalendarList({ selectedDate }: Props) {
                               end && dayjs(start).isSame(selectedDate, 'date')
                       ),
             [selectedDate]
-        )
+        ),
+        (a, b) => a.data === b.data
     );
     const tasks = useTasks(
         useCallback(
@@ -27,7 +28,8 @@ export default function CalendarList({ selectedDate }: Props) {
                           timelogs.find(({ taskId }) => taskId === id)
                       ),
             [timelogs]
-        )
+        ),
+        (a, b) => a.data === b.data
     );
 
     const projects = useProjects(
@@ -39,7 +41,8 @@ export default function CalendarList({ selectedDate }: Props) {
                           tasks.find(({ projectId }) => projectId === id)
                       ),
             [tasks]
-        )
+        ),
+        (a, b) => a.data === b.data
     );
 
     return (

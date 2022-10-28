@@ -51,6 +51,11 @@ const theme: Partial<MantineTheme> = {
                 listStyleType: 'none',
             },
         },
+        ActionIcon: {
+            defaultProps: {
+                p: 'sm',
+            },
+        },
     },
     fontSizes,
     spacing,

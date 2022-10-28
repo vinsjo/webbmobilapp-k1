@@ -8,6 +8,7 @@ import {
     TimeTracker,
     Calendar,
     RouteError,
+    Test,
 } from './routes';
 
 const router = createBrowserRouter([
@@ -33,6 +34,7 @@ const router = createBrowserRouter([
                 element: <TimeTracker />,
             },
             { path: '/calendar', element: <Calendar /> },
+            { path: '/test', element: <Test /> },
         ],
     },
 ]);

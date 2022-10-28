@@ -3,7 +3,7 @@ import { List, Text } from '@mantine/core';
 import { useTimelogs } from '@/context/TimeTracker';
 import { Timelog } from '@/utils/api/types';
 import dayjs from 'dayjs';
-import { DeleteButton } from '@/components/buttons';
+import { DeleteButton } from '@/components/buttons/IconButtons';
 import DurationOutput from '@/components/DurationOutput';
 
 type Props = {

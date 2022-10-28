@@ -1,5 +1,5 @@
 import { TextInput, type TextInputProps } from '@mantine/core';
-import { AddButton } from '../buttons';
+import { AddButton } from '../buttons/IconButtons';
 
 type Props = Omit<TextInputProps, 'rightSection'> & {
     disabled?: boolean;
