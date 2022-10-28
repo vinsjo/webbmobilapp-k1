@@ -5,7 +5,7 @@ import {
     TimelogsContext,
     type TimeTracker,
 } from '@/context/TimeTracker';
-import { type Api } from '@/utils/api';
+import { Api, defaultColor } from '@/utils/api';
 import { useApiHandler } from '@/hooks';
 import { Center, Text } from '@mantine/core';
 
@@ -54,6 +54,21 @@ export default function TimeTrackerProvider(props: React.PropsWithChildren) {
         [timelogs, setSelectedTimelog, addTimelog]
     );
 
+    const addProject = useCallback<TimeTracker.Add<Api.Project>>(
+        (data) => {
+            return projects.add(
+                !data.color ? { ...data, color: defaultColor } : data
+            );
+        },
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+        [projects.add]
+    );
+
+    const projectsValue = useMemo<TimeTracker.Context<Api.Project>>(
+        () => ({ ...projects, add: addProject }),
+        [projects, addProject]
+    );
+
     useEffect(() => {
         if (!loaded || projects.selected?.id === tasks.selected?.projectId) {
             return;
@@ -77,7 +92,7 @@ export default function TimeTrackerProvider(props: React.PropsWithChildren) {
     }, []);
 
     return (
-        <ProjectsContext.Provider value={projects}>
+        <ProjectsContext.Provider value={projectsValue}>
             <TasksContext.Provider value={tasks}>
                 <TimelogsContext.Provider value={timelogsValue}>
                     {!loaded ? (

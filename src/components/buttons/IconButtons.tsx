@@ -28,7 +28,7 @@ export function PlayButton({
 }) {
     return (
         <ActionIcon p="sm" {...props}>
-            {active ? <FaPlay /> : <FaStop />}
+            {!active ? <FaPlay /> : <FaStop />}
         </ActionIcon>
     );
 }

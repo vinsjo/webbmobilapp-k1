@@ -4,6 +4,23 @@ export type { Api };
 export { createApiHandler as createRouteHandler };
 import { filterData } from '..';
 
+export const colors = {
+    red: '#bf4040',
+    pink: '#bf406c',
+    grape: '#a640bf',
+    violet: '#6040bf',
+    indigo: '#4059bf',
+    blue: '#4082bf',
+    cyan: '#40adbf',
+    teal: '#40bf98',
+    green: '#40bf58',
+    lime: '#88bf40',
+    yellow: '#bf8a40',
+    orange: '#bf6c40',
+};
+
+export const defaultColor = colors.blue;
+
 export function getTotalDuration(timelogs: Api.Timelog[], onlySeconds = true) {
     if (!timelogs.length) return 0;
     return timelogs.reduce((sum, { start, end }) => {

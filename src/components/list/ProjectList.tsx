@@ -1,6 +1,6 @@
 import { useMemo } from 'react';
 
-import { List, Stack, Title, Divider } from '@mantine/core';
+import { Stack, Title } from '@mantine/core';
 import TaskList from './TaskList';
 
 import { filterData } from '@/utils';
@@ -15,9 +15,9 @@ type Props = {
 
 export default function ProjectList({ projects, tasks, timelogs }: Props) {
     return (
-        <Stack spacing="lg" sx={{ width: '100%' }}>
+        <Stack spacing="lg">
             <Title order={3}>Projects</Title>
-            <List spacing="md" size="xl">
+            <Stack spacing="md">
                 {projects.map((project) => {
                     return (
                         <ListItem
@@ -28,7 +28,7 @@ export default function ProjectList({ projects, tasks, timelogs }: Props) {
                         />
                     );
                 })}
-            </List>
+            </Stack>
         </Stack>
     );
 }
@@ -49,15 +49,17 @@ function ListItem({
         [id, timelogs]
     );
     return (
-        <List.Item style={{ display: 'block', width: '100%' }}>
-            <Divider />
-            <Stack p="md">
-                <Title order={4} color={color || undefined}>
-                    {name}
-                </Title>
-                <TaskList tasks={filteredTasks} timelogs={filteredTimelogs} />
-            </Stack>
-            <Divider />
-        </List.Item>
+        <Stack
+            p="md"
+            spacing="md"
+            sx={(theme) => ({
+                background: color || theme.colors.orange[6],
+                color: theme.colors.gray[0],
+                borderRadius: theme.radius.sm,
+            })}
+        >
+            <Title order={4}>{name}</Title>
+            <TaskList tasks={filteredTasks} timelogs={filteredTimelogs} />
+        </Stack>
     );
 }

@@ -1,13 +1,8 @@
-import { useCallback, useMemo, useState } from 'react';
-import {
-    ColorSwatch,
-    Group,
-    MantineSize,
-    Stack,
-    useMantineTheme,
-} from '@mantine/core';
-import { objectKeys } from '@/utils';
+import { useEffect, useState } from 'react';
+import { ColorSwatch, Group, MantineSize, Stack } from '@mantine/core';
 import { OmitProps } from '@/utils/type-utils';
+import { objectEntries } from '@/utils';
+import { colors, defaultColor } from '@/utils/api';
 
 type Props = OmitProps<typeof Group, 'children' | 'onChange' | 'size'> & {
     label?: React.ReactNode;
@@ -23,43 +18,33 @@ export default function ColorSwatches({
     size,
     ...props
 }: Props) {
-    const theme = useMantineTheme();
+    const [selected, setSelected] = useState(initialValue || defaultColor);
 
-    const colors = useMemo(() => {
-        return objectKeys(theme.colors)
-            .filter((key) => !['gray', 'dark'].includes(key))
-            .map((key) => ({ key, value: theme.colors[key][6] }));
-    }, [theme.colors]);
+    useEffect(() => {
+        typeof onChange === 'function' && onChange(selected);
+    }, [onChange, selected]);
 
-    const [selected, setSelected] = useState(initialValue || null);
-    const handleChange = useCallback(
-        (color: string) => {
-            setSelected(color);
-            typeof onChange === 'function' && onChange(color);
-        },
-        [onChange]
-    );
     return (
         <Stack spacing="xs">
             {label}
             <Group position="apart" spacing="xs" {...props}>
-                {colors.map(({ key, value }) => {
+                {objectEntries(colors).map(([key, color]) => {
                     return (
                         <ColorSwatch
                             key={key}
                             component="button"
-                            color={value}
-                            onClick={() => handleChange(value)}
+                            color={color}
+                            onClick={() => setSelected(color)}
                             title={key}
-                            sx={{
+                            sx={(theme) => ({
                                 border:
-                                    selected === value
+                                    selected === color
                                         ? `2px solid ${theme.colors.gray[0]}`
                                         : 'none',
                                 cursor: 'pointer',
                                 height: theme.fontSizes[size || 'xl'],
                                 width: theme.fontSizes[size || 'xl'],
-                            }}
+                            })}
                         />
                     );
                 })}

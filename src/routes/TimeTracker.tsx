@@ -11,6 +11,7 @@ import { getNestedTasks } from '@/utils/api';
 
 import type { Task } from '@/utils/api/types';
 import { filterData } from '@/utils';
+import AddTask from '@/components/input/AddTask';
 
 export default function TimeTracker() {
     const selectedProject = useProjects(
@@ -94,7 +95,7 @@ export default function TimeTracker() {
             <Stack>
                 <SelectProject />
             </Stack>
-            <TimerDisplay mx="auto" duration={duration} />
+            <TimerDisplay duration={duration} />
             {nestedTasks.map(({ timelogs, ...task }) => {
                 const selected = tasks.selected?.id === task.id;
                 return (
@@ -108,6 +109,7 @@ export default function TimeTracker() {
                     />
                 );
             })}
+            {selectedProject?.id && <AddTask projectId={selectedProject.id} />}
         </Stack>
     );
 }

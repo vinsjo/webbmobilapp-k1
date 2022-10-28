@@ -13,6 +13,17 @@ export default function TaskList({ tasks, timelogs }: Props) {
     return (
         <Stack>
             <Title order={5}>Tasks:</Title>
+            <Stack spacing="xs">
+                {tasks.map((task) => {
+                    return (
+                        <ListItem
+                            key={`task-${task.id}`}
+                            timelogs={timelogs}
+                            {...task}
+                        />
+                    );
+                })}
+            </Stack>
             <List spacing="sm" pl="md">
                 {tasks.map((task) => {
                     return (
@@ -34,11 +45,9 @@ function ListItem({ id, title, timelogs }: Task & { timelogs: Timelog[] }) {
         [id, timelogs]
     );
     return (
-        <List.Item>
-            <Stack spacing="xs">
-                <Text size="sm">{title}</Text>
-                <TimelogList timelogs={filteredTimelogs} />
-            </Stack>
-        </List.Item>
+        <Stack spacing="xs">
+            <Text size="sm">{title}</Text>
+            <TimelogList timelogs={filteredTimelogs} />
+        </Stack>
     );
 }

@@ -39,27 +39,23 @@ export default function useApiHandler<
         }
     }, []);
 
-    const add = useCallback<TimeTracker.Add<T>>(
-        async (data, signal) => {
-            if (!(data instanceof Object) || !Object.keys(data).length) {
-                return null;
-            }
-            try {
-                const added = (await handler.current.post(
-                    data,
-                    signal
-                )) as T | null;
-                if (!added) return null;
-                setData((prev) => [...prev, added]);
-                if (route !== 'timelogs') setSelectedId(added.id);
-                return added;
-            } catch (err) {
-                if (typeof err === 'string') setError(err);
-                return null;
-            }
-        },
-        [setSelectedId, route]
-    );
+    const add = useCallback<TimeTracker.Add<T>>(async (data, signal) => {
+        if (!(data instanceof Object) || !Object.keys(data).length) {
+            return null;
+        }
+        try {
+            const added = (await handler.current.post(
+                data,
+                signal
+            )) as T | null;
+            if (!added) return null;
+            setData((prev) => [...prev, added]);
+            return added;
+        } catch (err) {
+            if (typeof err === 'string') setError(err);
+            return null;
+        }
+    }, []);
 
     const update = useCallback<TimeTracker.Update<T>>(
         async (id, data, signal) => {

@@ -17,7 +17,7 @@ type Props = {
 
 export default function AddProjectModal({ buttonLabel }: Props) {
     const [open, setOpen] = useState(true);
-    const { data, add, error } = useProjects();
+    const { data, add, error, setSelected } = useProjects();
     const [input, setInput] = useState('');
     const [selectedColor, setSelectedColor] = useState<string | null>(null);
     const trimmed = useMemo(() => input.trim(), [input]);
@@ -47,11 +47,13 @@ export default function AddProjectModal({ buttonLabel }: Props) {
             ev.preventDefault();
             if (!open || nameExists) return;
             if (!trimmed.length) return setInput('');
-            add({ name: trimmed, color: selectedColor }).then(
-                (added) => added && close()
-            );
+            add({ name: trimmed, color: selectedColor }).then(async (added) => {
+                if (!added) return;
+                await setSelected(added.id);
+                close();
+            });
         },
-        [open, close, trimmed, nameExists, add, selectedColor]
+        [open, close, trimmed, nameExists, add, selectedColor, setSelected]
     );
 
     return (
