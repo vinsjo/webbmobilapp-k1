@@ -38,7 +38,6 @@
         "eslint-plugin-react": "latest",
         "eslint-plugin-react-hooks": "^4.6.0",
         "husky": "^8.0.1",
-        "json-server": "^0.17.0",
         "prettier": "latest",
         "pretty-quick": "latest",
         "prompts": "^2.4.2",
