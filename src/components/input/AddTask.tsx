@@ -3,7 +3,7 @@ import { Box } from '@mantine/core';
 import { useTasks } from '@/context/TimeTracker';
 import { Project } from '@/utils/api/types';
 import { filterData } from '@/utils';
-import { OmitProps } from '@/utils/types';
+import { OmitProps } from '@/utils/type-utils';
 import AddInput from './AddInput';
 
 type Props = OmitProps<typeof AddInput, 'value' | 'onChange' | 'error'> & {

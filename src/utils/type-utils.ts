@@ -11,3 +11,9 @@ export type OmitProps<
     K extends keyof P,
     P = any
 > = Omit<PropTypes<T>, K>;
+
+export type PickProps<
+    T extends FunctionComponent<P>,
+    K extends keyof P,
+    P = any
+> = Pick<PropTypes<T>, K>;

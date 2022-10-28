@@ -1,44 +1,14 @@
-import { isStr } from 'x-is-type/callbacks';
 import dayjs from 'dayjs';
 import duration from 'dayjs/plugin/duration';
 dayjs.extend(duration);
-export * as TypeUtils from './types';
 
-export const classNames = (...names: unknown[]) => {
-    return names.filter((name) => name && isStr(name)).join(' ');
-};
-
-export function pick<
-    T extends Record<string | number | symbol, unknown>,
-    K extends keyof T
->(obj: T, ...keys: K[]) {
-    return (
-        !(obj instanceof Object)
-            ? {}
-            : keys.reduce((output, key) => {
-                  if (!(key in obj)) return output;
-                  return { ...output, [key]: obj[key] };
-              }, {})
-    ) as Pick<T, typeof keys[number]>;
+export function rand_int(max: number, min = 0) {
+    if (typeof max !== 'number') return 0;
+    return Math.floor(Math.random() * (max + 1 - min)) + min;
 }
-
 export function replaceAtIndex<T = unknown>(arr: T[], index: number, value: T) {
     if (index < 0) return arr;
     return [...arr.slice(0, index), value, ...arr.slice(index + 1)];
-}
-
-export function omit<
-    T extends Record<string | number | symbol, unknown>,
-    K extends keyof T
->(obj: T, ...keys: K[]) {
-    return (
-        !(obj instanceof Object)
-            ? {}
-            : keys.reduce((output, key) => {
-                  if (!(key in obj)) return output;
-                  return { ...output, [key]: obj[key] };
-              }, {})
-    ) as Omit<T, typeof keys[number]>;
 }
 
 export function addLeadingZeroes(num: number, length = 2, fixedLength = true) {
@@ -103,4 +73,13 @@ export function objectEntries<
 >(obj: T) {
     if (!(obj instanceof Object)) return [];
     return Object.entries(obj) as [K, T[K]][];
+}
+
+export function objectKeyTypes<
+    K extends keyof T,
+    T = Record<string | number | symbol, unknown>
+>(obj: T) {
+    return objectKeys(obj).reduce((types, key) => {
+        return { ...types, [key]: typeof obj[key] };
+    }, {}) as Record<K, string>;
 }

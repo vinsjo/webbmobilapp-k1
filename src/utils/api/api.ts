@@ -1,5 +1,4 @@
 import axios, { AxiosError } from 'axios';
-import { isNum } from 'x-is-type/callbacks';
 import { Route, RouteType, RouteHandler } from './types';
 
 const API_BASE_URL = 'http://localhost:3000';
@@ -33,7 +32,7 @@ export function createApiHandler<R extends Route, T extends RouteType<R>>(
         ) {
             try {
                 const res = await axios.get<ID extends T['id'] ? T : T[]>(
-                    isNum(id) ? `${baseURL}/${id}` : baseURL,
+                    typeof id === 'number' ? `${baseURL}/${id}` : baseURL,
                     {
                         signal,
                     }

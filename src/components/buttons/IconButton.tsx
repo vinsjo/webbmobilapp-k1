@@ -1,5 +1,5 @@
 import { ActionIcon } from '@mantine/core';
-import type { OmitProps } from '@/utils/types';
+import type { OmitProps } from '@/utils/type-utils';
 
 export type IconButtonProps = OmitProps<
     typeof ActionIcon<'button'>,

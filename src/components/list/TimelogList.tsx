@@ -6,7 +6,11 @@ import dayjs from 'dayjs';
 import { DeleteButton } from '@/components/buttons';
 import DurationOutput from '@/components/DurationOutput';
 
-export default function TimelogList({ timelogs }: { timelogs: Timelog[] }) {
+type Props = {
+    timelogs: Timelog[];
+};
+
+export default function TimelogList({ timelogs }: Props) {
     const { remove } = useTimelogs();
     return (
         <List pl="sm">

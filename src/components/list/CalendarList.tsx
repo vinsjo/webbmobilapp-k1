@@ -1,16 +1,48 @@
+import { useCallback } from 'react';
+import { useTimelogs, useProjects, useTasks } from '@/context/TimeTracker';
 import dayjs from 'dayjs';
 import ProjectList from './ProjectList';
-import useNestedProjects from '@/hooks/useNestedProjects';
 
-type Props = { selectedDate: Date | null };
+type Props = { selectedDate: Date | string | null };
 
 export default function CalendarList({ selectedDate }: Props) {
-    const projects = useNestedProjects({
-        projects: ({ tasks }) => tasks.length,
-        tasks: ({ timelogs }) => timelogs.length,
-        timelogs: ({ start, end }) =>
-            selectedDate && end && dayjs(start).isSame(selectedDate, 'date'),
-    });
+    const timelogs = useTimelogs(
+        useCallback(
+            ({ data }) =>
+                !selectedDate
+                    ? []
+                    : data.filter(
+                          ({ start, end }) =>
+                              end && dayjs(start).isSame(selectedDate, 'date')
+                      ),
+            [selectedDate]
+        )
+    );
+    const tasks = useTasks(
+        useCallback(
+            ({ data }) =>
+                !timelogs.length
+                    ? []
+                    : data.filter(({ id }) =>
+                          timelogs.find(({ taskId }) => taskId === id)
+                      ),
+            [timelogs]
+        )
+    );
 
-    return <ProjectList projects={projects} />;
+    const projects = useProjects(
+        useCallback(
+            ({ data }) =>
+                !tasks.length
+                    ? []
+                    : data.filter(({ id }) =>
+                          tasks.find(({ projectId }) => projectId === id)
+                      ),
+            [tasks]
+        )
+    );
+
+    return (
+        <ProjectList projects={projects} tasks={tasks} timelogs={timelogs} />
+    );
 }

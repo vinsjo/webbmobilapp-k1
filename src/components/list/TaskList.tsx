@@ -1,23 +1,44 @@
-import { NestedTask } from '@/utils/api/types';
+import { filterData } from '@/utils';
+import { Task, Timelog } from '@/utils/api/types';
 import { List, Text, Stack, Title } from '@mantine/core';
+import { useMemo } from 'react';
 import TimelogList from './TimelogList';
 
-export default function TaskList({ tasks }: { tasks: NestedTask[] }) {
+type Props = {
+    tasks: Task[];
+    timelogs: Timelog[];
+};
+
+export default function TaskList({ tasks, timelogs }: Props) {
     return (
         <Stack>
             <Title order={5}>Tasks:</Title>
             <List spacing="sm" pl="md">
-                {tasks.map(({ id, title, timelogs }) => {
+                {tasks.map((task) => {
                     return (
-                        <List.Item key={`task-${id}`}>
-                            <Stack spacing="xs">
-                                <Text size="sm">{title}</Text>
-                                <TimelogList timelogs={timelogs} />
-                            </Stack>
-                        </List.Item>
+                        <ListItem
+                            key={`task-${task.id}`}
+                            timelogs={timelogs}
+                            {...task}
+                        />
                     );
                 })}
             </List>
         </Stack>
+    );
+}
+
+function ListItem({ id, title, timelogs }: Task & { timelogs: Timelog[] }) {
+    const filteredTimelogs = useMemo(
+        () => filterData(timelogs, 'taskId', id),
+        [id, timelogs]
+    );
+    return (
+        <List.Item>
+            <Stack spacing="xs">
+                <Text size="sm">{title}</Text>
+                <TimelogList timelogs={filteredTimelogs} />
+            </Stack>
+        </List.Item>
     );
 }

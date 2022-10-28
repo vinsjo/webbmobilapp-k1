@@ -2,7 +2,7 @@ import React, { useCallback, useMemo, useState } from 'react';
 import { Box, ColorSwatch, Group, Stack, useMantineTheme } from '@mantine/core';
 import AddInput from './AddInput';
 import { useProjects } from '@/context/TimeTracker';
-import { OmitProps } from '@/utils/types';
+import { OmitProps } from '@/utils/type-utils';
 import { objectKeys } from '@/utils';
 
 type Props = OmitProps<typeof AddInput, 'value' | 'onChange' | 'error'>;

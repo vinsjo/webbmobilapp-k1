@@ -1,6 +1,5 @@
 import { useState, useMemo, useCallback, useEffect, useRef } from 'react';
 import { useLocalStorage } from '@mantine/hooks';
-import { isObj } from 'x-is-type/callbacks';
 import { replaceAtIndex } from '@/utils';
 import { createRouteHandler, type Api } from '@/utils/api';
 import type { TimeTracker } from '@/context/TimeTracker';
@@ -13,6 +12,7 @@ export default function useApiHandler<
     const [loaded, setLoaded] = useState(false);
     const [data, setData] = useState<T[]>([]);
     const [error, setError] = useState<string | null>(null);
+
     const [selectedId, setSelectedId] = useLocalStorage<T['id'] | null>({
         key: `vinsjo-webbmobilapp-ks1-${route}-selected-id`,
         defaultValue: null,
@@ -41,7 +41,7 @@ export default function useApiHandler<
 
     const add = useCallback<TimeTracker.Add<T>>(
         async (data, signal) => {
-            if (!isObj(data) || !Object.keys(data).length) {
+            if (!(data instanceof Object) || !Object.keys(data).length) {
                 return null;
             }
             try {
@@ -63,7 +63,7 @@ export default function useApiHandler<
 
     const update = useCallback<TimeTracker.Update<T>>(
         async (id, data, signal) => {
-            if (!isObj(data) || !Object.keys(data).length) {
+            if (!(data instanceof Object) || !Object.keys(data).length) {
                 return null;
             }
             try {
