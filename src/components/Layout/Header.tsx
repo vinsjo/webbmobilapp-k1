@@ -1,5 +1,5 @@
 import { OmitProps } from '@/utils/type-utils';
-import { Header as MantineHeader, Group, Title } from '@mantine/core';
+import { Header as MantineHeader, Center, Title } from '@mantine/core';
 
 type Props = OmitProps<typeof MantineHeader, 'children'> & {
     title?: string;
@@ -7,10 +7,10 @@ type Props = OmitProps<typeof MantineHeader, 'children'> & {
 
 function Header({ title, ...props }: Props) {
     return (
-        <MantineHeader p="md" {...props}>
-            <Group spacing="md">
+        <MantineHeader {...props}>
+            <Center style={{ width: '100%', height: '100%' }}>
                 <Title size="h1">{title || 'Time Tracker'}</Title>
-            </Group>
+            </Center>
         </MantineHeader>
     );
 }

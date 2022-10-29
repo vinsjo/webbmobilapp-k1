@@ -39,6 +39,7 @@ export default function AddProject(props: Props) {
         },
         [trimmed, nameExists, add, selectedColor]
     );
+
     return (
         <Stack spacing="md">
             <Box component="form" onSubmit={handleSubmit}>

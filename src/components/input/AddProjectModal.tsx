@@ -1,23 +1,16 @@
 import { useCallback, useMemo, useState } from 'react';
-import {
-    Modal,
-    Stack,
-    Button,
-    Text,
-    TextInput,
-    Group,
-    Space,
-} from '@mantine/core';
+import { Stack, Button, Text, TextInput, Group, Space } from '@mantine/core';
 import { useProjects } from '@/context/TimeTracker';
 import ColorSwatches from './ColorSwatches';
+import ModalForm from './ModalForm';
 
 type Props = {
     buttonLabel?: React.ReactNode;
 };
 
 export default function AddProjectModal({ buttonLabel }: Props) {
-    const [open, setOpen] = useState(true);
     const { data, add, error, setSelected } = useProjects();
+
     const [input, setInput] = useState('');
     const [selectedColor, setSelectedColor] = useState<string | null>(null);
     const trimmed = useMemo(() => input.trim(), [input]);
@@ -36,72 +29,71 @@ export default function AddProjectModal({ buttonLabel }: Props) {
         return null;
     }, [error, nameExists]);
 
-    const close = useCallback(() => {
+    const handleClose = useCallback(() => {
         setInput('');
         setSelectedColor(null);
-        setOpen(false);
     }, []);
 
-    const handleSubmit = useCallback<React.FormEventHandler<HTMLFormElement>>(
-        (ev) => {
-            ev.preventDefault();
-            if (!open || nameExists) return;
-            if (!trimmed.length) return setInput('');
-            add({ name: trimmed, color: selectedColor }).then(async (added) => {
-                if (!added) return;
-                await setSelected(added.id);
-                close();
-            });
-        },
-        [open, close, trimmed, nameExists, add, selectedColor, setSelected]
-    );
+    const handleSubmit = useCallback(() => {
+        if (!open || nameExists) return;
+        if (!trimmed.length) return setInput('');
+        add({ name: trimmed, color: selectedColor }).then(async (added) => {
+            if (!added) return;
+            await setSelected(added.id);
+            handleClose();
+        });
+    }, [
+        open,
+        handleClose,
+        trimmed,
+        nameExists,
+        add,
+        selectedColor,
+        setSelected,
+    ]);
 
     return (
-        <>
-            <Modal opened={open} onClose={close} title="Add a project" centered>
+        <ModalForm
+            onSubmit={handleSubmit}
+            onClose={() => {
+                setInput('');
+                setSelectedColor(null);
+            }}
+            buttonLabel="Add Project"
+        >
+            <Stack spacing="lg">
+                <TextInput
+                    size="sm"
+                    label={
+                        <Text size="sm" weight={500}>
+                            Project name
+                        </Text>
+                    }
+                    placeholder="Enter project name"
+                    value={input}
+                    error={errorOutput}
+                    minLength={3}
+                    maxLength={50}
+                    inputWrapperOrder={['label', 'input', 'error']}
+                    onChange={({ target }) => setInput(target.value)}
+                />
+
+                <ColorSwatches
+                    label={
+                        <Text size="sm" weight={500}>
+                            Select Color
+                        </Text>
+                    }
+                    onChange={(c) => setSelectedColor(c)}
+                />
                 <Space h="lg" />
-                <form onSubmit={handleSubmit}>
-                    <Stack spacing="lg">
-                        <TextInput
-                            size="sm"
-                            label={
-                                <Text size="sm" weight={500}>
-                                    Project name
-                                </Text>
-                            }
-                            placeholder="Enter project name"
-                            value={input}
-                            error={errorOutput}
-                            minLength={3}
-                            maxLength={50}
-                            inputWrapperOrder={['label', 'input', 'error']}
-                            onChange={({ target }) => setInput(target.value)}
-                        />
-
-                        <ColorSwatches
-                            label={
-                                <Text size="sm" weight={500}>
-                                    Select Color
-                                </Text>
-                            }
-                            onChange={(c) => setSelectedColor(c)}
-                        />
-                        <Space h="lg" />
-                        <Button
-                            type="submit"
-                            disabled={!open || !trimmed.length || nameExists}
-                        >
-                            Add
-                        </Button>
-                    </Stack>
-                </form>
-            </Modal>
-
-            <Group position="center">
-                <Button onClick={() => setOpen(true)}>
-                    {buttonLabel || 'Add project'}
+                <Button
+                    type="submit"
+                    disabled={!open || !trimmed.length || nameExists}
+                >
+                    Add
                 </Button>
-            </Group>
-        </>
+            </Stack>
+        </ModalForm>
     );
 }

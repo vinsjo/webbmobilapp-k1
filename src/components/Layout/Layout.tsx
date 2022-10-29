@@ -12,10 +12,21 @@ export default function Layout(props: React.PropsWithChildren) {
         return `/${basePath}`;
     }, [pathname]);
 
+    const pageTitle = useMemo(() => {
+        switch (activePath) {
+            case '/calendar':
+                return 'Calendar';
+            case '/overview':
+                return 'Overview';
+            default:
+                return 'Time Tracker';
+        }
+    }, [activePath]);
+
     return (
         <AppShell
             navbarOffsetBreakpoint="sm"
-            header={<Header height={50} />}
+            header={<Header height={50} title={pageTitle} />}
             footer={<Footer height={70} activePath={activePath} />}
         >
             {props.children}
