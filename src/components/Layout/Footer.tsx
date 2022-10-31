@@ -5,7 +5,7 @@ import { OmitProps } from '@/utils/type-utils';
 
 const links = [
     { to: '/calendar', title: 'Calendar', icon: FaCalendarAlt },
-    { to: '/timer', title: 'Timer', icon: FaStopwatch },
+    { to: '/', title: 'Timer', icon: FaStopwatch },
     { to: '/overview', title: 'Overview', icon: FaListAlt },
 ];
 

@@ -3,12 +3,12 @@ import { ColorSwatch, Group, MantineSize, Stack } from '@mantine/core';
 import { OmitProps } from '@/utils/type-utils';
 import { objectEntries } from '@/utils';
 import { Colors, defaultColor } from '@/utils/api';
-import type { Project } from '@/utils/api/types';
+import { Project } from '@/utils/api/types';
 
 type Props = OmitProps<typeof Group, 'children' | 'onChange' | 'size'> & {
     label?: React.ReactNode;
     value?: Project['color'];
-    onChange?: (name: Project['color']) => unknown;
+    onChange?: (color: Project['color']) => unknown;
     size?: MantineSize;
 };
 
@@ -48,7 +48,7 @@ export default function ColorSwatches({
                             component="button"
                             type="button"
                             color={color}
-                            onClick={() => setSelected(name)}
+                            onClick={() => setSelected(color)}
                             title={name}
                             sx={(theme) => ({
                                 border:

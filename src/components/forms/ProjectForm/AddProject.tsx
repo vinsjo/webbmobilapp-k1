@@ -2,12 +2,13 @@ import { useCallback, useMemo, useState } from 'react';
 import { useProjects } from '@/context/TimeTracker';
 import type { Project } from '@/utils/api/types';
 import ProjectForm from './ProjectForm';
+import { randomColor } from '@/utils/api';
 
 export default function AddProject({ onSubmit }: { onSubmit?: () => unknown }) {
     const { data, add, setSelected, error } = useProjects();
 
     const [name, setName] = useState('');
-    const [color, setColor] = useState<Project['color']>(null);
+    const [color, setColor] = useState<Project['color']>(randomColor());
 
     const nameExists = useMemo(() => {
         const trimmed = name.trim();
@@ -32,7 +33,6 @@ export default function AddProject({ onSubmit }: { onSubmit?: () => unknown }) {
         if (!added) return;
         await setSelected(added.id);
         setName('');
-        setColor(null);
         if (typeof onSubmit === 'function') onSubmit();
     }, [add, name, color, nameExists, setSelected, onSubmit]);
 

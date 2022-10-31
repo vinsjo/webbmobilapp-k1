@@ -36,6 +36,7 @@ export default function ProjectForm({
                 onChange={({ target }) => onNameChange(target.value)}
                 withAsterisk={false}
                 autoComplete="off"
+                autoFocus
                 required
             />
             {!error && <Space h="md" />}

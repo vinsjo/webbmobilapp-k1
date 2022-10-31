@@ -3,6 +3,7 @@ import { Text } from '@mantine/core';
 import { useProjects } from '@/context/TimeTracker';
 import ProjectForm from './ProjectForm';
 import { Project } from '@/utils/api/types';
+import { defaultColor } from '@/utils/api';
 
 export default function EditProject({
     onSubmit,
@@ -28,7 +29,7 @@ export default function EditProject({
     );
 
     const [name, setName] = useState(selected?.name || '');
-    const [color, setColor] = useState(selected?.color || null);
+    const [color, setColor] = useState(selected?.color || defaultColor);
 
     const nameExists = useMemo(() => {
         const trimmed = name.trim();
@@ -64,7 +65,7 @@ export default function EditProject({
         const updated = await update(selected.id, changedValues);
         if (!updated) return;
         setName('');
-        setColor(null);
+        setColor(defaultColor);
         if (typeof onSubmit === 'function') onSubmit();
     }, [update, hasChanged, nameExists, selected, onSubmit, changedValues]);
 

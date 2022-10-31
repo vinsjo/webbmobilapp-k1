@@ -31,6 +31,7 @@ export default function TaskForm({
                 onChange={({ target }) => onChange(target.value)}
                 withAsterisk={false}
                 autoComplete="off"
+                autoFocus
                 required
             />
             {!error && <Space h="md" />}

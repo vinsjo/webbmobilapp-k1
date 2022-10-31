@@ -3,12 +3,9 @@ import { useCallback, useMemo } from 'react';
 import { Group, Stack, Title } from '@mantine/core';
 import TaskList from './TaskList';
 
-import { filterData } from '@/utils';
-
 import type { Project, Task, Timelog } from '@/utils/api/types';
 import { ProjectModal } from '@/components/modals';
 import { useProjects } from '@/context/TimeTracker';
-import { Colors } from '@/utils/api';
 import { FaEdit } from 'react-icons/fa';
 
 type Props = {
@@ -47,11 +44,11 @@ function ListItem({
 }: Project & { tasks: Task[]; timelogs: Timelog[] }) {
     const { setSelected } = useProjects();
     const filteredTasks = useMemo(
-        () => filterData(tasks, 'projectId', id),
+        () => tasks.filter(({ projectId }) => projectId === id),
         [id, tasks]
     );
     const filteredTimelogs = useMemo(
-        () => filterData(timelogs, 'projectId', id),
+        () => timelogs.filter(({ projectId }) => projectId === id),
         [id, timelogs]
     );
     const handleClick = useCallback(() => {
@@ -62,7 +59,7 @@ function ListItem({
             p="md"
             spacing="md"
             sx={(theme) => ({
-                background: !color ? theme.colors.gray[8] : Colors[color],
+                background: color || theme.colors.gray[8],
                 borderRadius: theme.radius.sm,
             })}
         >

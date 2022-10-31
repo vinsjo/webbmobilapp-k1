@@ -1,4 +1,3 @@
-import { filterData } from '@/utils';
 import { Task, Timelog } from '@/utils/api/types';
 import { Text, Stack, Title, Group, Divider } from '@mantine/core';
 import { useMemo } from 'react';
@@ -34,7 +33,7 @@ export default function TaskList({ tasks, timelogs }: Props) {
 
 function ListItem({ id, title, timelogs }: Task & { timelogs: Timelog[] }) {
     const filteredTimelogs = useMemo(
-        () => filterData(timelogs, 'taskId', id),
+        () => timelogs.filter(({ taskId }) => taskId === id),
         [id, timelogs]
     );
     const totalDuration = useMemo(

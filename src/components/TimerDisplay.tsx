@@ -1,5 +1,5 @@
 import { useProjects, useTasks, useTimelogs } from '@/context/TimeTracker';
-import { getTotalDuration, Colors } from '@/utils/api';
+import { getTotalDuration } from '@/utils/api';
 import { OmitProps } from '@/utils/type-utils';
 import {
     Group,
@@ -95,9 +95,9 @@ export default function TimerDisplay({ duration, maxWidth, ...props }: Props) {
             px="md"
             spacing="lg"
             sx={(theme) => ({
-                backgroundColor: !selectedProject?.color
+                backgroundColor: !selectedProject
                     ? theme.colors.dark[9]
-                    : Colors[selectedProject.color],
+                    : selectedProject.color,
                 width: '100%',
                 maxWidth,
                 borderRadius: theme.radius.md,

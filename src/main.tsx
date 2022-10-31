@@ -1,14 +1,7 @@
 import React from 'react';
 import ReactDOM from 'react-dom/client';
 import { createBrowserRouter, RouterProvider } from 'react-router-dom';
-import {
-    Root,
-    Home,
-    Overview,
-    TimeTracker,
-    Calendar,
-    RouteError,
-} from './routes';
+import { Root, Overview, TimeTracker, Calendar, RouteError } from './routes';
 
 const router = createBrowserRouter([
     {
@@ -18,7 +11,7 @@ const router = createBrowserRouter([
         children: [
             {
                 index: true,
-                element: <Home />,
+                element: <TimeTracker />,
             },
             {
                 path: '/overview/:activeTab',
@@ -27,10 +20,6 @@ const router = createBrowserRouter([
             {
                 path: '/overview',
                 element: <Overview />,
-            },
-            {
-                path: '/timer',
-                element: <TimeTracker />,
             },
             { path: '/calendar', element: <Calendar /> },
         ],
