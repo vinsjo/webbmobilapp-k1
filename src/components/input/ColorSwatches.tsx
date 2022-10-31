@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { ColorSwatch, Group, MantineSize, Stack } from '@mantine/core';
 import { OmitProps } from '@/utils/type-utils';
 import { objectEntries } from '@/utils';
@@ -7,6 +7,7 @@ import { colors, defaultColor } from '@/utils/api';
 type Props = OmitProps<typeof Group, 'children' | 'onChange' | 'size'> & {
     label?: React.ReactNode;
     initialValue?: string;
+    value?: string | null;
     onChange?: (color: string) => unknown;
     size?: MantineSize;
 };
@@ -16,13 +17,28 @@ export default function ColorSwatches({
     initialValue,
     onChange,
     size,
+    value: controlledValue,
     ...props
 }: Props) {
-    const [selected, setSelected] = useState(initialValue || defaultColor);
+    const onChangeRef = useRef(onChange);
+    const [selected, setSelected] = useState(
+        controlledValue || initialValue || defaultColor
+    );
 
     useEffect(() => {
-        typeof onChange === 'function' && onChange(selected);
-    }, [onChange, selected]);
+        typeof onChangeRef.current === 'function' &&
+            onChangeRef.current(selected);
+    }, [selected]);
+
+    useEffect(() => {
+        if (!controlledValue) return;
+        setSelected(controlledValue);
+    }, [controlledValue]);
+
+    useEffect(() => {
+        if (!onChange || onChangeRef.current === onChange) return;
+        onChangeRef.current = onChange;
+    }, [onChange]);
 
     return (
         <Stack spacing="xs">
@@ -33,6 +49,7 @@ export default function ColorSwatches({
                         <ColorSwatch
                             key={key}
                             component="button"
+                            type="button"
                             color={color}
                             onClick={() => setSelected(color)}
                             title={key}

@@ -19,8 +19,10 @@ export function addLeadingZeroes(num: number, length = 2, fixedLength = true) {
     return [...Array(length - str.length).fill(0), str].join('');
 }
 
-export function formatDuration(milliseconds: number, format?: string) {
-    return dayjs.duration(milliseconds).format(format || 'HH:mm:ss');
+export function formatDuration(milliseconds: number | null) {
+    return milliseconds === null
+        ? '--:--:--'
+        : dayjs.duration(milliseconds).format('HH:mm:ss');
 }
 
 export function getDurationValues(milliseconds: number) {

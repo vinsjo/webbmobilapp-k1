@@ -1,7 +1,7 @@
 import axios, { AxiosError } from 'axios';
 import { Route, RouteType, RouteHandler } from './types';
 
-const API_BASE_URL = 'http://localhost:3000';
+const API_BASE_URL = 'http://localhost:5000';
 
 const validRoutes: Route[] = ['projects', 'tasks', 'timelogs'];
 
@@ -15,6 +15,7 @@ export function createApiHandler<R extends Route, T extends RouteType<R>>(
     }
     const baseURL = `${API_BASE_URL}/${route}`;
 
+    // temporary "handling" of errors
     const handleError = (err: AxiosError | unknown) => {
         if (!axios.isAxiosError(err) || err.code === 'ERR_CANCELED') {
             return null;
@@ -26,43 +27,35 @@ export function createApiHandler<R extends Route, T extends RouteType<R>>(
     };
 
     return {
-        async get<ID = T['id'] | null | undefined>(
-            id?: ID,
-            signal?: AbortSignal
-        ) {
+        async get<ID = T['id'] | null | undefined>(id?: ID) {
             try {
                 const res = await axios.get<ID extends T['id'] ? T : T[]>(
-                    typeof id === 'number' ? `${baseURL}/${id}` : baseURL,
-                    {
-                        signal,
-                    }
+                    typeof id === 'number' ? `${baseURL}/${id}` : baseURL
                 );
                 return res?.data || null;
             } catch (err: AxiosError | unknown) {
                 return handleError(err);
             }
         },
-        async post(data: Omit<T, 'id'>, signal?: AbortSignal) {
+        async post(data: Omit<T, 'id'>) {
             try {
-                const res = await axios.post<T>(baseURL, data, { signal });
+                const res = await axios.post<T>(baseURL, data);
                 return res?.data || null;
             } catch (err: AxiosError | unknown) {
                 return handleError(err);
             }
         },
-        async patch(id: T['id'], data: Partial<T>, signal?: AbortSignal) {
+        async patch(id: T['id'], data: Partial<T>) {
             try {
-                const res = await axios.patch<T>(`${baseURL}/${id}`, data, {
-                    signal,
-                });
+                const res = await axios.patch<T>(`${baseURL}/${id}`, data);
                 return res?.data || null;
             } catch (err: AxiosError | unknown) {
                 return handleError(err);
             }
         },
-        async delete(id: T['id'], signal?: AbortSignal) {
+        async delete(id: T['id']) {
             try {
-                const res = await axios.delete(`${baseURL}/${id}`, { signal });
+                const res = await axios.delete(`${baseURL}/${id}`);
                 return res.status === 200;
             } catch (err: AxiosError | unknown) {
                 handleError(err);

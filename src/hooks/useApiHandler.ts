@@ -26,10 +26,9 @@ export default function useApiHandler<
         [data, selectedId]
     );
 
-    const load = useCallback<TimeTracker.Load<T>>(async (signal) => {
+    const load = useCallback<TimeTracker.Load<T>>(async () => {
         try {
-            const data =
-                ((await handler.current.get(null, signal)) as T[]) || null;
+            const data = ((await handler.current.get()) as T[]) || null;
             if (data) setData(data);
             setLoaded(true);
             return data;
@@ -39,15 +38,12 @@ export default function useApiHandler<
         }
     }, []);
 
-    const add = useCallback<TimeTracker.Add<T>>(async (data, signal) => {
+    const add = useCallback<TimeTracker.Add<T>>(async (data) => {
         if (!(data instanceof Object) || !Object.keys(data).length) {
             return null;
         }
         try {
-            const added = (await handler.current.post(
-                data,
-                signal
-            )) as T | null;
+            const added = (await handler.current.post(data)) as T | null;
             if (!added) return null;
             setData((prev) => [...prev, added]);
             return added;
@@ -57,30 +53,27 @@ export default function useApiHandler<
         }
     }, []);
 
-    const update = useCallback<TimeTracker.Update<T>>(
-        async (id, data, signal) => {
-            if (!(data instanceof Object) || !Object.keys(data).length) {
-                return null;
-            }
-            try {
-                const updated = await handler.current.patch(id, data, signal);
-                if (!updated) return null;
-                setData((prev) => {
-                    const i = prev.findIndex((data) => data.id === id);
-                    return replaceAtIndex(prev, i, updated as T);
-                });
-                return updated;
-            } catch (err) {
-                if (typeof err === 'string') setError(err);
-                return null;
-            }
-        },
-        []
-    );
-
-    const remove = useCallback<TimeTracker.Remove<T>>(async (id, signal) => {
+    const update = useCallback<TimeTracker.Update<T>>(async (id, data) => {
+        if (!(data instanceof Object) || !Object.keys(data).length) {
+            return null;
+        }
         try {
-            const success = await handler.current.delete(id, signal);
+            const updated = await handler.current.patch(id, data);
+            if (!updated) return null;
+            setData((prev) => {
+                const i = prev.findIndex((data) => data.id === id);
+                return replaceAtIndex(prev, i, updated as T);
+            });
+            return updated;
+        } catch (err) {
+            if (typeof err === 'string') setError(err);
+            return null;
+        }
+    }, []);
+
+    const remove = useCallback<TimeTracker.Remove<T>>(async (id) => {
+        try {
+            const success = await handler.current.delete(id);
             if (!success) return null;
             setData((prev) => prev.filter((data) => data.id !== id));
             return id;

@@ -1,59 +1,63 @@
 const fs = require('fs');
 const path = require('path');
-const prompts = require('prompts');
+const readline = require('readline');
 
-const output = {
-    projects: [],
-    tasks: [],
-    timelogs: [],
+const [flag, flagValue = 'true'] = process.argv.slice(2);
+
+const dbPath = path.resolve(__dirname, 'db.json');
+const dbExists = fs.existsSync(dbPath);
+
+if (dbExists && flag === '--overwrite' && flagValue === 'false') {
+    process.exit(0);
+}
+
+const writeDB = () => {
+    fs.writeFile(
+        dbPath,
+        JSON.stringify(
+            {
+                projects: [],
+                tasks: [],
+                timelogs: [],
+            },
+            undefined,
+            4
+        ),
+        'utf-8',
+        (err) => {
+            if (!err) {
+                console.log('created db.json');
+                process.exit(0);
+            }
+            console.error(err.message || err);
+            process.exit(1);
+        }
+    );
 };
 
 (async () => {
     try {
-        const skipPrompts = process.argv.slice(2)[0] === '-y';
-        const dbPath = path.resolve(__dirname, 'db.json');
-        if (skipPrompts) {
-            await fs.promises.writeFile(
-                dbPath,
-                JSON.stringify(output, undefined, 4),
-                'utf-8'
+        if (!dbExists || (flag === '--overwrite' && flagValue === 'true')) {
+            return writeDB();
+        }
+        const rl = readline.createInterface({
+            input: process.stdin,
+            output: process.stdout,
+        });
+        const overwrite = await new Promise((resolve) => {
+            rl.on('close', () => resolve(false));
+            rl.question(
+                'db.json already exists, overwrite it? y/n ',
+                (answer) => resolve(/^y(es)?$/i.test(answer))
             );
-            console.log('initialized empty db.json');
+        });
+        rl.close();
+        if (!overwrite) {
+            console.log('operation cancelled');
             return;
         }
-        const onCancel = () => {
-            throw new Error('✖ Operation cancelled');
-        };
-        const dbExists = fs.existsSync(dbPath);
-
-        await prompts(
-            [
-                {
-                    type: !dbExists ? null : 'toggle',
-                    name: 'overwrite',
-                    message: 'db.json already exists, overwrite it?',
-                    initial: false,
-                    active: 'yes',
-                    inactive: 'no',
-                },
-                {
-                    type: (_, { overwrite }) => {
-                        if (overwrite === false) onCancel();
-                        return null;
-                    },
-                },
-            ],
-            {
-                onCancel,
-            }
-        );
-
-        await fs.promises.writeFile(
-            dbPath,
-            JSON.stringify(output, undefined, 4),
-            'utf-8'
-        );
+        writeDB();
     } catch (err) {
-        console.log(err instanceof Error ? err.message : err);
+        console.log(err.message || err);
     }
 })();

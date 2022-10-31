@@ -1,23 +1,18 @@
 import type { Api } from '@/utils/api';
 
-export type Load<T extends Api.DataType> = (
-    signal?: AbortSignal
-) => Promise<T[] | null>;
+export type Load<T extends Api.DataType> = () => Promise<T[] | null>;
 
 export type Add<T extends Api.DataType> = (
-    data: Omit<T, 'id'>,
-    signal?: AbortSignal
+    data: Omit<T, 'id'>
 ) => Promise<T | null>;
 
 export type Update<T extends Api.DataType> = (
     id: T['id'],
-    data: Partial<T>,
-    signal?: AbortSignal
+    data: Partial<T>
 ) => Promise<T | null>;
 
 export type Remove<T extends Api.DataType> = (
-    id: T['id'],
-    signal?: AbortSignal
+    id: T['id']
 ) => Promise<T['id'] | null>;
 
 export type Select<T extends Api.DataType> = (

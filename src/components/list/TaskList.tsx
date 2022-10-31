@@ -1,8 +1,9 @@
 import { filterData } from '@/utils';
 import { Task, Timelog } from '@/utils/api/types';
-import { List, Text, Stack, Title } from '@mantine/core';
+import { Text, Stack, Title } from '@mantine/core';
 import { useMemo } from 'react';
 import TimelogList from './TimelogList';
+import TaskModal from '@/components/modals/TaskModal';
 
 type Props = {
     tasks: Task[];
@@ -10,7 +11,7 @@ type Props = {
 };
 
 export default function TaskList({ tasks, timelogs }: Props) {
-    return (
+    return !tasks.length ? null : (
         <Stack>
             <Title order={5}>Tasks:</Title>
             <Stack spacing="xs">
@@ -24,17 +25,6 @@ export default function TaskList({ tasks, timelogs }: Props) {
                     );
                 })}
             </Stack>
-            <List spacing="sm" pl="md">
-                {tasks.map((task) => {
-                    return (
-                        <ListItem
-                            key={`task-${task.id}`}
-                            timelogs={timelogs}
-                            {...task}
-                        />
-                    );
-                })}
-            </List>
         </Stack>
     );
 }
@@ -47,6 +37,7 @@ function ListItem({ id, title, timelogs }: Task & { timelogs: Timelog[] }) {
     return (
         <Stack spacing="xs">
             <Text size="sm">{title}</Text>
+            <TaskModal.Edit id={id} />
             <TimelogList timelogs={filteredTimelogs} />
         </Stack>
     );

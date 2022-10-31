@@ -2,27 +2,21 @@ import { useState, useEffect, useMemo } from 'react';
 import { formatDuration } from '@/utils';
 
 interface Props {
-    duration: number;
-    format?: string;
+    duration: number | null;
 }
 
-export default function DurationOutput({ duration, format }: Props) {
-    const ignoreMilliseconds = useMemo(
-        () => typeof format === 'string' && !/SS/.test(format),
-        [format]
-    );
+export default function DurationOutput({ duration }: Props) {
     const ms = useMemo(() => {
-        if (!duration) return 0;
-        return !ignoreMilliseconds
-            ? duration
-            : Math.floor(duration / 1000) * 1000;
-    }, [duration, ignoreMilliseconds]);
+        if (duration === null) return null;
+        if (duration <= 0) return 0;
+        return Math.floor(duration / 1000) * 1000;
+    }, [duration]);
 
-    const [output, setOutput] = useState(formatDuration(ms, format));
+    const [output, setOutput] = useState(formatDuration(ms));
 
     useEffect(() => {
-        setOutput(formatDuration(ms, format));
-    }, [ms, format]);
+        setOutput(formatDuration(ms));
+    }, [ms]);
 
     return <>{output}</>;
 }

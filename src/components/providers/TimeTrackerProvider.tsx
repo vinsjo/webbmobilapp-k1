@@ -36,9 +36,10 @@ export default function TimeTrackerProvider(props: React.PropsWithChildren) {
     );
 
     const addTimelog = useCallback<TimeTracker.Add<Api.Timelog>>(
-        async (data, signal) => {
-            const added = await timelogs.add(data, signal);
-            if (added) await setSelectedTimelog(added.id);
+        async (data) => {
+            const added = await timelogs.add(data);
+            if (!added) return null;
+            await setSelectedTimelog(added.id);
             return added;
         },
         // eslint-disable-next-line react-hooks/exhaustive-deps

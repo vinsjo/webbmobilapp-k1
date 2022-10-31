@@ -6,12 +6,10 @@ import {
     useTimelogs,
     type TimeTracker,
 } from '@/context/TimeTracker';
-
 import { Stack } from '@mantine/core';
 import SelectProject from '@/components/input/SelectProject';
-import AddProject from '@/components/input/AddProject';
-import AddTask from '@/components/input/AddTask';
 import ProjectList from '@/components/list/ProjectList';
+import ProjectModal from '@/components/modals/ProjectModal';
 
 import { filterData } from '@/utils';
 
@@ -32,10 +30,9 @@ export default function Home() {
     return (
         <Stack spacing="lg">
             <SelectProject />
-            <AddProject />
+            <ProjectModal.Add />
             {selected?.id && (
                 <>
-                    <AddTask projectId={selected.id} />
                     <ProjectList
                         projects={[selected]}
                         tasks={tasks}

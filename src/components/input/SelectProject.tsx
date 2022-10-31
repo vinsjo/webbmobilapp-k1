@@ -4,10 +4,12 @@ import { Select } from '@mantine/core';
 
 export default function SelectProject() {
     const { data, selected, setSelected } = useProjects();
+
     const value = useMemo(
         () => (!selected ? null : `${selected.id}`),
         [selected]
     );
+
     const selectData = useMemo(() => {
         return data.map(({ id, name }) => ({
             value: `${id}`,
@@ -23,14 +25,18 @@ export default function SelectProject() {
         [setSelected]
     );
     return (
-        <Select
-            value={value}
-            onChange={handleChange}
-            label="Selected Project"
-            placeholder="No project selected"
-            searchable
-            nothingFound="No projects with that name"
-            data={selectData}
-        />
+        <>
+            <Select
+                value={value}
+                onChange={handleChange}
+                dropdownPosition="bottom"
+                label="Selected Project"
+                placeholder="No project selected"
+                nothingFound={'No matches'}
+                data={selectData}
+                searchable
+                creatable
+            />
+        </>
     );
 }

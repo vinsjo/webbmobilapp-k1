@@ -1,29 +1,27 @@
-import { useCallback, useMemo } from 'react';
+import { useCallback } from 'react';
 import { useProjects, useTasks, useTimelogs } from '@/context/TimeTracker';
 import useTimer from '@/hooks/useTimer';
 
-import { Stack } from '@mantine/core';
-import TaskTime from '@/components/TaskTime';
+import { Group, Stack, Title } from '@mantine/core';
 import SelectProject from '@/components/input/SelectProject';
 import TimerDisplay from '@/components/TimerDisplay';
 
-import { getNestedTasks } from '@/utils/api';
-
 import type { Task } from '@/utils/api/types';
-import { filterData } from '@/utils';
-import AddTask from '@/components/input/AddTask';
+import { TaskModal } from '@/components/modals';
+import { PlayButton } from '@/components/buttons/IconButtons';
 
 export default function TimeTracker() {
-    const selectedProject = useProjects(
-        useCallback(({ selected }) => selected, [])
-    );
+    const { selected: selectedProject } = useProjects();
     const timelogs = useTimelogs(
         useCallback(
             ({ data, selected, setSelected, add }) => {
                 return {
                     data: !selectedProject
                         ? []
-                        : filterData(data, 'projectId', selectedProject.id),
+                        : data.filter(
+                              ({ projectId }) =>
+                                  projectId === selectedProject.id
+                          ),
                     selected,
                     setSelected,
                     add,
@@ -38,7 +36,10 @@ export default function TimeTracker() {
                 return {
                     data: !selectedProject
                         ? []
-                        : filterData(data, 'projectId', selectedProject.id),
+                        : data.filter(
+                              ({ projectId }) =>
+                                  projectId === selectedProject.id
+                          ),
 
                     selected,
                     setSelected,
@@ -85,31 +86,54 @@ export default function TimeTracker() {
         ]
     );
 
-    const nestedTasks = useMemo(
-        () => getNestedTasks(tasks.data, timelogs.data),
-        [tasks, timelogs]
-    );
-
     return (
-        <Stack spacing="md">
+        <Stack spacing="lg">
+            <TimerDisplay duration={duration} />
             <Stack>
                 <SelectProject />
+                <TaskModal.Add disabled={!selectedProject} />
             </Stack>
-            <TimerDisplay duration={duration} />
-            {nestedTasks.map(({ timelogs, ...task }) => {
-                const selected = tasks.selected?.id === task.id;
+
+            {tasks.data.map(({ id, title }) => {
+                const selected = tasks.selected?.id === id;
+                // return (
+                //     <TaskTime
+                //         key={`task-${task.id}`}
+                //         task={task}
+                //         timelogs={timelogs}
+                //         selected={selected}
+                //         onClick={handleClick}
+                //         duration={!selected ? 0 : duration}
+                //     />
+                // );
                 return (
-                    <TaskTime
-                        key={`task-${task.id}`}
-                        task={task}
-                        timelogs={timelogs}
-                        selected={selected}
-                        onClick={handleClick}
-                        duration={!selected ? 0 : duration}
-                    />
+                    <Group
+                        onClick={() => tasks.setSelected(id)}
+                        key={`task-${id}`}
+                        p="sm"
+                        spacing="sm"
+                        sx={(theme) => ({
+                            backgroundColor:
+                                theme.colors.gray[selected ? 7 : 9],
+                            borderRadius: theme.radius.sm,
+                            justifyContent: 'space-between',
+                        })}
+                    >
+                        <Title
+                            order={4}
+                            sx={(theme) => ({
+                                color: theme.colors.gray[selected ? 0 : 5],
+                            })}
+                        >
+                            {title}
+                        </Title>
+                        <PlayButton
+                            active={selected && active}
+                            onClick={() => handleClick(id)}
+                        />
+                    </Group>
                 );
             })}
-            {selectedProject?.id && <AddTask projectId={selectedProject.id} />}
         </Stack>
     );
 }

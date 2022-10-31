@@ -34,15 +34,8 @@ export type RouteType<T extends Route> = T extends 'projects'
     : Timelog;
 
 export interface RouteHandler<T extends DataType> {
-    get<ID = T['id']>(
-        id?: ID,
-        signal?: AbortSignal
-    ): Promise<(ID extends T['id'] ? T : T[]) | null>;
-    post(data: Omit<T, 'id'>, signal?: AbortSignal): Promise<T | null>;
-    patch(
-        id: T['id'],
-        data: Partial<T>,
-        signal?: AbortSignal
-    ): Promise<T | null>;
-    delete(id: T['id'], signal?: AbortSignal): Promise<boolean>;
+    get<ID = T['id']>(id?: ID): Promise<(ID extends T['id'] ? T : T[]) | null>;
+    post(data: Omit<T, 'id'>): Promise<T | null>;
+    patch(id: T['id'], data: Partial<T>): Promise<T | null>;
+    delete(id: T['id']): Promise<boolean>;
 }
