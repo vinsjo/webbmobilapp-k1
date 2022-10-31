@@ -105,11 +105,11 @@ export default function TimerDisplay({ duration, maxWidth, ...props }: Props) {
             {...props}
         >
             <Group position="apart">
-                <TimerText active={active} hidden={!selectedTask}>
-                    Task: {selectedTask?.title}
-                </TimerText>
                 <TimerText active={active} hidden={!selectedProject}>
                     Project: {selectedProject?.name}
+                </TimerText>
+                <TimerText active={active} hidden={!selectedTask}>
+                    Task: {selectedTask?.title}
                 </TimerText>
             </Group>
 

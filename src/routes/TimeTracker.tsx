@@ -88,51 +88,63 @@ export default function TimeTracker() {
     );
 
     return (
-        <Stack spacing="lg">
+        <Stack spacing="xl">
             <TimerDisplay duration={duration} />
-            <Stack>
-                <SelectProject />
+            <Stack spacing="md">
+                <SelectProject
+                    label={<Title order={4}>Selected Project</Title>}
+                />
                 <Group position="center" grow>
                     <ProjectModal.Add />
                     <TaskModal.Add disabled={!selectedProject} />
                 </Group>
             </Stack>
-
-            {tasks.data.map(({ id, title }) => {
-                const selected = tasks.selected?.id === id;
-                return (
-                    <Group
-                        onClick={() => tasks.setSelected(id)}
-                        key={`task-${id}`}
-                        p="sm"
-                        spacing="sm"
-                        position="apart"
-                        sx={(theme) => ({
-                            backgroundColor:
-                                theme.colors.gray[selected ? 7 : 9],
-                            borderRadius: theme.radius.sm,
-                        })}
-                    >
-                        <Title
-                            order={4}
-                            sx={(theme) => ({
-                                color: theme.colors.gray[selected ? 0 : 5],
-                            })}
-                        >
-                            {title}
-                        </Title>
-                        <Group>
-                            <TaskModal.Edit id={id} variant="subtle" p="xs">
-                                <FaEdit />
-                            </TaskModal.Edit>
-                            <PlayButton
-                                active={selected && active}
-                                onClick={() => handleClick(id)}
-                            />
-                        </Group>
-                    </Group>
-                );
-            })}
+            {!!tasks.data.length && (
+                <Stack>
+                    <Title order={5}>Tasks</Title>
+                    {tasks.data.map(({ id, title }) => {
+                        const selected = tasks.selected?.id === id;
+                        return (
+                            <Group
+                                onClick={() => tasks.setSelected(id)}
+                                key={`task-${id}`}
+                                p="sm"
+                                spacing="sm"
+                                position="apart"
+                                sx={(theme) => ({
+                                    backgroundColor:
+                                        theme.colors.gray[selected ? 7 : 9],
+                                    borderRadius: theme.radius.sm,
+                                })}
+                            >
+                                <Title
+                                    order={4}
+                                    sx={(theme) => ({
+                                        color: theme.colors.gray[
+                                            selected ? 0 : 5
+                                        ],
+                                    })}
+                                >
+                                    {title}
+                                </Title>
+                                <Group spacing="xs">
+                                    <TaskModal.Edit
+                                        id={id}
+                                        variant="subtle"
+                                        p="xs"
+                                    >
+                                        <FaEdit />
+                                    </TaskModal.Edit>
+                                    <PlayButton
+                                        active={selected && active}
+                                        onClick={() => handleClick(id)}
+                                    />
+                                </Group>
+                            </Group>
+                        );
+                    })}
+                </Stack>
+            )}
         </Stack>
     );
 }

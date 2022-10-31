@@ -52,7 +52,7 @@ export default function ColorSwatches({
                             title={name}
                             sx={(theme) => ({
                                 border:
-                                    selected === name
+                                    selected === color
                                         ? `2px solid ${theme.colors.gray[0]}`
                                         : 'none',
                                 cursor: 'pointer',

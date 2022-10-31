@@ -2,7 +2,7 @@ import { useMemo, useCallback } from 'react';
 import { useProjects } from '@/context/TimeTracker';
 import { Select } from '@mantine/core';
 
-export default function SelectProject() {
+export default function SelectProject({ label }: { label?: React.ReactNode }) {
     const { data, selected, setSelected } = useProjects();
 
     const value = useMemo(
@@ -38,6 +38,7 @@ export default function SelectProject() {
             nothingFound="No matches"
             data={selectData}
             disabled={disabled}
+            label={label}
             rightSectionProps={disabled ? { style: { display: 'none' } } : {}}
             searchable
             creatable
