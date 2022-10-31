@@ -1,5 +1,4 @@
 import ModalButton, {
-    closeAllModals,
     type ModalButtonProps,
 } from '@/components/buttons/ModalButton';
 import ProjectForm from '@/components/forms/ProjectForm';
@@ -9,8 +8,9 @@ import { useCallback } from 'react';
 
 export default function EditProjectModal({
     id,
+    disabled,
     ...props
-}: Omit<ModalButtonProps, 'modal' | 'onClick' | 'id'> & {
+}: Omit<ModalButtonProps, 'modalContent' | 'onClick' | 'id'> & {
     id: Project['id'];
 }) {
     const { setSelected, project } = useProjects(
@@ -31,12 +31,9 @@ export default function EditProjectModal({
 
     return (
         <ModalButton
-            modal={{
-                title: props.title,
-                children: <ProjectForm.Edit onSubmit={closeAllModals} />,
-            }}
+            modalContent={(onClose) => <ProjectForm.Edit onSubmit={onClose} />}
             onClick={handleClick}
-            disabled={!project}
+            disabled={!project || disabled}
             {...props}
         />
     );

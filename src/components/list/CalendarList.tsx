@@ -2,6 +2,7 @@ import { useCallback } from 'react';
 import { useTimelogs, useProjects, useTasks } from '@/context/TimeTracker';
 import dayjs from 'dayjs';
 import ProjectList from './ProjectList';
+import { Text } from '@mantine/core';
 
 type Props = { selectedDate: Date | string | null };
 
@@ -16,8 +17,7 @@ export default function CalendarList({ selectedDate }: Props) {
                               end && dayjs(start).isSame(selectedDate, 'date')
                       ),
             [selectedDate]
-        ),
-        (a, b) => a.data === b.data
+        )
     );
     const tasks = useTasks(
         useCallback(
@@ -28,8 +28,7 @@ export default function CalendarList({ selectedDate }: Props) {
                           timelogs.find(({ taskId }) => taskId === id)
                       ),
             [timelogs]
-        ),
-        (a, b) => a.data === b.data
+        )
     );
 
     const projects = useProjects(
@@ -41,11 +40,12 @@ export default function CalendarList({ selectedDate }: Props) {
                           tasks.find(({ projectId }) => projectId === id)
                       ),
             [tasks]
-        ),
-        (a, b) => a.data === b.data
+        )
     );
 
-    return (
+    return !projects.length ? (
+        <Text align="center">No results for selected date</Text>
+    ) : (
         <ProjectList projects={projects} tasks={tasks} timelogs={timelogs} />
     );
 }

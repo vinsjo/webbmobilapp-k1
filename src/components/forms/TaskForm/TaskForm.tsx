@@ -30,6 +30,7 @@ export default function TaskForm({
                 inputWrapperOrder={['label', 'input', 'error']}
                 onChange={({ target }) => onChange(target.value)}
                 withAsterisk={false}
+                autoComplete="off"
                 required
             />
             {!error && <Space h="md" />}

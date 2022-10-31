@@ -6,9 +6,10 @@ import TaskList from './TaskList';
 import { filterData } from '@/utils';
 
 import type { Project, Task, Timelog } from '@/utils/api/types';
-import { ProjectModal, TaskModal } from '@/components/modals';
+import { ProjectModal } from '@/components/modals';
 import { useProjects } from '@/context/TimeTracker';
-import { defaultColor } from '@/utils/api';
+import { Colors } from '@/utils/api';
+import { FaEdit } from 'react-icons/fa';
 
 type Props = {
     projects: Project[];
@@ -19,9 +20,7 @@ type Props = {
 export default function ProjectList({ projects, tasks, timelogs }: Props) {
     return (
         <Stack spacing="lg">
-            <Title order={3}>
-                {!projects.length ? 'No projects exists' : 'Projects'}
-            </Title>
+            <Title order={3}>Projects</Title>
             <ProjectModal.Add />
             <Stack spacing="md">
                 {projects.map((project) => {
@@ -56,22 +55,22 @@ function ListItem({
         [id, timelogs]
     );
     const handleClick = useCallback(() => {
-        return setSelected(id);
+        setSelected(id);
     }, [id, setSelected]);
     return (
         <Stack
             p="md"
             spacing="md"
             sx={(theme) => ({
-                background: color || defaultColor,
-                color: theme.colors.gray[0],
+                background: !color ? theme.colors.gray[8] : Colors[color],
                 borderRadius: theme.radius.sm,
             })}
         >
-            <Title order={4}>{name}</Title>
-            <Group position="left" spacing="md">
-                <ProjectModal.Edit id={id} />
-                <TaskModal.Add onClick={handleClick} />
+            <Group position="apart" onClick={handleClick}>
+                <Title order={4}>{name}</Title>
+                <ProjectModal.Edit id={id} variant="subtle" p="xs">
+                    <FaEdit />
+                </ProjectModal.Edit>
             </Group>
             <TaskList tasks={filteredTasks} timelogs={filteredTimelogs} />
         </Stack>

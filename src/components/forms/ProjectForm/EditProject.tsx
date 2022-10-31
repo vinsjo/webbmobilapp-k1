@@ -2,6 +2,7 @@ import { useCallback, useMemo, useState } from 'react';
 import { Text } from '@mantine/core';
 import { useProjects } from '@/context/TimeTracker';
 import ProjectForm from './ProjectForm';
+import { Project } from '@/utils/api/types';
 
 export default function EditProject({
     onSubmit,
@@ -37,7 +38,7 @@ export default function EditProject({
     }, [name, data]);
 
     const changedValues = useMemo(() => {
-        const values: { name?: string; color?: string } = {};
+        const values: { name?: string; color?: Project['color'] } = {};
         if (!selected) return values;
         const trimmed = name.trim();
         if (trimmed && trimmed !== selected.name) values.name = trimmed;
@@ -87,7 +88,7 @@ export default function EditProject({
             submitLabel="Save Changes"
             onDelete={handleDelete}
             deleteLabel="Delete project"
-            disabled={nameExists}
+            disabled={nameExists || !hasChanged}
         />
     );
 }

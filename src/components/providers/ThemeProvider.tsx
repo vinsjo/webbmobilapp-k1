@@ -4,6 +4,7 @@ import {
     DEFAULT_THEME,
     type MantineTheme,
     type MantineSizes,
+    Global,
 } from '@mantine/core';
 
 const mainFont = 'Roboto, sans-serif';
@@ -45,6 +46,7 @@ const theme: Partial<MantineTheme> = {
     focusRing: 'never',
     cursorType: 'pointer',
     primaryColor: 'gray',
+    primaryShade: 8,
     components: {
         List: {
             defaultProps: {
@@ -65,6 +67,7 @@ const theme: Partial<MantineTheme> = {
 export default function ThemeProvider({ children }: React.PropsWithChildren) {
     return (
         <MantineProvider withGlobalStyles withNormalizeCSS theme={theme}>
+            <Global styles={{ body: { color: 'white' } }} />
             {children}
         </MantineProvider>
     );

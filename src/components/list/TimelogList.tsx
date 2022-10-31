@@ -1,5 +1,5 @@
 import { useMemo } from 'react';
-import { List, Text } from '@mantine/core';
+import { Group, Stack, Text } from '@mantine/core';
 import { useTimelogs } from '@/context/TimeTracker';
 import { Timelog } from '@/utils/api/types';
 import dayjs from 'dayjs';
@@ -13,7 +13,7 @@ type Props = {
 export default function TimelogList({ timelogs }: Props) {
     const { remove } = useTimelogs();
     return (
-        <List pl="sm">
+        <Stack spacing="xs">
             {timelogs.map((props) => {
                 return (
                     <ListItem
@@ -23,7 +23,7 @@ export default function TimelogList({ timelogs }: Props) {
                     />
                 );
             })}
-        </List>
+        </Stack>
     );
 }
 
@@ -45,10 +45,11 @@ function ListItem({
         };
     }, [start, end]);
     return (
-        <List.Item icon={<DeleteButton onClick={onDelete} />}>
+        <Group>
+            <DeleteButton onClick={onDelete} title="Delete Timelog" size="lg" />
             <Text size="sm">
                 {output} (<DurationOutput duration={duration} />)
             </Text>
-        </List.Item>
+        </Group>
     );
 }

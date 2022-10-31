@@ -32,5 +32,3 @@ export function PlayButton({
         </ActionIcon>
     );
 }
-
-export default { Add: AddButton, Delete: DeleteButton, Play: PlayButton };

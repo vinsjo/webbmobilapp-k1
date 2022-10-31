@@ -5,7 +5,7 @@ import {
     TimelogsContext,
     type TimeTracker,
 } from '@/context/TimeTracker';
-import { Api, defaultColor } from '@/utils/api';
+import { Api, randomColor } from '@/utils/api';
 import { useApiHandler } from '@/hooks';
 import { Center, Text } from '@mantine/core';
 
@@ -58,7 +58,7 @@ export default function TimeTrackerProvider(props: React.PropsWithChildren) {
     const addProject = useCallback<TimeTracker.Add<Api.Project>>(
         (data) => {
             return projects.add(
-                !data.color ? { ...data, color: defaultColor } : data
+                !data.color ? { ...data, color: randomColor() } : data
             );
         },
         // eslint-disable-next-line react-hooks/exhaustive-deps

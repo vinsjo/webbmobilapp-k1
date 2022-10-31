@@ -2,24 +2,9 @@ import * as Api from './types';
 import { createApiHandler } from './api';
 export type { Api };
 export { createApiHandler as createRouteHandler };
-import { filterData } from '..';
-
-export const colors = {
-    red: '#bf4040',
-    pink: '#bf406c',
-    grape: '#a640bf',
-    violet: '#6040bf',
-    indigo: '#4059bf',
-    blue: '#4082bf',
-    cyan: '#40adbf',
-    teal: '#40bf98',
-    green: '#40bf58',
-    lime: '#88bf40',
-    yellow: '#bf8a40',
-    orange: '#bf6c40',
-};
-
-export const defaultColor = colors.blue;
+import { filterData, objectKeys } from '..';
+import Colors from './colors';
+export { default as Colors, defaultColor } from './colors';
 
 export function getTotalDuration(timelogs: Api.Timelog[], onlySeconds = true) {
     if (!timelogs.length) return 0;
@@ -78,4 +63,9 @@ export function getNestedProjects(
     return typeof filters?.projects === 'function'
         ? output.filter(filters.projects)
         : output;
+}
+
+export function randomColor() {
+    const keys = objectKeys(Colors);
+    return keys[Math.floor(Math.random() * keys.length)];
 }

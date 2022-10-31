@@ -35,6 +35,7 @@ export default function ProjectForm({
                 inputWrapperOrder={['label', 'input', 'error']}
                 onChange={({ target }) => onNameChange(target.value)}
                 withAsterisk={false}
+                autoComplete="off"
                 required
             />
             {!error && <Space h="md" />}

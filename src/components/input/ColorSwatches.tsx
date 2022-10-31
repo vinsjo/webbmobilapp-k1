@@ -2,28 +2,25 @@ import { useEffect, useRef, useState } from 'react';
 import { ColorSwatch, Group, MantineSize, Stack } from '@mantine/core';
 import { OmitProps } from '@/utils/type-utils';
 import { objectEntries } from '@/utils';
-import { colors, defaultColor } from '@/utils/api';
+import { Colors, defaultColor } from '@/utils/api';
+import type { Project } from '@/utils/api/types';
 
 type Props = OmitProps<typeof Group, 'children' | 'onChange' | 'size'> & {
     label?: React.ReactNode;
-    initialValue?: string;
-    value?: string | null;
-    onChange?: (color: string) => unknown;
+    value?: Project['color'];
+    onChange?: (name: Project['color']) => unknown;
     size?: MantineSize;
 };
 
 export default function ColorSwatches({
     label,
-    initialValue,
     onChange,
     size,
     value: controlledValue,
     ...props
 }: Props) {
     const onChangeRef = useRef(onChange);
-    const [selected, setSelected] = useState(
-        controlledValue || initialValue || defaultColor
-    );
+    const [selected, setSelected] = useState(controlledValue || defaultColor);
 
     useEffect(() => {
         typeof onChangeRef.current === 'function' &&
@@ -44,18 +41,18 @@ export default function ColorSwatches({
         <Stack spacing="xs">
             {label}
             <Group position="apart" spacing="xs" {...props}>
-                {objectEntries(colors).map(([key, color]) => {
+                {objectEntries(Colors).map(([name, color]) => {
                     return (
                         <ColorSwatch
-                            key={key}
+                            key={name}
                             component="button"
                             type="button"
                             color={color}
-                            onClick={() => setSelected(color)}
-                            title={key}
+                            onClick={() => setSelected(name)}
+                            title={name}
                             sx={(theme) => ({
                                 border:
-                                    selected === color
+                                    selected === name
                                         ? `2px solid ${theme.colors.gray[0]}`
                                         : 'none',
                                 cursor: 'pointer',

@@ -7,8 +7,9 @@ import SelectProject from '@/components/input/SelectProject';
 import TimerDisplay from '@/components/TimerDisplay';
 
 import type { Task } from '@/utils/api/types';
-import { TaskModal } from '@/components/modals';
+import { ProjectModal, TaskModal } from '@/components/modals';
 import { PlayButton } from '@/components/buttons/IconButtons';
+import { FaEdit } from 'react-icons/fa';
 
 export default function TimeTracker() {
     const { selected: selectedProject } = useProjects();
@@ -91,32 +92,25 @@ export default function TimeTracker() {
             <TimerDisplay duration={duration} />
             <Stack>
                 <SelectProject />
-                <TaskModal.Add disabled={!selectedProject} />
+                <Group position="center" grow>
+                    <ProjectModal.Add />
+                    <TaskModal.Add disabled={!selectedProject} />
+                </Group>
             </Stack>
 
             {tasks.data.map(({ id, title }) => {
                 const selected = tasks.selected?.id === id;
-                // return (
-                //     <TaskTime
-                //         key={`task-${task.id}`}
-                //         task={task}
-                //         timelogs={timelogs}
-                //         selected={selected}
-                //         onClick={handleClick}
-                //         duration={!selected ? 0 : duration}
-                //     />
-                // );
                 return (
                     <Group
                         onClick={() => tasks.setSelected(id)}
                         key={`task-${id}`}
                         p="sm"
                         spacing="sm"
+                        position="apart"
                         sx={(theme) => ({
                             backgroundColor:
                                 theme.colors.gray[selected ? 7 : 9],
                             borderRadius: theme.radius.sm,
-                            justifyContent: 'space-between',
                         })}
                     >
                         <Title
@@ -127,10 +121,15 @@ export default function TimeTracker() {
                         >
                             {title}
                         </Title>
-                        <PlayButton
-                            active={selected && active}
-                            onClick={() => handleClick(id)}
-                        />
+                        <Group>
+                            <TaskModal.Edit id={id} variant="subtle" p="xs">
+                                <FaEdit />
+                            </TaskModal.Edit>
+                            <PlayButton
+                                active={selected && active}
+                                onClick={() => handleClick(id)}
+                            />
+                        </Group>
                     </Group>
                 );
             })}

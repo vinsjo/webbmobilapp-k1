@@ -20,7 +20,7 @@ export function addLeadingZeroes(num: number, length = 2, fixedLength = true) {
 }
 
 export function formatDuration(milliseconds: number | null) {
-    return milliseconds === null
+    return typeof milliseconds !== 'number'
         ? '--:--:--'
         : dayjs.duration(milliseconds).format('HH:mm:ss');
 }

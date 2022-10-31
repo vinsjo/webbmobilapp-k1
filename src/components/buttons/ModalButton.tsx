@@ -1,51 +1,71 @@
-import { Button, Group } from '@mantine/core';
+import { Button, Modal, ModalProps } from '@mantine/core';
 import { OmitProps } from '@/utils/type-utils';
-import { openModal, closeAllModals } from '@mantine/modals';
-import { useCallback } from 'react';
-export { closeAllModals };
-
-type ModalSettings = Parameters<typeof openModal>[0];
+import { useCallback, useState } from 'react';
 
 export type ModalButtonProps<C = 'button'> = OmitProps<
     typeof Button<C>,
     'onClick'
 > & {
-    modal: ModalSettings;
+    modalContent:
+        | React.ReactNode
+        | ((onClose: () => Promise<void>) => JSX.Element);
+    modalProps?: Omit<ModalProps, 'opened' | 'onClose' | 'title'>;
     onClick?: () => unknown | boolean | Promise<unknown | boolean>;
+    onClose?: () => unknown | Promise<unknown>;
 };
 
 export default function ModalButton({
     title,
-    modal,
+    modalContent,
+    modalProps,
     children,
     onClick,
+    onClose,
     disabled,
     ...props
 }: ModalButtonProps) {
+    const [opened, setOpened] = useState(false);
+    const handleClose = useCallback(async () => {
+        if (typeof onClose === 'function') await onClose();
+        setOpened(false);
+    }, [onClose]);
+
     const handleClick = useCallback(async () => {
         if (disabled) return;
         if (typeof onClick === 'function') {
             const shouldOpen = await onClick();
             if (shouldOpen === false) return;
         }
-        openModal(modal);
-    }, [disabled, onClick, modal]);
+        setOpened(true);
+    }, [disabled, onClick]);
 
     return (
-        <Group position="center">
+        <>
+            <Modal
+                title={title}
+                opened={!disabled && opened}
+                onClose={handleClose}
+                centered
+                {...(modalProps || {})}
+            >
+                {typeof modalContent === 'function'
+                    ? modalContent(handleClose)
+                    : modalContent}
+            </Modal>
             <Button
                 type="button"
                 title={title}
-                onClick={handleClick}
                 disabled={disabled}
+                onClick={handleClick}
                 {...props}
             >
                 {children || title || 'Open Modal'}
             </Button>
-        </Group>
+        </>
     );
 }
 
 ModalButton.defaultProps = {
     component: 'button',
+    modalProps: {},
 };

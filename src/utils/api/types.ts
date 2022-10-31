@@ -1,7 +1,9 @@
+import Colors from './colors';
+export type ColorName = keyof typeof Colors;
 export interface Project {
     id: number;
     name: string;
-    color: string | null;
+    color: ColorName | null;
 }
 export interface Task {
     id: number;

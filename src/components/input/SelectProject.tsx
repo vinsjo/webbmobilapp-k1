@@ -11,11 +11,14 @@ export default function SelectProject() {
     );
 
     const selectData = useMemo(() => {
-        return data.map(({ id, name }) => ({
+        return data.map(({ id, name, color }) => ({
             value: `${id}`,
             label: name,
+            color,
         }));
     }, [data]);
+
+    const disabled = useMemo(() => !data.length, [data]);
 
     const handleChange = useCallback(
         (value: string | null) => {
@@ -25,18 +28,19 @@ export default function SelectProject() {
         [setSelected]
     );
     return (
-        <>
-            <Select
-                value={value}
-                onChange={handleChange}
-                dropdownPosition="bottom"
-                label="Selected Project"
-                placeholder="No project selected"
-                nothingFound={'No matches'}
-                data={selectData}
-                searchable
-                creatable
-            />
-        </>
+        <Select
+            value={value}
+            onChange={handleChange}
+            dropdownPosition="bottom"
+            placeholder={
+                !data.length ? 'No projects created yet' : 'Select a project'
+            }
+            nothingFound="No matches"
+            data={selectData}
+            disabled={disabled}
+            rightSectionProps={disabled ? { style: { display: 'none' } } : {}}
+            searchable
+            creatable
+        />
     );
 }

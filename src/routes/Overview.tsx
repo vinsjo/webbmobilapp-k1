@@ -1,7 +1,10 @@
 import { useCallback } from 'react';
 import { useNavigate, useParams, Navigate } from 'react-router-dom';
-import { Tabs, List } from '@mantine/core';
+import { Tabs, Stack, Group, Text } from '@mantine/core';
 import { useProjects, useTasks } from '@/context/TimeTracker';
+import { Colors, defaultColor } from '@/utils/api';
+import { ProjectModal, TaskModal } from '@/components/modals';
+import { FaEdit } from 'react-icons/fa';
 
 export default function Overview() {
     const projects = useProjects();
@@ -28,27 +31,54 @@ export default function Overview() {
             </Tabs.List>
 
             <Tabs.Panel value="projects">
-                <List listStyleType="none">
+                <Stack py="xl">
                     {projects.data.map(({ id, name, color }) => {
                         return (
-                            <List.Item
+                            <Group
+                                position="apart"
+                                p="md"
                                 key={`project-${id}`}
-                                color={color || undefined}
+                                sx={(theme) => ({
+                                    borderRadius: theme.radius.sm,
+                                    background: !color
+                                        ? defaultColor
+                                        : Colors[color],
+                                })}
                             >
-                                {name}
-                            </List.Item>
+                                <Text>{name}</Text>
+                                <ProjectModal.Edit
+                                    id={id}
+                                    variant="subtle"
+                                    p="xs"
+                                >
+                                    <FaEdit />
+                                </ProjectModal.Edit>
+                            </Group>
                         );
                     })}
-                </List>
+                </Stack>
             </Tabs.Panel>
             <Tabs.Panel value="tasks">
-                <List listStyleType="none">
+                <Stack py="xl">
                     {tasks.data.map(({ id, title }) => {
                         return (
-                            <List.Item key={`project-${id}`}>{title}</List.Item>
+                            <Group
+                                position="apart"
+                                p="md"
+                                key={`project-${id}`}
+                                sx={(theme) => ({
+                                    borderRadius: theme.radius.sm,
+                                    background: defaultColor,
+                                })}
+                            >
+                                <Text>{title}</Text>
+                                <TaskModal.Edit id={id} variant="subtle" p="xs">
+                                    <FaEdit />
+                                </TaskModal.Edit>
+                            </Group>
                         );
                     })}
-                </List>
+                </Stack>
             </Tabs.Panel>
         </Tabs>
     );

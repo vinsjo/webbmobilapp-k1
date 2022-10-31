@@ -9,7 +9,7 @@ export default function Calendar() {
     const [date, setDate] = useState<Date | null>(new Date());
 
     return (
-        <Stack>
+        <Stack spacing="xl">
             <DatePicker
                 value={date}
                 onChange={setDate}
