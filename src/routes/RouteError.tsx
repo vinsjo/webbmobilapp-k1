@@ -1,14 +1,26 @@
-import { useEffect, useState } from 'react';
-import { useRouteError, Navigate } from 'react-router-dom';
-import { Stack, Text } from '@mantine/core';
+import { useEffect, useMemo, useState } from 'react';
+import {
+    useRouteError,
+    isRouteErrorResponse,
+    Navigate,
+    Link,
+} from 'react-router-dom';
+import { Button, Stack, Text, Title } from '@mantine/core';
 import Layout from '@/components/Layout';
+import { ThemeProvider } from '@/components/providers';
 
-export default function RouteError() {
+export default function RouteError({
+    redirectCountdown = 15,
+}: {
+    redirectCountdown?: number;
+}) {
     const error = useRouteError();
-    const [countdown, setCountdown] = useState(15);
+    const [countdown, setCountdown] = useState(redirectCountdown);
 
-    useEffect(() => {
-        console.error('Route Error: ', error);
+    const errorOutput = useMemo(() => {
+        return !isRouteErrorResponse(error)
+            ? 'An error occurred...'
+            : `${error.status} - ${error.statusText}`;
     }, [error]);
 
     useEffect(() => {
@@ -21,23 +33,44 @@ export default function RouteError() {
     return countdown <= 0 ? (
         <Navigate to="/" replace />
     ) : (
-        <Layout>
-            <Stack>
-                <Text>An error occurred...</Text>
-                <Text>
-                    Navigating to homepage in
+        <ThemeProvider>
+            <Layout>
+                <Stack spacing="xl" py="xl" align="center">
+                    <Title order={2}>Oh no!</Title>
                     <Text
+                        size="lg"
+                        py="sm"
+                        px="md"
                         align="center"
-                        sx={{
-                            display: 'inline-block',
-                            width: '4ch',
-                        }}
+                        sx={(theme) => ({
+                            fontFamily: theme.fontFamilyMonospace,
+                            background: theme.colors.gray[9],
+                            borderRadius: theme.radius.md,
+                        })}
                     >
-                        {countdown}
-                    </Text>{' '}
-                    seconds
-                </Text>
-            </Stack>
-        </Layout>
+                        {errorOutput}
+                    </Text>
+
+                    <Text>
+                        Navigating to homepage in
+                        <Text
+                            align="center"
+                            style={{
+                                display: 'inline-block',
+                                width: `${
+                                    redirectCountdown.toString().length + 1.5
+                                }ch`,
+                            }}
+                        >
+                            {countdown}
+                        </Text>
+                        seconds
+                    </Text>
+                    <Button component={Link} to="/" title="Home">
+                        Go back now
+                    </Button>
+                </Stack>
+            </Layout>
+        </ThemeProvider>
     );
 }

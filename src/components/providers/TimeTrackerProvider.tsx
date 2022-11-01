@@ -55,6 +55,38 @@ export default function TimeTrackerProvider(props: React.PropsWithChildren) {
         [timelogs, setSelectedTimelog, addTimelog]
     );
 
+    const removeProject = useCallback<TimeTracker.Remove<Api.Project>>(
+        async (id) => {
+            const removed = await projects.remove(id);
+            if (!removed) return null;
+            await tasks.load();
+            await timelogs.load();
+            return removed;
+        },
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+        [projects.remove, tasks.load, timelogs.load]
+    );
+    const removeTask = useCallback<TimeTracker.Remove<Api.Task>>(
+        async (id) => {
+            const removed = await tasks.remove(id);
+            if (!removed) return null;
+            await timelogs.load();
+            return removed;
+        },
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+        [tasks.remove, timelogs.load]
+    );
+
+    const projectsValue = useMemo<TimeTracker.Context<Api.Project>>(
+        () => ({ ...projects, remove: removeProject }),
+        [projects, removeProject]
+    );
+    const tasksValue = useMemo<TimeTracker.Context<Api.Task>>(
+        () => ({ ...tasks, remove: removeTask }),
+
+        [tasks, removeTask]
+    );
+
     useEffect(() => {
         if (!loaded || projects.selected?.id === tasks.selected?.projectId) {
             return;
@@ -78,8 +110,8 @@ export default function TimeTrackerProvider(props: React.PropsWithChildren) {
     }, []);
 
     return (
-        <ProjectsContext.Provider value={projects}>
-            <TasksContext.Provider value={tasks}>
+        <ProjectsContext.Provider value={projectsValue}>
+            <TasksContext.Provider value={tasksValue}>
                 <TimelogsContext.Provider value={timelogsValue}>
                     {!loaded ? (
                         <Center sx={{ height: '100vh' }}>

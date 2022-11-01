@@ -3,12 +3,15 @@ import ModalButton, {
 } from '@/components/buttons/ModalButton';
 import ProjectForm from '@/components/forms/ProjectForm';
 
-export default function AddProjectModal(
-    props: Omit<ModalButtonProps, 'modalContent'>
-) {
+export default function AddProjectModal({
+    selectAdded,
+    ...props
+}: Omit<ModalButtonProps, 'modalContent'> & { selectAdded?: boolean }) {
     return (
         <ModalButton
-            modalContent={(onClose) => <ProjectForm.Add onSubmit={onClose} />}
+            modalContent={(onClose) => (
+                <ProjectForm.Add onSubmit={onClose} selectAdded={selectAdded} />
+            )}
             {...props}
         />
     );
@@ -16,4 +19,5 @@ export default function AddProjectModal(
 
 AddProjectModal.defaultProps = {
     title: 'Add Project',
+    selectAdded: true,
 };

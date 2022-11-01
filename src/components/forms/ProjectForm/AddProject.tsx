@@ -4,7 +4,13 @@ import type { Project } from '@/utils/api/types';
 import ProjectForm from './ProjectForm';
 import { randomColor } from '@/utils/api';
 
-export default function AddProject({ onSubmit }: { onSubmit?: () => unknown }) {
+export default function AddProject({
+    onSubmit,
+    selectAdded,
+}: {
+    onSubmit?: () => unknown;
+    selectAdded?: boolean;
+}) {
     const { data, add, setSelected, error } = useProjects();
 
     const [name, setName] = useState('');
@@ -31,10 +37,10 @@ export default function AddProject({ onSubmit }: { onSubmit?: () => unknown }) {
         if (!trimmed.length) return setName('');
         const added = await add({ name: trimmed, color });
         if (!added) return;
-        await setSelected(added.id);
+        if (selectAdded) await setSelected(added.id);
         setName('');
         if (typeof onSubmit === 'function') onSubmit();
-    }, [add, name, color, nameExists, setSelected, onSubmit]);
+    }, [add, name, color, nameExists, setSelected, onSubmit, selectAdded]);
 
     return (
         <ProjectForm
@@ -49,3 +55,7 @@ export default function AddProject({ onSubmit }: { onSubmit?: () => unknown }) {
         />
     );
 }
+
+AddProject.defaultProps = {
+    selectAdded: true,
+};

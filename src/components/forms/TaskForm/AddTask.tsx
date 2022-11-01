@@ -2,7 +2,13 @@ import { useState, useMemo, useCallback } from 'react';
 import { useProjects, useTasks } from '@/context/TimeTracker';
 import TaskForm from './TaskForm';
 
-export default function AddTask({ onSubmit }: { onSubmit?: () => unknown }) {
+export default function AddTask({
+    onSubmit,
+    selectAdded,
+}: {
+    onSubmit?: () => unknown;
+    selectAdded?: boolean;
+}) {
     const { selected: selectedProject } = useProjects();
     const { data, add, setSelected, error } = useTasks(
         useCallback(
@@ -49,10 +55,18 @@ export default function AddTask({ onSubmit }: { onSubmit?: () => unknown }) {
             projectId: selectedProject.id,
         });
         if (!added) return;
-        await setSelected(added.id);
+        if (selectAdded) await setSelected(added.id);
         setInput('');
         if (typeof onSubmit === 'function') onSubmit();
-    }, [add, input, titleExists, setSelected, onSubmit, selectedProject]);
+    }, [
+        add,
+        input,
+        titleExists,
+        setSelected,
+        onSubmit,
+        selectedProject,
+        selectAdded,
+    ]);
 
     return (
         <TaskForm
@@ -64,3 +78,7 @@ export default function AddTask({ onSubmit }: { onSubmit?: () => unknown }) {
         />
     );
 }
+
+AddTask.defaultProps = {
+    selectAdded: true,
+};

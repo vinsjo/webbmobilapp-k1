@@ -1,4 +1,4 @@
-import { useCallback } from 'react';
+import { useCallback, useEffect, useRef } from 'react';
 import { useProjects, useTasks, useTimelogs } from '@/context/TimeTracker';
 import useTimer from '@/hooks/useTimer';
 
@@ -13,64 +13,51 @@ import { FaEdit } from 'react-icons/fa';
 
 export default function TimeTracker() {
     const { selected: selectedProject } = useProjects();
-    const timelogs = useTimelogs(
-        useCallback(
-            ({ data, selected, setSelected, add }) => {
-                return {
-                    data: !selectedProject
-                        ? []
-                        : data.filter(
-                              ({ projectId }) =>
-                                  projectId === selectedProject.id
-                          ),
-                    selected,
-                    setSelected,
-                    add,
-                };
-            },
-            [selectedProject]
-        )
-    );
-    const tasks = useTasks(
+    const {
+        selected: selectedTimelog,
+        setSelected: setSelectedTimelog,
+        add: addTimelog,
+    } = useTimelogs();
+    const { tasks, selectedTask, setSelectedTask } = useTasks(
         useCallback(
             ({ data, selected, setSelected }) => {
                 return {
-                    data: !selectedProject
+                    tasks: !selectedProject
                         ? []
                         : data.filter(
                               ({ projectId }) =>
                                   projectId === selectedProject.id
                           ),
 
-                    selected,
-                    setSelected,
+                    selectedTask: selected,
+                    setSelectedTask: setSelected,
                 };
             },
             [selectedProject]
         )
     );
 
-    const { start, stop, duration, active } = useTimer(
-        timelogs.selected?.start
-    );
+    const prevTask = useRef(selectedTask);
+
+    const { start, stop, duration, active } = useTimer(selectedTimelog?.start);
 
     const handleClick = useCallback(
         async (id: Task['id']) => {
             if (!selectedProject) return;
-            if (tasks.selected?.id === id && active) {
-                await timelogs.setSelected(null);
+            if (selectedTask?.id === id && active) {
+                await setSelectedTimelog(null);
                 stop();
                 return;
             }
-            await tasks.setSelected(id);
-            const added = await timelogs.add({
+            await setSelectedTask(id);
+            const added = await addTimelog({
                 projectId: selectedProject.id,
                 taskId: id,
                 start: Date.now(),
                 end: 0,
             });
             if (!added) return;
-            await timelogs.setSelected(added.id);
+            await setSelectedTimelog(added.id);
             start();
         },
 
@@ -80,12 +67,18 @@ export default function TimeTracker() {
             active,
             start,
             stop,
-            tasks.selected,
-            tasks.setSelected,
-            timelogs.add,
-            timelogs.setSelected,
+            selectedTask,
+            setSelectedTask,
+            addTimelog,
+            setSelectedTimelog,
         ]
     );
+
+    useEffect(() => {
+        if (!active || prevTask.current?.id === selectedTask?.id) return;
+        stop();
+        prevTask.current = selectedTask;
+    }, [selectedTask, stop, active]);
 
     return (
         <Stack spacing="xl">
@@ -95,18 +88,21 @@ export default function TimeTracker() {
                     label={<Title order={4}>Selected Project</Title>}
                 />
                 <Group position="center" grow>
-                    <ProjectModal.Add />
-                    <TaskModal.Add disabled={!selectedProject} />
+                    <ProjectModal.Add selectAdded={!selectedProject} />
+                    <TaskModal.Add
+                        disabled={!selectedProject}
+                        selectAdded={!active || !selectedTask}
+                    />
                 </Group>
             </Stack>
-            {!!tasks.data.length && (
+            {!!tasks.length && (
                 <Stack>
                     <Title order={5}>Tasks</Title>
-                    {tasks.data.map(({ id, title }) => {
-                        const selected = tasks.selected?.id === id;
+                    {tasks.map(({ id, title }) => {
+                        const selected = selectedTask?.id === id;
                         return (
                             <Group
-                                onClick={() => tasks.setSelected(id)}
+                                onClick={() => setSelectedTask(id)}
                                 key={`task-${id}`}
                                 p="sm"
                                 spacing="sm"
