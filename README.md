@@ -53,22 +53,22 @@ Resets db.json (used by [json-server](https://github.com/typicode/json-server)) 
 
 ### Dependencies
 
--   [@mantine/core](https://github.com/mantinedev/mantine) - [Mantine](https://mantine.dev/) core components
--   [@mantine/hooks](https://github.com/mantinedev/mantine) - hooks for state and UI management
--   [@mantine/dates](https://github.com/mantinedev/mantine) - date inputs and calendars
--   [react-icons](https://github.com/react-icons/react-icons) - icon components
--   [axios](https://github.com/axios/axios) - http requests
--   [dayjs](https://github.com/iamkun/dayjs/) - date parsing and formatting
+- [@mantine/core](https://github.com/mantinedev/mantine) - [Mantine](https://mantine.dev/) core components
+- [@mantine/hooks](https://github.com/mantinedev/mantine) - hooks for state and UI management
+- [@mantine/dates](https://github.com/mantinedev/mantine) - date inputs and calendars
+- [react-icons](https://github.com/react-icons/react-icons) - icon components
+- [axios](https://github.com/axios/axios) - http requests
+- [dayjs](https://github.com/iamkun/dayjs/) - date parsing and formatting
 
 ### DevDependencies
 
--   [vite](https://github.com/vitejs/vite)
--   [json-server](https://github.com/typicode/json-server)
--   [typescript](https://github.com/microsoft/TypeScript)
--   [eslint](https://github.com/eslint/eslint)
--   [prettier](https://github.com/prettier/prettier)
--   [pretty-quick](https://github.com/azz/pretty-quick)
--   [husky](https://github.com/typicode/husky)
+- [vite](https://github.com/vitejs/vite)
+- [json-server](https://github.com/typicode/json-server)
+- [typescript](https://github.com/microsoft/TypeScript)
+- [eslint](https://github.com/eslint/eslint)
+- [prettier](https://github.com/prettier/prettier)
+- [pretty-quick](https://github.com/azz/pretty-quick)
+- [husky](https://github.com/typicode/husky)
 
 ### Styling
 
