@@ -10,8 +10,8 @@ export interface Task {
 }
 export interface Timelog {
     id: number;
-    taskId: Task['id'];
     projectId: Project['id'];
+    taskId: Task['id'];
     /** Timelog start time as a unix timestamp */
     start: number;
     /** Timelog end time as a unix timestamp, or 0 if Timelog is not ended */
