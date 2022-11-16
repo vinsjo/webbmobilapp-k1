@@ -1,7 +1,7 @@
 import axios, { AxiosError } from 'axios';
 import { Route, RouteType, RouteHandler } from './types';
 
-const API_BASE_URL = 'http://localhost:5000';
+const API_BASE_URL = 'https://ionized-lovely-copper.glitch.me/';
 
 const validRoutes: Route[] = ['projects', 'tasks', 'timelogs'];
 
