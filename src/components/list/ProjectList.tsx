@@ -3,7 +3,6 @@ import { useCallback, useMemo } from 'react';
 import { Group, Stack, Title } from '@mantine/core';
 import TaskList from './TaskList';
 
-import type { Project, Task, Timelog } from '@/utils/api/types';
 import { ProjectModal } from '@/components/modals';
 import { useProjects } from '@/context/TimeTracker';
 import { FaEdit } from 'react-icons/fa';
@@ -16,10 +15,10 @@ type Props = {
 
 export default function ProjectList({ projects, tasks, timelogs }: Props) {
     return (
-        <Stack spacing="lg">
+        <Stack spacing='lg'>
             <Title order={3}>Projects</Title>
             <ProjectModal.Add />
-            <Stack spacing="md">
+            <Stack spacing='md'>
                 {projects.map((project) => {
                     return (
                         <ListItem
@@ -42,7 +41,7 @@ function ListItem({
     tasks,
     timelogs,
 }: Project & { tasks: Task[]; timelogs: Timelog[] }) {
-    const { setSelected } = useProjects();
+    const { setCurrent: setSelected } = useProjects();
     const filteredTasks = useMemo(
         () => tasks.filter(({ projectId }) => projectId === id),
         [id, tasks]
@@ -56,16 +55,16 @@ function ListItem({
     }, [id, setSelected]);
     return (
         <Stack
-            p="md"
-            spacing="md"
+            p='md'
+            spacing='md'
             sx={(theme) => ({
                 background: color || theme.colors.gray[8],
                 borderRadius: theme.radius.sm,
             })}
         >
-            <Group position="apart" onClick={handleClick}>
+            <Group position='apart' onClick={handleClick}>
                 <Title order={4}>{name}</Title>
-                <ProjectModal.Edit id={id} variant="subtle" p="xs">
+                <ProjectModal.Edit id={id} variant='subtle' p='xs'>
                     <FaEdit />
                 </ProjectModal.Edit>
             </Group>

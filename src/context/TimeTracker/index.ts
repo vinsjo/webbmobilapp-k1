@@ -1,3 +1,7 @@
-export * as TimeTracker from './types';
-export { ProjectsContext, TasksContext, TimelogsContext } from './Context';
-export { useProjects, useTasks, useTimelogs } from './hooks';
+export {
+    UsersContext,
+    ProjectsContext,
+    TasksContext,
+    TimelogsContext,
+} from './Context';
+export { useUsers, useProjects, useTasks, useTimelogs } from './hooks';

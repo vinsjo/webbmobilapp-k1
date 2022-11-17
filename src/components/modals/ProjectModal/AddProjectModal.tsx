@@ -6,7 +6,9 @@ import ProjectForm from '@/components/forms/ProjectForm';
 export default function AddProjectModal({
     selectAdded,
     ...props
-}: Omit<ModalButtonProps, 'modalContent'> & { selectAdded?: boolean }) {
+}: Omit<ModalButtonProps, 'modalContent'> & {
+    selectAdded?: boolean;
+}) {
     return (
         <ModalButton
             modalContent={(onClose) => (

@@ -2,7 +2,6 @@ import ModalButton, {
     type ModalButtonProps,
 } from '@/components/buttons/ModalButton';
 import TaskForm from '@/components/forms/TaskForm';
-import { Task } from '@/utils/api/types';
 import { useTasks } from '@/context/TimeTracker';
 import { useCallback } from 'react';
 
@@ -15,7 +14,7 @@ export default function EditTaskModal({
 }) {
     const { setSelected, task } = useTasks(
         useCallback(
-            ({ setSelected, data }) => {
+            ({ setCurrent: setSelected, data }) => {
                 return {
                     task: data.find((task) => task.id === id),
                     setSelected,

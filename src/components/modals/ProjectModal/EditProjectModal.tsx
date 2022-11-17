@@ -2,7 +2,6 @@ import ModalButton, {
     type ModalButtonProps,
 } from '@/components/buttons/ModalButton';
 import ProjectForm from '@/components/forms/ProjectForm';
-import { Project } from '@/utils/api/types';
 import { useProjects } from '@/context/TimeTracker';
 import { useCallback } from 'react';
 
@@ -15,7 +14,7 @@ export default function EditProjectModal({
 }) {
     const { setSelected, project } = useProjects(
         useCallback(
-            ({ setSelected, data }) => {
+            ({ setCurrent: setSelected, data }) => {
                 return {
                     setSelected,
                     project: data.find((p) => p.id === id),

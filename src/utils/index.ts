@@ -32,3 +32,11 @@ export function objectEntries<
     if (!(obj instanceof Object)) return [];
     return Object.entries(obj) as [K, T[K]][];
 }
+
+export function objectValues<
+    K extends keyof T,
+    T = Record<string | number | symbol, unknown>
+>(obj: T) {
+    if (!(obj instanceof Object)) return [];
+    return Object.values(obj) as T[K][];
+}

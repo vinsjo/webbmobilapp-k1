@@ -4,26 +4,22 @@ import { useTasks } from '@/context/TimeTracker';
 import TaskForm from './TaskForm';
 
 export default function EditTask({ onSubmit }: { onSubmit?: () => unknown }) {
-    const { data, update, selected, error, remove } = useTasks(
-        useCallback(
-            ({ data, update, selected, setSelected, error, remove }) => {
-                return {
-                    data: !selected
-                        ? []
-                        : data.filter(({ id, projectId }) => {
-                              projectId === selected.id && id !== selected.id;
-                          }),
-                    update,
-                    setSelected,
-                    selected,
-                    error,
-                    remove,
-                };
-            },
-            []
-        )
+    const { data, update, current, error, remove } = useTasks(
+        useCallback(({ data, update, current, error, remove }) => {
+            return {
+                data: !current
+                    ? []
+                    : data.filter(({ id, projectId }) => {
+                          projectId === current.id && id !== current.id;
+                      }),
+                update,
+                current,
+                error,
+                remove,
+            };
+        }, [])
     );
-    const [input, setInput] = useState(selected?.title || '');
+    const [input, setInput] = useState(current?.title || '');
 
     const titleExists = useMemo(() => {
         const trimmed = input.trim();
@@ -33,9 +29,9 @@ export default function EditTask({ onSubmit }: { onSubmit?: () => unknown }) {
     }, [input, data]);
 
     const hasChanged = useMemo(() => {
-        if (!selected) return false;
-        return input.trim() !== selected.title;
-    }, [input, selected]);
+        if (!current) return false;
+        return input.trim() !== current.title;
+    }, [input, current]);
 
     const errorOutput = useMemo(() => {
         if (typeof error === 'string') return error;
@@ -46,21 +42,21 @@ export default function EditTask({ onSubmit }: { onSubmit?: () => unknown }) {
     }, [error, titleExists]);
 
     const handleSubmit = useCallback(async () => {
-        if (titleExists || !hasChanged || !selected) return;
-        const updated = await update(selected.id, { title: input.trim() });
+        if (titleExists || !hasChanged || !current) return;
+        const updated = await update(current.id, { title: input.trim() });
         if (!updated) return;
         setInput('');
         if (typeof onSubmit === 'function') onSubmit();
-    }, [update, input, titleExists, selected, onSubmit, hasChanged]);
+    }, [update, input, titleExists, current, onSubmit, hasChanged]);
 
     const handleDelete = useCallback(async () => {
-        if (!selected) return;
-        const removed = await remove(selected.id);
+        if (!current) return;
+        const removed = await remove(current.id);
         if (!removed) return;
         typeof onSubmit === 'function' && onSubmit();
-    }, [selected, remove, onSubmit]);
+    }, [current, remove, onSubmit]);
 
-    return !selected ? (
+    return !current ? (
         <Text>Error: No task selected</Text>
     ) : (
         <TaskForm
@@ -69,8 +65,8 @@ export default function EditTask({ onSubmit }: { onSubmit?: () => unknown }) {
             error={errorOutput}
             onSubmit={handleSubmit}
             onDelete={handleDelete}
-            deleteLabel="Delete Task"
-            submitLabel="Save"
+            deleteLabel='Delete Task'
+            submitLabel='Save'
         />
     );
 }

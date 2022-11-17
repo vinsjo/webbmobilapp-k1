@@ -1,15 +1,14 @@
 import { useMemo, useCallback } from 'react';
-import { useProjects } from '@/context/TimeTracker';
+import { useUsers } from '@/context/TimeTracker';
 import { Select } from '@mantine/core';
 
 export default function SelectProject({ label }: { label?: React.ReactNode }) {
-    const { data, current, setCurrent } = useProjects();
+    const { data, current, setCurrent } = useUsers();
 
     const selectData = useMemo(() => {
-        return data.map(({ id, name, color }) => ({
+        return data.map(({ id, name }) => ({
             value: `${id}`,
             label: name,
-            color,
         }));
     }, [data]);
 
@@ -20,23 +19,19 @@ export default function SelectProject({ label }: { label?: React.ReactNode }) {
         },
         [setCurrent]
     );
+
     return (
         <Select
             value={!current ? null : `${current.id}`}
             onChange={handleChange}
             dropdownPosition='bottom'
-            placeholder={
-                !data.length ? 'No projects created yet' : 'Select a project'
-            }
-            nothingFound='No matches'
+            placeholder={!data.length ? 'No users exist' : 'Select user'}
             data={selectData}
             disabled={!data.length}
             label={label}
             rightSectionProps={
                 !data.length ? { style: { display: 'none' } } : {}
             }
-            searchable
-            creatable
         />
     );
 }

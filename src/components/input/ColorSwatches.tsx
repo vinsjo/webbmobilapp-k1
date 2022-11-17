@@ -1,11 +1,12 @@
 import { useEffect, useRef, useState } from 'react';
 import { ColorSwatch, Group, MantineSize, Stack } from '@mantine/core';
-import { OmitProps } from '@/utils/type-utils';
 import { objectEntries } from '@/utils';
-import { Colors, defaultColor } from '@/utils/api';
-import { Project } from '@/utils/api/types';
+import { colors, defaultColor } from '@/utils/api';
 
-type Props = OmitProps<typeof Group, 'children' | 'onChange' | 'size'> & {
+type Props = Omit<
+    Parameters<typeof Group>[0],
+    'children' | 'onChange' | 'size'
+> & {
     label?: React.ReactNode;
     value?: Project['color'];
     onChange?: (color: Project['color']) => unknown;
@@ -38,15 +39,15 @@ export default function ColorSwatches({
     }, [onChange]);
 
     return (
-        <Stack spacing="xs">
+        <Stack spacing='xs'>
             {label}
-            <Group position="apart" spacing="xs" {...props}>
-                {objectEntries(Colors).map(([name, color]) => {
+            <Group position='apart' spacing='xs' {...props}>
+                {objectEntries(colors).map(([name, color]) => {
                     return (
                         <ColorSwatch
                             key={name}
-                            component="button"
-                            type="button"
+                            component='button'
+                            type='button'
                             color={color}
                             onClick={() => setSelected(color)}
                             title={name}

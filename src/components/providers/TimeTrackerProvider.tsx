@@ -1,41 +1,42 @@
 import React, { useCallback, useEffect, useMemo } from 'react';
 import {
+    UsersContext,
     ProjectsContext,
     TasksContext,
     TimelogsContext,
-    type TimeTracker,
 } from '@/context/TimeTracker';
-import { Api } from '@/utils/api';
 import { useApiHandler } from '@/hooks';
-import { Center, Text } from '@mantine/core';
+import { LoadingOverlay } from '@mantine/core';
 
 export default function TimeTrackerProvider(props: React.PropsWithChildren) {
+    const users = useApiHandler('users');
     const projects = useApiHandler('projects');
     const tasks = useApiHandler('tasks');
     const timelogs = useApiHandler('timelogs');
 
     const loaded = useMemo(
-        () => projects.loaded && tasks.loaded && timelogs.loaded,
-        [projects.loaded, tasks.loaded, timelogs.loaded]
+        () =>
+            users.loaded && projects.loaded && tasks.loaded && timelogs.loaded,
+        [users.loaded, projects.loaded, tasks.loaded, timelogs.loaded]
     );
 
     // End selected timelog before updating selected timelog
-    const setSelectedTimelog = useCallback<TimeTracker.Select<Api.Timelog>>(
+    const setSelectedTimelog = useCallback<TimeTracker.Select<Timelog>>(
         async (id) => {
-            if (timelogs.selected?.id === id) return;
+            if (timelogs.current?.id === id) return;
             await (() =>
-                timelogs.selected &&
-                !timelogs.selected.end &&
-                timelogs.update(timelogs.selected.id, {
+                timelogs.current &&
+                !timelogs.current.end &&
+                timelogs.update(timelogs.current.id, {
                     end: Date.now(),
                 }))();
-            await timelogs.setSelected(id);
+            await timelogs.setCurrent(id);
         },
         // eslint-disable-next-line react-hooks/exhaustive-deps
-        [timelogs.selected, timelogs.setSelected, timelogs.update]
+        [timelogs.current, timelogs.setCurrent, timelogs.update]
     );
 
-    const addTimelog = useCallback<TimeTracker.Add<Api.Timelog>>(
+    const addTimelog = useCallback<TimeTracker.Add<Timelog>>(
         async (data) => {
             const added = await timelogs.add(data);
             if (!added) return null;
@@ -46,16 +47,16 @@ export default function TimeTrackerProvider(props: React.PropsWithChildren) {
         [timelogs.add, setSelectedTimelog]
     );
 
-    const timelogsValue = useMemo<TimeTracker.Context<Api.Timelog>>(
+    const timelogsValue = useMemo<TimeTracker.Context<Timelog>>(
         () => ({
             ...timelogs,
-            setSelected: setSelectedTimelog,
+            setCurrent: setSelectedTimelog,
             add: addTimelog,
         }),
         [timelogs, setSelectedTimelog, addTimelog]
     );
 
-    const removeProject = useCallback<TimeTracker.Remove<Api.Project>>(
+    const removeProject = useCallback<TimeTracker.Remove<Project>>(
         async (id) => {
             const removed = await projects.remove(id);
             if (!removed) return null;
@@ -66,7 +67,7 @@ export default function TimeTrackerProvider(props: React.PropsWithChildren) {
         // eslint-disable-next-line react-hooks/exhaustive-deps
         [projects.remove, tasks.load, timelogs.load]
     );
-    const removeTask = useCallback<TimeTracker.Remove<Api.Task>>(
+    const removeTask = useCallback<TimeTracker.Remove<Task>>(
         async (id) => {
             const removed = await tasks.remove(id);
             if (!removed) return null;
@@ -77,51 +78,66 @@ export default function TimeTrackerProvider(props: React.PropsWithChildren) {
         [tasks.remove, timelogs.load]
     );
 
-    const projectsValue = useMemo<TimeTracker.Context<Api.Project>>(
+    const projectsValue = useMemo<TimeTracker.Context<Project>>(
         () => ({ ...projects, remove: removeProject }),
         [projects, removeProject]
     );
-    const tasksValue = useMemo<TimeTracker.Context<Api.Task>>(
+    const tasksValue = useMemo<TimeTracker.Context<Task>>(
         () => ({ ...tasks, remove: removeTask }),
 
         [tasks, removeTask]
     );
 
     useEffect(() => {
-        if (!loaded || projects.selected?.id === tasks.selected?.projectId) {
+        if (!loaded || users.current?.id === projects.current?.userId) {
             return;
         }
-        tasks.setSelected(null);
+        tasks.setCurrent(null);
         // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [loaded, projects.selected, tasks.selected, tasks.setSelected]);
+    }, [loaded, users.current, projects.current, projects.setCurrent]);
 
     useEffect(() => {
-        if (!loaded || tasks.selected?.id === timelogs.selected?.taskId) {
+        if (!loaded || projects.current?.id === tasks.current?.projectId) {
+            return;
+        }
+        tasks.setCurrent(null);
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [loaded, projects.current, tasks.current, tasks.setCurrent]);
+
+    useEffect(() => {
+        if (!loaded || tasks.current?.id === timelogs.current?.taskId) {
             return;
         }
         setSelectedTimelog(null);
-    }, [loaded, tasks.selected, timelogs.selected, setSelectedTimelog]);
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [loaded, tasks.current, timelogs.current, setSelectedTimelog]);
 
     useEffect(() => {
-        projects.load();
-        tasks.load();
-        timelogs.load();
+        users.load();
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
+    useEffect(() => {
+        if (!users.current?.id) return;
+        const userId = users.current.id;
+        projects.load((project) => project.userId === userId);
+        tasks.load((task) => task.userId === userId);
+        timelogs.load((timelog) => timelog.userId === userId);
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [users.current?.id]);
 
     return (
-        <ProjectsContext.Provider value={projectsValue}>
-            <TasksContext.Provider value={tasksValue}>
-                <TimelogsContext.Provider value={timelogsValue}>
-                    {!loaded ? (
-                        <Center sx={{ height: '100vh' }}>
-                            <Text>Loading...</Text>
-                        </Center>
-                    ) : (
-                        props.children
-                    )}
-                </TimelogsContext.Provider>
-            </TasksContext.Provider>
-        </ProjectsContext.Provider>
+        <UsersContext.Provider value={users}>
+            <ProjectsContext.Provider value={projectsValue}>
+                <TasksContext.Provider value={tasksValue}>
+                    <TimelogsContext.Provider value={timelogsValue}>
+                        <LoadingOverlay
+                            visible={!users.loaded}
+                            overlayBlur={2}
+                        />
+                        {props.children}
+                    </TimelogsContext.Provider>
+                </TasksContext.Provider>
+            </ProjectsContext.Provider>
+        </UsersContext.Provider>
     );
 }

@@ -1,4 +1,2 @@
 node_modules
 dist
-init-db.cjs
-db.json

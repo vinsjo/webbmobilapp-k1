@@ -1,48 +1,15 @@
 import { useProjects, useTasks, useTimelogs } from '@/context/TimeTracker';
 import { getTotalDuration } from '@/utils/api';
-import { OmitProps } from '@/utils/type-utils';
 import {
     Group,
     MantineNumberSize,
     Stack,
-    CSSObject,
-    Text,
     type CenterProps,
 } from '@mantine/core';
 import dayjs from 'dayjs';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import DurationOutput from './DurationOutput';
-
-function TimerText({
-    children,
-    sx,
-    size,
-    hidden,
-    active,
-    ...props
-}: OmitProps<typeof Text<'div'>, 'sx'> & {
-    sx?: CSSObject;
-    hidden?: boolean;
-    active?: boolean;
-}) {
-    return (
-        <Text
-            size={size || 'xs'}
-            sx={(theme) => ({
-                fontFamily: theme.fontFamilyMonospace,
-                color: active ? 'white' : theme.colors.gray[4],
-                transition: 'color 0.1s ease',
-                minHeight: theme.fontSizes.xs,
-                userSelect: 'none',
-                visibility: hidden ? 'hidden' : 'visible',
-                ...(sx || {}),
-            })}
-            {...props}
-        >
-            {children}
-        </Text>
-    );
-}
+import TimerText from './TimerText';
 
 interface Props extends Omit<CenterProps, 'children'> {
     duration: number;
@@ -52,8 +19,8 @@ interface Props extends Omit<CenterProps, 'children'> {
 }
 
 export default function TimerDisplay({ duration, maxWidth, ...props }: Props) {
-    const { selected: selectedProject } = useProjects();
-    const { selected: selectedTask } = useTasks();
+    const { current: selectedProject } = useProjects();
+    const { current: selectedTask } = useTasks();
     const timelogs = useTimelogs(
         useCallback(
             ({ data }) =>
@@ -91,9 +58,9 @@ export default function TimerDisplay({ duration, maxWidth, ...props }: Props) {
 
     return (
         <Stack
-            py="lg"
-            px="md"
-            spacing="lg"
+            py='lg'
+            px='md'
+            spacing='lg'
             sx={(theme) => ({
                 backgroundColor: !selectedProject
                     ? theme.colors.dark[9]
@@ -104,7 +71,7 @@ export default function TimerDisplay({ duration, maxWidth, ...props }: Props) {
             })}
             {...props}
         >
-            <Group position="apart">
+            <Group position='apart'>
                 <TimerText active={active} hidden={!selectedProject}>
                     Project: {selectedProject?.name}
                 </TimerText>
@@ -113,16 +80,11 @@ export default function TimerDisplay({ duration, maxWidth, ...props }: Props) {
                 </TimerText>
             </Group>
 
-            <TimerText
-                size="lg"
-                align="center"
-                my="lg"
-                sx={{ fontWeight: 800 }}
-            >
+            <TimerText size='lg' align='center' my='lg' fontWeight={800}>
                 <DurationOutput duration={!active ? null : duration} />
             </TimerText>
 
-            <Group position="apart">
+            <Group position='apart'>
                 <TimerText active={active} hidden={!selectedTask}>
                     Today:{' '}
                     <DurationOutput duration={todaysDuration + duration} />

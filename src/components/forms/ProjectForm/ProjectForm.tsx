@@ -1,6 +1,5 @@
 import { Text, TextInput, Space, type TextInputProps } from '@mantine/core';
 import ColorSwatches from '@/components/input/ColorSwatches';
-import type { Project } from '@/utils/api/types';
 import Form, { FormProps } from '../Form';
 
 export type ProjectFormProps = Omit<FormProps, 'children'> &
@@ -21,13 +20,13 @@ export default function ProjectForm({
     return (
         <Form {...props}>
             <TextInput
-                size="sm"
+                size='sm'
                 label={
-                    <Text size="sm" weight={500}>
+                    <Text size='sm' weight={500}>
                         Project name
                     </Text>
                 }
-                placeholder="Enter project name"
+                placeholder='Enter project name'
                 value={name}
                 error={error}
                 minLength={3}
@@ -35,14 +34,14 @@ export default function ProjectForm({
                 inputWrapperOrder={['label', 'input', 'error']}
                 onChange={({ target }) => onNameChange(target.value)}
                 withAsterisk={false}
-                autoComplete="off"
+                autoComplete='off'
                 autoFocus
                 required
             />
-            {!error && <Space h="md" />}
+            {!error && <Space h='md' />}
             <ColorSwatches
                 label={
-                    <Text size="sm" weight={500}>
+                    <Text size='sm' weight={500}>
                         Select Color
                     </Text>
                 }

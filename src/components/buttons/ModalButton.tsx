@@ -1,9 +1,8 @@
 import { Button, Modal, ModalProps } from '@mantine/core';
-import { OmitProps } from '@/utils/type-utils';
 import { useCallback, useState } from 'react';
 
-export type ModalButtonProps<C = 'button'> = OmitProps<
-    typeof Button<C>,
+export type ModalButtonProps<C = 'button'> = Omit<
+    Parameters<typeof Button<C>>[0],
     'onClick'
 > & {
     modalContent:
@@ -53,7 +52,7 @@ export default function ModalButton({
                     : modalContent}
             </Modal>
             <Button
-                type="button"
+                type='button'
                 title={title}
                 disabled={disabled}
                 onClick={handleClick}

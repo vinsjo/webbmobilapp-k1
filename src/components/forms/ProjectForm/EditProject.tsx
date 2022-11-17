@@ -2,7 +2,6 @@ import { useCallback, useMemo, useState } from 'react';
 import { Text } from '@mantine/core';
 import { useProjects } from '@/context/TimeTracker';
 import ProjectForm from './ProjectForm';
-import { Project } from '@/utils/api/types';
 import { defaultColor } from '@/utils/api';
 
 export default function EditProject({
@@ -10,26 +9,20 @@ export default function EditProject({
 }: {
     onSubmit?: () => unknown;
 }) {
-    const { data, update, selected, error, remove } = useProjects(
-        useCallback(
-            ({ data, update, selected, setSelected, error, remove }) => {
-                return {
-                    data: !selected
-                        ? []
-                        : data.filter((p) => p.id !== selected.id),
-                    update,
-                    setSelected,
-                    selected,
-                    error,
-                    remove,
-                };
-            },
-            []
-        )
+    const { data, update, current, error, remove } = useProjects(
+        useCallback(({ data, update, current, error, remove }) => {
+            return {
+                data: !current ? [] : data.filter((p) => p.id !== current.id),
+                update,
+                current,
+                error,
+                remove,
+            };
+        }, [])
     );
 
-    const [name, setName] = useState(selected?.name || '');
-    const [color, setColor] = useState(selected?.color || defaultColor);
+    const [name, setName] = useState(current?.name || '');
+    const [color, setColor] = useState(current?.color || defaultColor);
 
     const nameExists = useMemo(() => {
         const trimmed = name.trim();
@@ -40,12 +33,12 @@ export default function EditProject({
 
     const changedValues = useMemo(() => {
         const values: { name?: string; color?: Project['color'] } = {};
-        if (!selected) return values;
+        if (!current) return values;
         const trimmed = name.trim();
-        if (trimmed && trimmed !== selected.name) values.name = trimmed;
-        if (color && color !== selected.color) values.color = color;
+        if (trimmed && trimmed !== current.name) values.name = trimmed;
+        if (color && color !== current.color) values.color = color;
         return values;
-    }, [selected, name, color]);
+    }, [current, name, color]);
 
     const hasChanged = useMemo(
         () => !!Object.keys(changedValues).length,
@@ -61,22 +54,22 @@ export default function EditProject({
     }, [error, nameExists]);
 
     const handleSubmit = useCallback(async () => {
-        if (nameExists || !hasChanged || !selected) return;
-        const updated = await update(selected.id, changedValues);
+        if (nameExists || !hasChanged || !current) return;
+        const updated = await update(current.id, changedValues);
         if (!updated) return;
         setName('');
         setColor(defaultColor);
         if (typeof onSubmit === 'function') onSubmit();
-    }, [update, hasChanged, nameExists, selected, onSubmit, changedValues]);
+    }, [update, hasChanged, nameExists, current, onSubmit, changedValues]);
 
     const handleDelete = useCallback(() => {
-        if (!selected) return;
-        remove(selected.id).then(() => {
+        if (!current) return;
+        remove(current.id).then(() => {
             typeof onSubmit === 'function' && onSubmit();
         });
-    }, [selected, remove, onSubmit]);
+    }, [current, remove, onSubmit]);
 
-    return !selected ? (
+    return !current ? (
         <Text>Error: No project selected</Text>
     ) : (
         <ProjectForm
@@ -86,9 +79,9 @@ export default function EditProject({
             error={errorOutput}
             onNameChange={setName}
             onColorChange={setColor}
-            submitLabel="Save Changes"
+            submitLabel='Save Changes'
             onDelete={handleDelete}
-            deleteLabel="Delete project"
+            deleteLabel='Delete project'
             disabled={nameExists || !hasChanged}
         />
     );

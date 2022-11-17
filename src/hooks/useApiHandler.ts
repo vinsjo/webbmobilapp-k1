@@ -1,14 +1,14 @@
 import { useState, useMemo, useCallback, useEffect, useRef } from 'react';
 import { useLocalStorage } from '@mantine/hooks';
 import { replaceAtIndex } from '@/utils';
-import { createRouteHandler, type Api } from '@/utils/api';
-import type { TimeTracker } from '@/context/TimeTracker';
+import { createApiHandler } from '@/utils/api';
 
 export default function useApiHandler<
     R extends Api.Route,
-    T extends Api.RouteType<R>
+    T extends Api.InferTypeFromRoute<R>
 >(route: R) {
-    const handler = useRef<Api.RouteHandler<T>>(createRouteHandler(route));
+    const handler = useRef<Api.RequestHandler<T>>(createApiHandler(route));
+    const [loading, setLoading] = useState(true);
     const [loaded, setLoaded] = useState(false);
     const [data, setData] = useState<T[]>([]);
     const [error, setError] = useState<string | null>(null);
@@ -26,16 +26,23 @@ export default function useApiHandler<
         [data, selectedId]
     );
 
-    const load = useCallback<TimeTracker.Load<T>>(async () => {
+    const load = useCallback<TimeTracker.Load<T>>(async (filterCallback) => {
+        setLoading(true);
         try {
-            const data = ((await handler.current.get()) as T[]) || null;
-            if (data) setData(data);
-            setLoaded(true);
+            let data = ((await handler.current.get()) as T[]) || null;
+            if (!data) throw `failed loading ${route}`;
+            if (typeof filterCallback === 'function') {
+                data = data.filter(filterCallback);
+            }
+            setData(data);
             return data;
         } catch (err) {
             if (typeof err === 'string') setError(err);
             return null;
+        } finally {
+            setLoading(false);
         }
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
 
     const add = useCallback<TimeTracker.Add<T>>(async (data) => {
@@ -96,18 +103,35 @@ export default function useApiHandler<
 
     useEffect(() => setError(null), [data]);
 
+    useEffect(() => {
+        if (loading || loaded) return;
+        setLoaded(true);
+    }, [loaded, loading]);
+
     return useMemo<TimeTracker.Context<T>>(
         () => ({
             data,
+            loading,
             error,
             loaded,
             load,
             add,
             update,
             remove,
+            current: selected,
+            setCurrent: setSelected,
+        }),
+        [
+            data,
+            loading,
+            error,
+            add,
+            update,
+            remove,
+            load,
             selected,
             setSelected,
-        }),
-        [data, error, add, update, remove, load, selected, setSelected, loaded]
+            loaded,
+        ]
     );
 }

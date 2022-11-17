@@ -1,8 +1,8 @@
 import { useCallback, useMemo, useState } from 'react';
 import { useProjects } from '@/context/TimeTracker';
-import type { Project } from '@/utils/api/types';
 import ProjectForm from './ProjectForm';
 import { randomColor } from '@/utils/api';
+import { useUsers } from '@/context/TimeTracker/hooks';
 
 export default function AddProject({
     onSubmit,
@@ -11,7 +11,8 @@ export default function AddProject({
     onSubmit?: () => unknown;
     selectAdded?: boolean;
 }) {
-    const { data, add, setSelected, error } = useProjects();
+    const { current: currentUser } = useUsers();
+    const { data, add, setCurrent, error } = useProjects();
 
     const [name, setName] = useState('');
     const [color, setColor] = useState<Project['color']>(randomColor());
@@ -32,16 +33,29 @@ export default function AddProject({
     }, [error, nameExists]);
 
     const handleSubmit = useCallback(async () => {
-        if (nameExists) return;
+        if (!currentUser || nameExists) return;
         const trimmed = name.trim();
         if (!trimmed.length) return setName('');
-        const added = await add({ name: trimmed, color });
+        const added = await add({
+            userId: currentUser.id,
+            name: trimmed,
+            color,
+        });
         if (!added) return;
-        if (selectAdded) await setSelected(added.id);
+        if (selectAdded) await setCurrent(added.id);
         setName('');
         if (typeof onSubmit === 'function') onSubmit();
-    }, [add, name, color, nameExists, setSelected, onSubmit, selectAdded]);
-
+    }, [
+        currentUser,
+        add,
+        name,
+        color,
+        nameExists,
+        setCurrent,
+        onSubmit,
+        selectAdded,
+    ]);
+    console.log(color);
     return (
         <ProjectForm
             onSubmit={handleSubmit}
@@ -50,7 +64,7 @@ export default function AddProject({
             error={errorOutput}
             onNameChange={setName}
             onColorChange={setColor}
-            submitLabel="Add"
+            submitLabel='Add'
             disabled={nameExists}
         />
     );

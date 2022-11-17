@@ -1,4 +1,4 @@
-const Colors = {
+const colors = {
     red: '#bf4040',
     pink: '#bf406c',
     grape: '#a640bf',
@@ -14,6 +14,6 @@ const Colors = {
     gray: '#808080',
 };
 
-export default Colors;
+export default colors;
 
-export const defaultColor = Colors.gray;
+export const defaultColor = colors.gray;

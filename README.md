@@ -11,14 +11,6 @@ npm start
 
 ## Available Scripts
 
-### Run application
-
-```bash
-npm start
-```
-
-Runs client on [http://localhost:3000](http://localhost:3000) and development server on [http://localhost:5000](http://localhost:5000)
-
 ### Run client
 
 ```bash
@@ -26,30 +18,6 @@ npm run dev
 ```
 
 Runs app in the development mode on [http://localhost:3000](http://localhost:3000)
-
-### Run development server
-
-```bash
-npm run dev-server
-```
-
-Runs development server ([json-server](https://github.com/typicode/json-server)) on [http://localhost:5000](http://localhost:5000)
-
-### Reset db
-
-```bash
-npm run reset-db
-```
-
-Resets db.json (used by [json-server](https://github.com/typicode/json-server)) to it's initial state:
-
-```json
-{
-    "projects": [],
-    "tasks": [],
-    "timelogs": []
-}
-```
 
 ### Dependencies
 
@@ -109,4 +77,4 @@ start: number;      // start time as unix timestamp
 end: number;        // end time as a unix timestamp (0 if not ended yet)
 ```
 
-Additional type definitions are available in [src/utils/api/types.ts](https://github.com/vinsjo/webbmobilapp-k1/blob/main/src/utils/api/types.ts) and [src/context/TimeTracker/types.ts](https://github.com/vinsjo/webbmobilapp-k1/blob/main/src/context/TimeTracker/types.ts)
+Additional types are declared in [src/types](https://github.com/vinsjo/webbmobilapp-k1/blob/main/src/types/)

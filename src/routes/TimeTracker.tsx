@@ -6,21 +6,22 @@ import { Group, Stack, Title } from '@mantine/core';
 import SelectProject from '@/components/input/SelectProject';
 import TimerDisplay from '@/components/TimerDisplay';
 
-import type { Task } from '@/utils/api/types';
 import { ProjectModal, TaskModal } from '@/components/modals';
 import { PlayButton } from '@/components/buttons/IconButtons';
 import { FaEdit } from 'react-icons/fa';
+import { useUsers } from '@/context/TimeTracker/hooks';
 
 export default function TimeTracker() {
-    const { selected: selectedProject } = useProjects();
+    const { current: selectedUser } = useUsers();
+    const { current: selectedProject } = useProjects();
     const {
-        selected: selectedTimelog,
-        setSelected: setSelectedTimelog,
+        current: selectedTimelog,
+        setCurrent: setSelectedTimelog,
         add: addTimelog,
     } = useTimelogs();
     const { tasks, selectedTask, setSelectedTask } = useTasks(
         useCallback(
-            ({ data, selected, setSelected }) => {
+            ({ data, current: selected, setCurrent: setSelected }) => {
                 return {
                     tasks: !selectedProject
                         ? []
@@ -43,7 +44,7 @@ export default function TimeTracker() {
 
     const handleClick = useCallback(
         async (id: Task['id']) => {
-            if (!selectedProject) return;
+            if (!selectedUser || !selectedProject) return;
             if (selectedTask?.id === id && active) {
                 await setSelectedTimelog(null);
                 stop();
@@ -51,6 +52,7 @@ export default function TimeTracker() {
             }
             await setSelectedTask(id);
             const added = await addTimelog({
+                userId: selectedUser.id,
                 projectId: selectedProject.id,
                 taskId: id,
                 start: Date.now(),
@@ -81,13 +83,13 @@ export default function TimeTracker() {
     }, [selectedTask, stop, active]);
 
     return (
-        <Stack spacing="xl">
+        <Stack spacing='xl'>
             <TimerDisplay duration={duration} />
-            <Stack spacing="md">
+            <Stack spacing='md'>
                 <SelectProject
                     label={<Title order={4}>Selected Project</Title>}
                 />
-                <Group position="center" grow>
+                <Group position='center' grow>
                     <ProjectModal.Add selectAdded={!selectedProject} />
                     <TaskModal.Add
                         disabled={!selectedProject}
@@ -102,11 +104,14 @@ export default function TimeTracker() {
                         const selected = selectedTask?.id === id;
                         return (
                             <Group
-                                onClick={() => setSelectedTask(id)}
+                                onClick={(ev) => {
+                                    ev.stopPropagation();
+                                    setSelectedTask(id);
+                                }}
                                 key={`task-${id}`}
-                                p="sm"
-                                spacing="sm"
-                                position="apart"
+                                p='sm'
+                                spacing='sm'
+                                position='apart'
                                 sx={(theme) => ({
                                     backgroundColor:
                                         theme.colors.gray[selected ? 7 : 9],
@@ -123,17 +128,19 @@ export default function TimeTracker() {
                                 >
                                     {title}
                                 </Title>
-                                <Group spacing="xs">
+                                <Group spacing='xs'>
                                     <TaskModal.Edit
                                         id={id}
-                                        variant="subtle"
-                                        p="xs"
+                                        variant='subtle'
+                                        p='xs'
                                     >
                                         <FaEdit />
                                     </TaskModal.Edit>
                                     <PlayButton
                                         active={selected && active}
-                                        onClick={() => handleClick(id)}
+                                        onClick={() => {
+                                            handleClick(id);
+                                        }}
                                     />
                                 </Group>
                             </Group>

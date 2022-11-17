@@ -1,8 +1,10 @@
 import { ActionIcon } from '@mantine/core';
-import type { OmitProps } from '@/utils/type-utils';
 import { FaPlay, FaPlus, FaStop, FaTimes } from 'react-icons/fa';
 
-export type Props<C = 'button'> = OmitProps<typeof ActionIcon<C>, 'children'>;
+export type Props<C = 'button'> = Omit<
+    Parameters<typeof ActionIcon<C>>[0],
+    'children'
+>;
 
 export function AddButton({ type = 'submit', ...props }: Props) {
     return (
@@ -27,7 +29,7 @@ export function PlayButton({
     active: boolean;
 }) {
     return (
-        <ActionIcon p="sm" {...props}>
+        <ActionIcon p='sm' {...props}>
             {!active ? <FaPlay /> : <FaStop />}
         </ActionIcon>
     );

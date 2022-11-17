@@ -9,23 +9,22 @@ export default function AddTask({
     onSubmit?: () => unknown;
     selectAdded?: boolean;
 }) {
-    const { selected: selectedProject } = useProjects();
-    const { data, add, setSelected, error } = useTasks(
+    const { current: currentProject } = useProjects();
+    const { data, add, setCurrent, error } = useTasks(
         useCallback(
-            ({ data, add, setSelected, error }) => {
+            ({ data, add, setCurrent, error }) => {
                 return {
-                    data: !selectedProject
+                    data: !currentProject
                         ? []
                         : data.filter(
-                              ({ projectId }) =>
-                                  projectId === selectedProject.id
+                              ({ projectId }) => projectId === currentProject.id
                           ),
                     error,
                     add,
-                    setSelected,
+                    setCurrent,
                 };
             },
-            [selectedProject]
+            [currentProject]
         )
     );
 
@@ -47,24 +46,25 @@ export default function AddTask({
     }, [error, titleExists]);
 
     const handleSubmit = useCallback(async () => {
-        if (titleExists || !selectedProject) return;
+        if (titleExists || !currentProject) return;
         const trimmed = input.trim();
         if (!trimmed.length) return setInput('');
         const added = await add({
             title: trimmed,
-            projectId: selectedProject.id,
+            userId: currentProject.userId,
+            projectId: currentProject.id,
         });
         if (!added) return;
-        if (selectAdded) await setSelected(added.id);
+        if (selectAdded) await setCurrent(added.id);
         setInput('');
         if (typeof onSubmit === 'function') onSubmit();
     }, [
         add,
         input,
         titleExists,
-        setSelected,
+        setCurrent,
         onSubmit,
-        selectedProject,
+        currentProject,
         selectAdded,
     ]);
 
@@ -74,7 +74,7 @@ export default function AddTask({
             error={errorOutput}
             onChange={setInput}
             onSubmit={handleSubmit}
-            submitLabel="Add"
+            submitLabel='Add'
         />
     );
 }
