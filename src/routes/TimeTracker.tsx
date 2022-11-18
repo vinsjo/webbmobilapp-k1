@@ -9,78 +9,75 @@ import TimerDisplay from '@/components/TimerDisplay';
 import { ProjectModal, TaskModal } from '@/components/modals';
 import { PlayButton } from '@/components/buttons/IconButtons';
 import { FaEdit } from 'react-icons/fa';
-import { useUsers } from '@/context/TimeTracker/hooks';
 
 export default function TimeTracker() {
-    const { current: selectedUser } = useUsers();
-    const { current: selectedProject } = useProjects();
+    const { current: currentProject } = useProjects();
     const {
-        current: selectedTimelog,
-        setCurrent: setSelectedTimelog,
+        current: currentTimelog,
+        setCurrent: setCurrentTimelog,
         add: addTimelog,
     } = useTimelogs();
-    const { tasks, selectedTask, setSelectedTask } = useTasks(
+    const { tasks, currentTask, setCurrentTask } = useTasks(
         useCallback(
-            ({ data, current: selected, setCurrent: setSelected }) => {
+            ({ data, current, setCurrent }) => {
                 return {
-                    tasks: !selectedProject
+                    tasks: !currentProject
                         ? []
                         : data.filter(
-                              ({ projectId }) =>
-                                  projectId === selectedProject.id
+                              ({ projectId }) => projectId === currentProject.id
                           ),
 
-                    selectedTask: selected,
-                    setSelectedTask: setSelected,
+                    currentTask: current,
+                    setCurrentTask: setCurrent,
                 };
             },
-            [selectedProject]
+            [currentProject]
         )
     );
 
-    const prevTask = useRef(selectedTask);
+    const prevTask = useRef(currentTask);
 
-    const { start, stop, duration, active } = useTimer(selectedTimelog?.start);
+    const { start, stop, duration, active } = useTimer(currentTimelog?.start);
 
     const handleClick = useCallback(
         async (id: Task['id']) => {
-            if (!selectedUser || !selectedProject) return;
-            if (selectedTask?.id === id && active) {
-                await setSelectedTimelog(null);
+            if (!currentProject) return;
+            if (currentTask?.id === id && active) {
+                await setCurrentTimelog(null);
                 stop();
                 return;
             }
-            await setSelectedTask(id);
+            await setCurrentTask(id);
             const added = await addTimelog({
-                userId: selectedUser.id,
-                projectId: selectedProject.id,
+                userId: currentProject.userId,
+                projectId: currentProject.id,
                 taskId: id,
                 start: Date.now(),
                 end: 0,
             });
             if (!added) return;
-            await setSelectedTimelog(added.id);
+            await setCurrentTimelog(added.id);
             start();
         },
 
         // eslint-disable-next-line react-hooks/exhaustive-deps
         [
-            selectedProject,
             active,
             start,
             stop,
-            selectedTask,
-            setSelectedTask,
+            currentProject,
+            currentTask,
+            setCurrentTask,
             addTimelog,
-            setSelectedTimelog,
+            setCurrentTimelog,
         ]
     );
 
     useEffect(() => {
-        if (!active || prevTask.current?.id === selectedTask?.id) return;
+        if (!active || prevTask.current?.id === currentTask?.id) return;
         stop();
-        prevTask.current = selectedTask;
-    }, [selectedTask, stop, active]);
+        prevTask.current = currentTask;
+    }, [currentTask, stop, active]);
 
     return (
         <Stack spacing='xl'>
@@ -90,10 +87,10 @@ export default function TimeTracker() {
                     label={<Title order={4}>Selected Project</Title>}
                 />
                 <Group position='center' grow>
-                    <ProjectModal.Add selectAdded={!selectedProject} />
+                    <ProjectModal.Add selectAdded={!currentProject} />
                     <TaskModal.Add
-                        disabled={!selectedProject}
-                        selectAdded={!active || !selectedTask}
+                        disabled={!currentProject}
+                        selectAdded={!active || !currentTask}
                     />
                 </Group>
             </Stack>
@@ -101,13 +98,9 @@ export default function TimeTracker() {
                 <Stack>
                     <Title order={5}>Tasks</Title>
                     {tasks.map(({ id, title }) => {
-                        const selected = selectedTask?.id === id;
+                        const selected = currentTask?.id === id;
                         return (
                             <Group
-                                onClick={(ev) => {
-                                    ev.stopPropagation();
-                                    setSelectedTask(id);
-                                }}
                                 key={`task-${id}`}
                                 p='sm'
                                 spacing='sm'
@@ -117,6 +110,7 @@ export default function TimeTracker() {
                                         theme.colors.gray[selected ? 7 : 9],
                                     borderRadius: theme.radius.sm,
                                 })}
+                                noWrap
                             >
                                 <Title
                                     order={4}
@@ -124,11 +118,20 @@ export default function TimeTracker() {
                                         color: theme.colors.gray[
                                             selected ? 0 : 5
                                         ],
+                                        width: '100%',
                                     })}
+                                    onClick={() => {
+                                        console.log(`title ${id} clicked`);
+                                        setCurrentTask(id);
+                                    }}
                                 >
                                     {title}
                                 </Title>
-                                <Group spacing='xs'>
+                                <Group
+                                    spacing='xs'
+                                    // sx={{ minWidth: 'fit-content' }}
+                                    noWrap
+                                >
                                     <TaskModal.Edit
                                         id={id}
                                         variant='subtle'
@@ -138,9 +141,7 @@ export default function TimeTracker() {
                                     </TaskModal.Edit>
                                     <PlayButton
                                         active={selected && active}
-                                        onClick={() => {
-                                            handleClick(id);
-                                        }}
+                                        onClick={() => handleClick(id)}
                                     />
                                 </Group>
                             </Group>

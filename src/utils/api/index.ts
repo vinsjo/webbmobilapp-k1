@@ -7,7 +7,7 @@ import axios from 'axios';
 import { isArr, isBool, isNum, isObj, isStr } from 'x-is-type';
 import { isProject, isTask, isTimelog, isUser } from './validation';
 
-const API_BASE_URL = 'https://ionized-lovely-copper.glitch.me/';
+const API_BASE_URL = 'https://ionized-lovely-copper.glitch.me';
 
 const validRoutes: Api.Route[] = ['users', 'projects', 'tasks', 'timelogs'];
 

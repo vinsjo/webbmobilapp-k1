@@ -86,7 +86,7 @@ export default function TimeTrackerProvider(props: React.PropsWithChildren) {
         if (
             users.loaded &&
             projects.loaded &&
-            users.current?.id !== projects.current?.id
+            users.current?.id !== projects.current?.userId
         ) {
             projects.setCurrent(null);
         }
@@ -103,7 +103,7 @@ export default function TimeTrackerProvider(props: React.PropsWithChildren) {
         if (
             projects.loaded &&
             tasks.loaded &&
-            projects.current?.id !== tasks.current?.id
+            projects.current?.id !== tasks.current?.projectId
         ) {
             tasks.setCurrent(null);
         }
@@ -120,7 +120,7 @@ export default function TimeTrackerProvider(props: React.PropsWithChildren) {
         if (
             tasks.loaded &&
             timelogs.loaded &&
-            tasks.current?.id !== timelogs.current?.id
+            tasks.current?.id !== timelogs.current?.taskId
         ) {
             setSelectedTimelog(null);
         }
