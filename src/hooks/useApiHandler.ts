@@ -26,14 +26,11 @@ export default function useApiHandler<
         [data, selectedId]
     );
 
-    const load = useCallback<TimeTracker.Load<T>>(async (filterCallback) => {
+    const load = useCallback<TimeTracker.Load<T>>(async (filter) => {
         setLoading(true);
         try {
-            let data = ((await handler.current.get()) as T[]) || null;
-            if (!data) throw `failed loading ${route}`;
-            if (typeof filterCallback === 'function') {
-                data = data.filter(filterCallback);
-            }
+            const data = await handler.current.get(filter);
+            if (!data) return null;
             setData(data);
             return data;
         } catch (err) {

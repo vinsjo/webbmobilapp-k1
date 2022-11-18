@@ -1,6 +1,6 @@
 declare namespace TimeTracker {
     type Load<T extends Api.Data> = (
-        filterCallback?: (value: T) => boolean
+        filter?: Api.Filter<T>
     ) => Promise<T[] | null>;
 
     type Add<T extends Api.Data> = (data: Omit<T, 'id'>) => Promise<T | null>;

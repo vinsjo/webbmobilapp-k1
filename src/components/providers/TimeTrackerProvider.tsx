@@ -14,12 +14,6 @@ export default function TimeTrackerProvider(props: React.PropsWithChildren) {
     const tasks = useApiHandler('tasks');
     const timelogs = useApiHandler('timelogs');
 
-    const loaded = useMemo(
-        () =>
-            users.loaded && projects.loaded && tasks.loaded && timelogs.loaded,
-        [users.loaded, projects.loaded, tasks.loaded, timelogs.loaded]
-    );
-
     // End selected timelog before updating selected timelog
     const setSelectedTimelog = useCallback<TimeTracker.Select<Timelog>>(
         async (id) => {
@@ -89,28 +83,55 @@ export default function TimeTrackerProvider(props: React.PropsWithChildren) {
     );
 
     useEffect(() => {
-        if (!loaded || users.current?.id === projects.current?.userId) {
-            return;
+        if (
+            users.loaded &&
+            projects.loaded &&
+            users.current?.id !== projects.current?.id
+        ) {
+            projects.setCurrent(null);
         }
-        tasks.setCurrent(null);
         // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [loaded, users.current, projects.current, projects.setCurrent]);
+    }, [
+        users.loaded,
+        users.current,
+        projects.loaded,
+        projects.current,
+        projects.setCurrent,
+    ]);
 
     useEffect(() => {
-        if (!loaded || projects.current?.id === tasks.current?.projectId) {
-            return;
+        if (
+            projects.loaded &&
+            tasks.loaded &&
+            projects.current?.id !== tasks.current?.id
+        ) {
+            tasks.setCurrent(null);
         }
-        tasks.setCurrent(null);
         // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [loaded, projects.current, tasks.current, tasks.setCurrent]);
+    }, [
+        projects.loaded,
+        projects.current,
+        tasks.loaded,
+        tasks.current,
+        tasks.setCurrent,
+    ]);
 
     useEffect(() => {
-        if (!loaded || tasks.current?.id === timelogs.current?.taskId) {
-            return;
+        if (
+            tasks.loaded &&
+            timelogs.loaded &&
+            tasks.current?.id !== timelogs.current?.id
+        ) {
+            setSelectedTimelog(null);
         }
-        setSelectedTimelog(null);
         // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [loaded, tasks.current, timelogs.current, setSelectedTimelog]);
+    }, [
+        tasks.loaded,
+        tasks.current,
+        timelogs.loaded,
+        timelogs.current,
+        setSelectedTimelog,
+    ]);
 
     useEffect(() => {
         users.load();
@@ -119,9 +140,9 @@ export default function TimeTrackerProvider(props: React.PropsWithChildren) {
     useEffect(() => {
         if (!users.current?.id) return;
         const userId = users.current.id;
-        projects.load((project) => project.userId === userId);
-        tasks.load((task) => task.userId === userId);
-        timelogs.load((timelog) => timelog.userId === userId);
+        projects.load({ userId });
+        tasks.load({ userId });
+        timelogs.load({ userId });
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [users.current?.id]);
 
@@ -130,11 +151,11 @@ export default function TimeTrackerProvider(props: React.PropsWithChildren) {
             <ProjectsContext.Provider value={projectsValue}>
                 <TasksContext.Provider value={tasksValue}>
                     <TimelogsContext.Provider value={timelogsValue}>
-                        <LoadingOverlay
-                            visible={!users.loaded}
-                            overlayBlur={2}
-                        />
-                        {props.children}
+                        {!users.loaded ? (
+                            <LoadingOverlay visible={true} overlayBlur={2} />
+                        ) : (
+                            props.children
+                        )}
                     </TimelogsContext.Provider>
                 </TasksContext.Provider>
             </ProjectsContext.Provider>

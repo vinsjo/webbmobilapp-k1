@@ -8,6 +8,7 @@ declare interface Project {
     userId: User['id'];
     name: string;
     color: string;
+    hourlyRate?: number;
 }
 declare interface Task {
     id: number;
