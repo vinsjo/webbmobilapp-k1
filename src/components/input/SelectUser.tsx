@@ -25,7 +25,7 @@ function UserAvatar({ name, size }: { name: string; size?: MantineSize }) {
     }, [theme]);
     return (
         <Avatar
-            size={theme.fontSizes[size || 'lg']}
+            size={theme.fontSizes[size || 'md']}
             name={name}
             variant='beam'
             colors={colors}
@@ -52,7 +52,13 @@ const SelectItem = forwardRef<HTMLDivElement, SelectItemProps>(
     }
 );
 
-export default function SelectUser({ label }: { label?: React.ReactNode }) {
+export default function SelectUser({
+    label,
+    size,
+}: {
+    label?: React.ReactNode;
+    size?: MantineSize;
+}) {
     const { data, current, setCurrent } = useUsers();
 
     const selectData: SelectItemProps[] = useMemo(() => {
@@ -73,13 +79,16 @@ export default function SelectUser({ label }: { label?: React.ReactNode }) {
 
     return (
         <Select
+            size={size}
             value={!current ? null : `${current.id}`}
             onChange={handleChange}
             dropdownPosition='bottom'
             placeholder={!data.length ? 'No users exist' : 'Select user'}
             data={selectData}
             itemComponent={SelectItem}
-            icon={!current ? null : <UserAvatar name={current.name} />}
+            icon={
+                !current ? null : <UserAvatar name={current.name} size={size} />
+            }
             disabled={!data.length}
             label={label}
             rightSectionProps={

@@ -28,12 +28,12 @@ export default function Layout(props: React.PropsWithChildren) {
 
     useEffect(() => {
         if (users.loaded && !users.current) setOpenModal(true);
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [users.current, users.loaded]);
 
     return (
         <AppShell
-            navbarOffsetBreakpoint='sm'
-            header={<Header height={50} title={pageTitle} />}
+            header={<Header height={{ base: 100, sm: 70 }} title={pageTitle} />}
             footer={<Footer height={70} activePath={activePath} />}
         >
             <UserModal opened={openModal} onClose={() => setOpenModal(false)} />

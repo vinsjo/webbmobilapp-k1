@@ -1,4 +1,3 @@
-import { useUsers } from '@/context/TimeTracker';
 import {
     Header as MantineHeader,
     Group,
@@ -35,10 +34,9 @@ function Header({ title, ...props }: Props) {
                     px='md'
                 >
                     <Title size='h1'>{title || 'Time Tracker'}</Title>
-                    <Group>
-                        <Title order={4}>Current user: </Title>
-                        <SelectUser />
-                        <Button onClick={() => setOpenModal(true)}>
+                    <Group spacing='xs'>
+                        <SelectUser size='sm' />
+                        <Button size='sm' onClick={() => setOpenModal(true)}>
                             Add User
                         </Button>
                     </Group>
