@@ -6,7 +6,7 @@ import {
     TimelogsContext,
 } from '@/context/TimeTracker';
 import { useApiHandler } from '@/hooks';
-import { LoadingOverlay } from '@mantine/core';
+import LoadingOverlay from '../LoadingOverlay';
 
 export default function TimeTrackerProvider(props: React.PropsWithChildren) {
     const users = useApiHandler('users');
@@ -15,15 +15,14 @@ export default function TimeTrackerProvider(props: React.PropsWithChildren) {
     const timelogs = useApiHandler('timelogs');
 
     // End selected timelog before updating selected timelog
-    const setSelectedTimelog = useCallback<TimeTracker.Select<Timelog>>(
+    const setCurrentTimelog = useCallback<TimeTracker.Select<Timelog>>(
         async (id) => {
             if (timelogs.current?.id === id) return;
-            await (() =>
-                timelogs.current &&
-                !timelogs.current.end &&
-                timelogs.update(timelogs.current.id, {
+            if (timelogs.current && !timelogs.current.end) {
+                await timelogs.update(timelogs.current.id, {
                     end: Date.now(),
-                }))();
+                });
+            }
             await timelogs.setCurrent(id);
         },
         // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -34,20 +33,20 @@ export default function TimeTrackerProvider(props: React.PropsWithChildren) {
         async (data) => {
             const added = await timelogs.add(data);
             if (!added) return null;
-            await setSelectedTimelog(added.id);
+            await setCurrentTimelog(added.id);
             return added;
         },
         // eslint-disable-next-line react-hooks/exhaustive-deps
-        [timelogs.add, setSelectedTimelog]
+        [timelogs.add, setCurrentTimelog]
     );
 
     const timelogsValue = useMemo<TimeTracker.Context<Timelog>>(
         () => ({
             ...timelogs,
-            setCurrent: setSelectedTimelog,
+            setCurrent: setCurrentTimelog,
             add: addTimelog,
         }),
-        [timelogs, setSelectedTimelog, addTimelog]
+        [timelogs, setCurrentTimelog, addTimelog]
     );
 
     const removeProject = useCallback<TimeTracker.Remove<Project>>(
@@ -117,23 +116,6 @@ export default function TimeTrackerProvider(props: React.PropsWithChildren) {
     ]);
 
     useEffect(() => {
-        if (
-            tasks.loaded &&
-            timelogs.loaded &&
-            tasks.current?.id !== timelogs.current?.taskId
-        ) {
-            setSelectedTimelog(null);
-        }
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [
-        tasks.loaded,
-        tasks.current,
-        timelogs.loaded,
-        timelogs.current,
-        setSelectedTimelog,
-    ]);
-
-    useEffect(() => {
         users.load();
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
@@ -151,11 +133,7 @@ export default function TimeTrackerProvider(props: React.PropsWithChildren) {
             <ProjectsContext.Provider value={projectsValue}>
                 <TasksContext.Provider value={tasksValue}>
                     <TimelogsContext.Provider value={timelogsValue}>
-                        {!users.loaded ? (
-                            <LoadingOverlay visible={true} overlayBlur={2} />
-                        ) : (
-                            props.children
-                        )}
+                        {!users.loaded ? <LoadingOverlay /> : props.children}
                     </TimelogsContext.Provider>
                 </TasksContext.Provider>
             </ProjectsContext.Provider>
