@@ -1,8 +1,14 @@
 import { useCallback, useMemo, useState } from 'react';
 import { useProjects } from '@/context/TimeTracker';
 import ProjectForm from './ProjectForm';
-import { randomColor } from '@/utils/api';
+import { colors } from '@/utils/api';
 import { useUsers } from '@/context/TimeTracker/hooks';
+import { objectValues } from '@/utils';
+
+const randomColor = () => {
+    const values = objectValues(colors);
+    return values[Math.floor(Math.random() * values.length)];
+};
 
 export default function AddProject({
     onSubmit,
@@ -55,7 +61,6 @@ export default function AddProject({
         onSubmit,
         selectAdded,
     ]);
-    console.log(color);
     return (
         <ProjectForm
             onSubmit={handleSubmit}
