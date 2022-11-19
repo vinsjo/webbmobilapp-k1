@@ -1,6 +1,6 @@
 import axios from 'axios';
 import { isArr, isBool, isNum, isObj, isStr } from 'x-is-type';
-import { isProject, isTask, isTimelog, isUser } from './validation';
+import { isProject, isTask, isTimelog, isUser } from './validate';
 import { objectEntries } from '..';
 
 const API_BASE_URL = 'https://ionized-lovely-copper.glitch.me';
@@ -43,7 +43,7 @@ export default function createApiHandler<
             : route === 'tasks'
             ? isTask
             : isTimelog
-    ) as (data: unknown) => data is T;
+    ) as Api.Validator<T>;
 
     return {
         async get(filter) {

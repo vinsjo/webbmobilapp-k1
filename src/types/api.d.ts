@@ -20,6 +20,8 @@ declare namespace Api {
         : Timelog;
 
     type Filter<T extends Data> = Partial<T>;
+
+    type Validator<T extends Data> = (data: unknown) => data is T;
     interface RequestHandler<T extends Data> {
         get(filter?: Filter<T>): Promise<T[] | null>;
         post(data: Omit<T, 'id'>): Promise<T | null>;

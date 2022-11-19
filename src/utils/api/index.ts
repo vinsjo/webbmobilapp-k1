@@ -1,5 +1,6 @@
 export { default as createApiHandler } from './createApiHandler';
 export { default as colors, defaultColor } from './colors';
+export * as validate from './validate';
 
 export function getTotalDuration(timelogs: Timelog[], onlySeconds = true) {
     if (!timelogs.length) return 0;
