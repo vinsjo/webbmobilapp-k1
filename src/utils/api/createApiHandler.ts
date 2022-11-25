@@ -2,14 +2,13 @@ import axios from 'axios';
 import { isArr, isBool, isNum, isObj, isStr } from 'x-is-type';
 import { isProject, isTask, isTimelog, isUser } from './validate';
 import { objectEntries } from '..';
-
-const API_BASE_URL = 'https://ionized-lovely-copper.glitch.me';
+import { API_URL } from './config';
 
 export default function createApiHandler<
     R extends Api.Route,
     T extends Api.InferTypeFromRoute<R>
 >(route: R): Api.RequestHandler<T> {
-    const baseURL = `${API_BASE_URL}/${route}`;
+    const baseURL = `${API_URL}/${route}`;
 
     const handleError = (err: unknown) => {
         if (!(err instanceof Error)) return null;

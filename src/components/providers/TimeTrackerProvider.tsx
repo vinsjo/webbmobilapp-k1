@@ -6,13 +6,17 @@ import {
     TimelogsContext,
 } from '@/context/TimeTracker';
 import { useApiHandler } from '@/hooks';
-import LoadingOverlay from '../LoadingOverlay';
 
-export default function TimeTrackerProvider(props: React.PropsWithChildren) {
-    const users = useApiHandler('users');
-    const projects = useApiHandler('projects');
-    const tasks = useApiHandler('tasks');
-    const timelogs = useApiHandler('timelogs');
+type Props = {
+    children: React.ReactNode;
+    initialData?: Api.DbData;
+};
+
+export default function TimeTrackerProvider({ children, initialData }: Props) {
+    const users = useApiHandler('users', initialData?.users);
+    const projects = useApiHandler('projects', initialData?.projects);
+    const tasks = useApiHandler('tasks', initialData?.tasks);
+    const timelogs = useApiHandler('timelogs', initialData?.timelogs);
 
     // End selected timelog before updating selected timelog
     const setCurrentTimelog = useCallback<TimeTracker.Select<Timelog>>(
@@ -133,7 +137,7 @@ export default function TimeTrackerProvider(props: React.PropsWithChildren) {
             <ProjectsContext.Provider value={projectsValue}>
                 <TasksContext.Provider value={tasksValue}>
                     <TimelogsContext.Provider value={timelogsValue}>
-                        {!users.loaded ? <LoadingOverlay /> : props.children}
+                        {children}
                     </TimelogsContext.Provider>
                 </TasksContext.Provider>
             </ProjectsContext.Provider>

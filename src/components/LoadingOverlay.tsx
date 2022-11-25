@@ -1,23 +1,50 @@
 import {
+    Center,
+    Text,
     LoadingOverlay as MantineLoadingOverlay,
-    LoadingOverlayProps,
+    type LoadingOverlayProps,
 } from '@mantine/core';
+import { isStr } from 'x-is-type';
 
-type Props = Omit<LoadingOverlayProps, 'loaderProps' | 'visible'> & {
-    visible?: boolean;
+type Props = Omit<LoadingOverlayProps, 'zIndex'> & {
+    zIndex?: number;
+    label?: React.ReactNode;
 };
 
 export default function LoadingOverlay({
-    visible = true,
-    overlayBlur = 2,
+    label,
+    zIndex = 100,
+    visible,
     ...props
 }: Props) {
     return (
-        <MantineLoadingOverlay
-            visible={visible}
-            loaderProps={{ size: 'xl', variant: 'oval' }}
-            overlayBlur={overlayBlur}
-            {...props}
-        />
+        <>
+            <MantineLoadingOverlay
+                visible={visible}
+                zIndex={100}
+                overlayBlur={3}
+                overlayOpacity={0.5}
+                loaderProps={{ color: 'white', size: 'lg' }}
+                {...props}
+            />
+            {label && visible && (
+                <Center
+                    pos='absolute'
+                    inset={0}
+                    pt={125}
+                    sx={{
+                        zIndex: zIndex + 1,
+                    }}
+                >
+                    {isStr(label) ? (
+                        <Text color='white' size='lg'>
+                            {label}
+                        </Text>
+                    ) : (
+                        label
+                    )}
+                </Center>
+            )}
+        </>
     );
 }

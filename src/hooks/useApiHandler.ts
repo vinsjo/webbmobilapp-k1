@@ -6,11 +6,10 @@ import { createApiHandler } from '@/utils/api';
 export default function useApiHandler<
     R extends Api.Route,
     T extends Api.InferTypeFromRoute<R>
->(route: R) {
+>(route: R, initialData?: T[]) {
     const handler = useRef<Api.RequestHandler<T>>(createApiHandler(route));
-    const [loading, setLoading] = useState(true);
-    const [loaded, setLoaded] = useState(false);
-    const [data, setData] = useState<T[]>([]);
+    const [data, setData] = useState<T[]>(initialData || []);
+    const [loaded, setLoaded] = useState(!!initialData);
     const [error, setError] = useState<string | null>(null);
 
     const [selectedId, setSelectedId] = useLocalStorage<T['id'] | null>({
@@ -27,7 +26,6 @@ export default function useApiHandler<
     );
 
     const load = useCallback<TimeTracker.Load<T>>(async (filter) => {
-        setLoading(true);
         try {
             const data = await handler.current.get(filter);
             if (!data) return null;
@@ -37,7 +35,7 @@ export default function useApiHandler<
             if (typeof err === 'string') setError(err);
             return null;
         } finally {
-            setLoading(false);
+            setLoaded(true);
         }
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
@@ -100,15 +98,9 @@ export default function useApiHandler<
 
     useEffect(() => setError(null), [data]);
 
-    useEffect(() => {
-        if (loading || loaded) return;
-        setLoaded(true);
-    }, [loaded, loading]);
-
     return useMemo<TimeTracker.Context<T>>(
         () => ({
             data,
-            loading,
             error,
             loaded,
             load,
@@ -118,17 +110,6 @@ export default function useApiHandler<
             current: selected,
             setCurrent: setSelected,
         }),
-        [
-            data,
-            loading,
-            error,
-            add,
-            update,
-            remove,
-            load,
-            selected,
-            setSelected,
-            loaded,
-        ]
+        [data, error, add, update, remove, load, selected, setSelected, loaded]
     );
 }

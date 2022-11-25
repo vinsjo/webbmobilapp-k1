@@ -27,3 +27,13 @@ export const isTimelog: Api.Validator<Timelog> = (data): data is Timelog => {
     const { id, userId, projectId, taskId, start, end } = data;
     return [id, userId, projectId, taskId, start, end].every(isNum);
 };
+
+export const isDbData = (data: unknown): data is Api.DbData => {
+    if (!isObj(data)) return false;
+    const { users, projects, tasks, timelogs } = data;
+    if (!Array.isArray(users) || !users.every(isUser)) return false;
+    if (!Array.isArray(projects) || !projects.every(isProject)) return false;
+    if (!Array.isArray(tasks) || !tasks.every(isTask)) return false;
+    if (!Array.isArray(timelogs) || !timelogs.every(isTimelog)) return false;
+    return true;
+};

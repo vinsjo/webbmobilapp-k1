@@ -16,7 +16,7 @@ declare namespace TimeTracker {
 
     interface Context<T extends Api.Data> {
         data: T[];
-        loading: boolean;
+        loaded: boolean;
         error: string | null;
         current: T | null;
         setCurrent: Select<T>;
@@ -24,6 +24,5 @@ declare namespace TimeTracker {
         add: Add<T>;
         update: Update<T>;
         remove: Remove<T>;
-        loaded: boolean;
     }
 }

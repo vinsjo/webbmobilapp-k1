@@ -49,7 +49,11 @@ export default function TimeTrackerDashboard() {
     const handlePlayClick = useCallback(
         async (id: Task['id']) => {
             if (!currentProject) return;
-            if (currentTask?.id === id && active) return stop();
+            if (currentTask?.id === id && active) {
+                await setCurrentTimelog(null);
+                stop();
+                return;
+            }
             setCurrentTask(id);
             const now = Date.now();
             start(now);

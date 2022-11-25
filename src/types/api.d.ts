@@ -28,4 +28,11 @@ declare namespace Api {
         patch(id: T['id'], data: Partial<T>): Promise<T | null>;
         delete(id: T['id']): Promise<boolean>;
     }
+
+    interface DbData {
+        users: User[];
+        projects: Project[];
+        tasks: Task[];
+        timelogs: Timelog[];
+    }
 }

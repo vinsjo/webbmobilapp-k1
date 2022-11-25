@@ -14,5 +14,5 @@ export default function TimeTracker() {
         setLoaded(projectsLoaded && tasksLoaded && timelogsLoaded);
     }, [projectsLoaded, tasksLoaded, timelogsLoaded]);
 
-    return !loaded ? <LoadingOverlay /> : <TimeTrackerDashboard />;
+    return !loaded ? <LoadingOverlay visible /> : <TimeTrackerDashboard />;
 }
