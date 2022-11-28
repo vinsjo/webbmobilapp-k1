@@ -4,7 +4,7 @@ import { Group, Stack, Title } from '@mantine/core';
 import TaskList from './TaskList';
 
 import { ProjectModal } from '@/components/modals';
-import { useProjects } from '@/context/TimeTracker';
+import { useProjects } from '@/context/TimeTrackerContext';
 import { FaEdit } from 'react-icons/fa';
 
 type Props = {

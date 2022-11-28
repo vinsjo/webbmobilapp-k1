@@ -1,5 +1,5 @@
 import { useMemo, useCallback } from 'react';
-import { useProjects } from '@/context/TimeTracker';
+import { useProjects } from '@/context/TimeTrackerContext';
 import { Select } from '@mantine/core';
 
 export default function SelectProject({ label }: { label?: React.ReactNode }) {

@@ -1,4 +1,8 @@
-import { useProjects, useTasks, useTimelogs } from '@/context/TimeTracker';
+import {
+    useProjects,
+    useTasks,
+    useTimelogs,
+} from '@/context/TimeTrackerContext';
 import { getTotalDuration } from '@/utils/api';
 import {
     Group,

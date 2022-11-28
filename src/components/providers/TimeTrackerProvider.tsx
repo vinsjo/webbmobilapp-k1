@@ -4,7 +4,7 @@ import {
     ProjectsContext,
     TasksContext,
     TimelogsContext,
-} from '@/context/TimeTracker';
+} from '@/context/TimeTrackerContext';
 import { useApiHandler } from '@/hooks';
 
 type Props = {
@@ -17,7 +17,6 @@ export default function TimeTrackerProvider({ children, initialData }: Props) {
     const projects = useApiHandler('projects', initialData?.projects);
     const tasks = useApiHandler('tasks', initialData?.tasks);
     const timelogs = useApiHandler('timelogs', initialData?.timelogs);
-
     // End selected timelog before updating selected timelog
     const setCurrentTimelog = useCallback<TimeTracker.Select<Timelog>>(
         async (id) => {
@@ -120,9 +119,10 @@ export default function TimeTrackerProvider({ children, initialData }: Props) {
     ]);
 
     useEffect(() => {
+        if (initialData?.users) return;
         users.load();
         // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, []);
+    }, [initialData]);
     useEffect(() => {
         if (!users.current?.id) return;
         const userId = users.current.id;

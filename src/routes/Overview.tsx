@@ -1,7 +1,7 @@
 import { useCallback } from 'react';
 import { useNavigate, useParams, Navigate } from 'react-router-dom';
 import { Tabs, Stack, Group, Text } from '@mantine/core';
-import { useProjects, useTasks } from '@/context/TimeTracker';
+import { useProjects, useTasks } from '@/context/TimeTrackerContext';
 import { defaultColor } from '@/utils/api';
 import { ProjectModal, TaskModal } from '@/components/modals';
 import { FaEdit } from 'react-icons/fa';
@@ -21,29 +21,29 @@ export default function Overview() {
         <Navigate to={'/overview/projects'} replace />
     ) : (
         <Tabs
-            defaultValue="projects"
+            defaultValue='projects'
             value={activeTab}
             onTabChange={handleTabChange}
         >
             <Tabs.List grow>
-                <Tabs.Tab value="projects">
-                    <Text size="lg">Projects</Text>
+                <Tabs.Tab value='projects'>
+                    <Text size='lg'>Projects</Text>
                 </Tabs.Tab>
-                <Tabs.Tab value="tasks">
-                    <Text size="lg">Tasks</Text>
+                <Tabs.Tab value='tasks'>
+                    <Text size='lg'>Tasks</Text>
                 </Tabs.Tab>
             </Tabs.List>
 
-            <Tabs.Panel value="projects">
-                <Stack py="xl">
+            <Tabs.Panel value='projects'>
+                <Stack py='xl'>
                     {!projects.length ? (
                         <Text>No projects exist</Text>
                     ) : (
                         projects.map(({ id, name, color }) => {
                             return (
                                 <Group
-                                    position="apart"
-                                    p="md"
+                                    position='apart'
+                                    p='md'
                                     key={`project-${id}`}
                                     sx={(theme) => ({
                                         borderRadius: theme.radius.sm,
@@ -53,8 +53,8 @@ export default function Overview() {
                                     <Text>{name}</Text>
                                     <ProjectModal.Edit
                                         id={id}
-                                        variant="subtle"
-                                        p="xs"
+                                        variant='subtle'
+                                        p='xs'
                                     >
                                         <FaEdit />
                                     </ProjectModal.Edit>
@@ -65,8 +65,8 @@ export default function Overview() {
                 </Stack>
             </Tabs.Panel>
 
-            <Tabs.Panel value="tasks">
-                <Stack py="xl">
+            <Tabs.Panel value='tasks'>
+                <Stack py='xl'>
                     {!tasks.length ? (
                         <Text>No tasks exist</Text>
                     ) : (
@@ -76,8 +76,8 @@ export default function Overview() {
                                     ?.color || defaultColor;
                             return (
                                 <Group
-                                    position="apart"
-                                    p="md"
+                                    position='apart'
+                                    p='md'
                                     key={`project-${id}`}
                                     sx={(theme) => ({
                                         borderRadius: theme.radius.sm,
@@ -87,8 +87,8 @@ export default function Overview() {
                                     <Text>{title}</Text>
                                     <TaskModal.Edit
                                         id={id}
-                                        variant="subtle"
-                                        p="xs"
+                                        variant='subtle'
+                                        p='xs'
                                     >
                                         <FaEdit />
                                     </TaskModal.Edit>

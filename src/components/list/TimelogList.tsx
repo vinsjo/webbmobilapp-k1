@@ -1,6 +1,6 @@
 import { useMemo } from 'react';
 import { Group, Stack, Text } from '@mantine/core';
-import { useTimelogs } from '@/context/TimeTracker';
+import { useTimelogs } from '@/context/TimeTrackerContext';
 import dayjs from 'dayjs';
 import { DeleteButton } from '@/components/buttons/IconButtons';
 import DurationOutput from '@/components/DurationOutput';

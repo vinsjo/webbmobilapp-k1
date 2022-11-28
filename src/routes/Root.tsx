@@ -1,43 +1,26 @@
+import React, { Suspense } from 'react';
 import { Outlet } from 'react-router-dom';
-import { ThemeProvider, TimeTrackerProvider } from '@/components/providers';
-import Layout from '@/components/Layout';
 import LoadingOverlay from '@/components/LoadingOverlay';
-import axios from 'axios';
-import { API_URL } from '@/utils/api/config';
 import { getAllData } from '@/utils/api';
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useState } from 'react';
+
+const ThemeProvider = React.lazy(
+    () => import('../components/providers/ThemeProvider')
+);
+const Layout = React.lazy(() => import('../components/Layout'));
+const TimeTrackerProvider = React.lazy(
+    () => import('../components/providers/TimeTrackerProvider')
+);
 
 export default function Root() {
-    const [serverIsAwake, setServerIsAwake] = useState(false);
     const [loaded, setLoaded] = useState(false);
     const [data, setData] = useState<Api.DbData>();
-    const loadingLabel = useMemo(() => {
-        if (!serverIsAwake) return 'Connecting to server...';
-        if (!loaded) return 'Loading data...';
-        return null;
-    }, [serverIsAwake, loaded]);
 
     useEffect(() => {
-        const controller = new AbortController();
-        (async () => {
-            try {
-                await axios.head(API_URL, { signal: controller.signal });
-            } catch (err) {
-                if (axios.isCancel(err)) return;
-                console.error(err instanceof Error ? err.message : err);
-            } finally {
-                setServerIsAwake(true);
-            }
-        })();
-        return () => controller.abort();
-    }, []);
-
-    useEffect(() => {
-        if (!serverIsAwake) return;
         (async () => {
             try {
                 const data = await getAllData();
-                if (!data) throw 'failed loading data';
+                if (!data) throw 'failed loading initial data';
                 setData(data);
             } catch (err) {
                 console.error(err instanceof Error ? err.message : err);
@@ -45,18 +28,20 @@ export default function Root() {
                 setLoaded(true);
             }
         })();
-    }, [serverIsAwake]);
+    }, []);
     return (
-        <ThemeProvider>
-            <Layout>
+        <Suspense fallback={<LoadingOverlay label='Loading interface' />}>
+            <ThemeProvider>
                 {!loaded ? (
-                    <LoadingOverlay visible={!loaded} label={loadingLabel} />
+                    <LoadingOverlay label='Loading data' visible={!loaded} />
                 ) : (
                     <TimeTrackerProvider initialData={data}>
-                        <Outlet />
+                        <Layout>
+                            <Outlet />
+                        </Layout>
                     </TimeTrackerProvider>
                 )}
-            </Layout>
-        </ThemeProvider>
+            </ThemeProvider>
+        </Suspense>
     );
 }

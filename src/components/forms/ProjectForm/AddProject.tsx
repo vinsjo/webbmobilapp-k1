@@ -1,8 +1,7 @@
 import { useCallback, useMemo, useState } from 'react';
-import { useProjects } from '@/context/TimeTracker';
+import { useUsers, useProjects } from '@/context/TimeTrackerContext';
 import ProjectForm from './ProjectForm';
 import { colors } from '@/utils/api';
-import { useUsers } from '@/context/TimeTracker/hooks';
 import { objectValues } from '@/utils';
 
 const randomColor = () => {

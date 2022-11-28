@@ -2,7 +2,7 @@ import ModalButton, {
     type ModalButtonProps,
 } from '@/components/buttons/ModalButton';
 import TaskForm from '@/components/forms/TaskForm';
-import { useTasks } from '@/context/TimeTracker';
+import { useTasks } from '@/context/TimeTrackerContext';
 import { useCallback } from 'react';
 
 export default function EditTaskModal({

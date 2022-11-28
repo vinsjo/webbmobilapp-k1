@@ -3,13 +3,13 @@ import { useLocation } from 'react-router-dom';
 import { AppShell } from '@mantine/core';
 import Footer from './Footer';
 import Header from './Header';
-import { useUsers } from '@/context/TimeTracker';
 import UserModal from '../modals/UserModal';
+import { useUsers } from '@/context/TimeTrackerContext';
 
 export default function Layout(props: React.PropsWithChildren) {
-    const users = useUsers();
+    const { loaded, current: currentUser } = useUsers();
+    const [openUserModal, setOpenUserModal] = useState(!currentUser);
     const { pathname } = useLocation();
-    const [openModal, setOpenModal] = useState(false);
     const activePath = useMemo(() => {
         const basePath = pathname.split('/').filter((p) => p)[0] || '';
         return `/${basePath}`;
@@ -27,16 +27,18 @@ export default function Layout(props: React.PropsWithChildren) {
     }, [activePath]);
 
     useEffect(() => {
-        if (users.loaded && !users.current) setOpenModal(true);
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [users.current, users.loaded]);
+        if (loaded && !currentUser) setOpenUserModal(true);
+    }, [loaded, currentUser]);
 
     return (
         <AppShell
             header={<Header height={{ base: 100, sm: 70 }} title={pageTitle} />}
             footer={<Footer height={70} activePath={activePath} />}
         >
-            <UserModal opened={openModal} onClose={() => setOpenModal(false)} />
+            <UserModal
+                opened={openUserModal}
+                onClose={() => setOpenUserModal(false)}
+            />
             {props.children}
         </AppShell>
     );

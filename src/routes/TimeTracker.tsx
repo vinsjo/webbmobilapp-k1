@@ -1,5 +1,9 @@
 import { useEffect, useState } from 'react';
-import { useProjects, useTasks, useTimelogs } from '@/context/TimeTracker';
+import {
+    useProjects,
+    useTasks,
+    useTimelogs,
+} from '@/context/TimeTrackerContext';
 import LoadingOverlay from '@/components/LoadingOverlay';
 
 import TimeTrackerDashboard from '@/components/TimeTrackerDashboard';
@@ -14,5 +18,5 @@ export default function TimeTracker() {
         setLoaded(projectsLoaded && tasksLoaded && timelogsLoaded);
     }, [projectsLoaded, tasksLoaded, timelogsLoaded]);
 
-    return !loaded ? <LoadingOverlay visible /> : <TimeTrackerDashboard />;
+    return !loaded ? <LoadingOverlay /> : <TimeTrackerDashboard />;
 }

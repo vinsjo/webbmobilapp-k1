@@ -1,5 +1,9 @@
 import { useCallback } from 'react';
-import { useProjects, useTasks, useTimelogs } from '@/context/TimeTracker';
+import {
+    useProjects,
+    useTasks,
+    useTimelogs,
+} from '@/context/TimeTrackerContext';
 import useTimer from '@/hooks/useTimer';
 
 import { Group, Stack, Title } from '@mantine/core';

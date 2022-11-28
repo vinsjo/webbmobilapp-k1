@@ -2,7 +2,7 @@ import ModalButton, {
     type ModalButtonProps,
 } from '@/components/buttons/ModalButton';
 import ProjectForm from '@/components/forms/ProjectForm';
-import { useProjects } from '@/context/TimeTracker';
+import { useProjects } from '@/context/TimeTrackerContext';
 import { useCallback } from 'react';
 
 export default function EditProjectModal({

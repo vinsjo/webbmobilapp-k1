@@ -7,7 +7,7 @@ import {
     StackProps,
     InputWrapperBaseProps,
 } from '@mantine/core';
-import { useUsers } from '@/context/TimeTracker';
+import { useUsers } from '@/context/TimeTrackerContext';
 
 type Props = Omit<StackProps, 'children' | 'title'> & {
     label?: InputWrapperBaseProps['label'];

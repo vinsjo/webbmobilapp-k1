@@ -1,5 +1,9 @@
 import { useCallback } from 'react';
-import { useTimelogs, useProjects, useTasks } from '@/context/TimeTracker';
+import {
+    useTimelogs,
+    useProjects,
+    useTasks,
+} from '@/context/TimeTrackerContext';
 import dayjs from 'dayjs';
 import ProjectList from './ProjectList';
 import { Text } from '@mantine/core';
@@ -44,7 +48,7 @@ export default function CalendarList({ selectedDate }: Props) {
     );
 
     return !projects.length ? (
-        <Text align="center">No results for selected date</Text>
+        <Text align='center'>No results for selected date</Text>
     ) : (
         <ProjectList projects={projects} tasks={tasks} timelogs={timelogs} />
     );

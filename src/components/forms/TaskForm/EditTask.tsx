@@ -1,6 +1,6 @@
 import { useCallback, useMemo, useState } from 'react';
 import { Text } from '@mantine/core';
-import { useTasks } from '@/context/TimeTracker';
+import { useTasks } from '@/context/TimeTrackerContext';
 import TaskForm from './TaskForm';
 
 export default function EditTask({ onSubmit }: { onSubmit?: () => unknown }) {

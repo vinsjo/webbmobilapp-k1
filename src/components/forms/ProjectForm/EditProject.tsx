@@ -1,6 +1,6 @@
 import { useCallback, useMemo, useState } from 'react';
 import { Text } from '@mantine/core';
-import { useProjects } from '@/context/TimeTracker';
+import { useProjects } from '@/context/TimeTrackerContext';
 import ProjectForm from './ProjectForm';
 import { defaultColor } from '@/utils/api';
 

@@ -4,7 +4,7 @@ import { useContext as useReactContext, useMemo } from 'react';
  * Create a hook TimeTracker.Context hook, with optional selector callback
  * (inspired by {@link https://github.com/pmndrs/zustand zustand})
  */
-export default function createContextHook<T = unknown>(
+export default function createContextHook<T>(
     context: React.Context<T | null>,
     name?: string
 ) {
