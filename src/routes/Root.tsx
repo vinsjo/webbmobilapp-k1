@@ -48,15 +48,15 @@ export default function Root() {
     }, [serverIsAwake]);
     return (
         <ThemeProvider>
-            {!loaded ? (
-                <LoadingOverlay visible={!loaded} label={loadingLabel} />
-            ) : (
-                <TimeTrackerProvider initialData={data}>
-                    <Layout>
+            <Layout>
+                {!loaded ? (
+                    <LoadingOverlay visible={!loaded} label={loadingLabel} />
+                ) : (
+                    <TimeTrackerProvider initialData={data}>
                         <Outlet />
-                    </Layout>
-                </TimeTrackerProvider>
-            )}
+                    </TimeTrackerProvider>
+                )}
+            </Layout>
         </ThemeProvider>
     );
 }
