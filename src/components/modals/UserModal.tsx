@@ -10,7 +10,7 @@ type Props = {
 };
 
 export default function UserModal({ opened, onClose }: Props) {
-    const { current } = useUsers();
+    const { selected: current } = useUsers();
     const handleClose = useCallback(async () => {
         if (!current) return;
         onClose();

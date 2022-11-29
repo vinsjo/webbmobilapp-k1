@@ -9,10 +9,10 @@ export default function AddTask({
     onSubmit?: () => unknown;
     selectAdded?: boolean;
 }) {
-    const { current: currentProject } = useProjects();
+    const { selected: currentProject } = useProjects();
     const { data, add, setCurrent, error } = useTasks(
         useCallback(
-            ({ data, add, setCurrent, error }) => {
+            ({ data, add, setSelected: setCurrent, error }) => {
                 return {
                     data: !currentProject
                         ? []

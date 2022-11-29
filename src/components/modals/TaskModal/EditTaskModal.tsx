@@ -14,7 +14,7 @@ export default function EditTaskModal({
 }) {
     const { setSelected, task } = useTasks(
         useCallback(
-            ({ setCurrent: setSelected, data }) => {
+            ({ setSelected: setSelected, data }) => {
                 return {
                     task: data.find((task) => task.id === id),
                     setSelected,

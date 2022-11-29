@@ -41,7 +41,7 @@ function ListItem({
     tasks,
     timelogs,
 }: Project & { tasks: Task[]; timelogs: Timelog[] }) {
-    const { setCurrent: setSelected } = useProjects();
+    const { setSelected: setSelected } = useProjects();
     const filteredTasks = useMemo(
         () => tasks.filter(({ projectId }) => projectId === id),
         [id, tasks]

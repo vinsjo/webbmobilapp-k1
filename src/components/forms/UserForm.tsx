@@ -23,7 +23,7 @@ export default function UserForm({
     label,
     ...stackProps
 }: Props) {
-    const { data, add, setCurrent, error } = useUsers();
+    const { data, add, setSelected: setCurrent, error } = useUsers();
     const [input, setInput] = useState('');
 
     const [errorOutput, setErrorOutput] = useState<string | null>(error);

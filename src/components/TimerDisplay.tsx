@@ -23,8 +23,8 @@ interface Props extends Omit<CenterProps, 'children'> {
 }
 
 export default function TimerDisplay({ duration, maxWidth, ...props }: Props) {
-    const { current: selectedProject } = useProjects();
-    const { current: selectedTask } = useTasks();
+    const { selected: selectedProject } = useProjects();
+    const { selected: selectedTask } = useTasks();
     const timelogs = useTimelogs(
         useCallback(
             ({ data }) =>

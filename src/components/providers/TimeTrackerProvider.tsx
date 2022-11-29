@@ -20,16 +20,18 @@ export default function TimeTrackerProvider({ children, initialData }: Props) {
     // End selected timelog before updating selected timelog
     const setCurrentTimelog = useCallback<TimeTracker.Select<Timelog>>(
         async (id) => {
-            if (timelogs.current?.id === id) return;
-            if (timelogs.current && !timelogs.current.end) {
-                await timelogs.update(timelogs.current.id, {
+            const { selected } = timelogs;
+            if (selected?.id === id) return;
+            if (selected && !selected.end) {
+                await timelogs.update({
+                    id: selected.id,
                     end: Date.now(),
                 });
             }
-            await timelogs.setCurrent(id);
+            await timelogs.setSelected(id);
         },
         // eslint-disable-next-line react-hooks/exhaustive-deps
-        [timelogs.current, timelogs.setCurrent, timelogs.update]
+        [timelogs.selected, timelogs.setSelected, timelogs.update]
     );
 
     const addTimelog = useCallback<TimeTracker.Add<Timelog>>(
@@ -46,7 +48,7 @@ export default function TimeTrackerProvider({ children, initialData }: Props) {
     const timelogsValue = useMemo<TimeTracker.Context<Timelog>>(
         () => ({
             ...timelogs,
-            setCurrent: setCurrentTimelog,
+            setSelected: setCurrentTimelog,
             add: addTimelog,
         }),
         [timelogs, setCurrentTimelog, addTimelog]
@@ -88,34 +90,34 @@ export default function TimeTrackerProvider({ children, initialData }: Props) {
         if (
             users.loaded &&
             projects.loaded &&
-            users.current?.id !== projects.current?.userId
+            users.selected?.id !== projects.selected?.userId
         ) {
-            projects.setCurrent(null);
+            projects.setSelected(null);
         }
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [
         users.loaded,
-        users.current,
+        users.selected,
         projects.loaded,
-        projects.current,
-        projects.setCurrent,
+        projects.selected,
+        projects.setSelected,
     ]);
 
     useEffect(() => {
         if (
             projects.loaded &&
             tasks.loaded &&
-            projects.current?.id !== tasks.current?.projectId
+            projects.selected?.id !== tasks.selected?.projectId
         ) {
-            tasks.setCurrent(null);
+            tasks.setSelected(null);
         }
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [
         projects.loaded,
-        projects.current,
+        projects.selected,
         tasks.loaded,
-        tasks.current,
-        tasks.setCurrent,
+        tasks.selected,
+        tasks.setSelected,
     ]);
 
     useEffect(() => {
@@ -124,13 +126,13 @@ export default function TimeTrackerProvider({ children, initialData }: Props) {
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [initialData]);
     useEffect(() => {
-        if (!users.current?.id) return;
-        const userId = users.current.id;
+        if (!users.selected?.id) return;
+        const userId = users.selected.id;
         projects.load({ userId });
         tasks.load({ userId });
         timelogs.load({ userId });
         // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [users.current?.id]);
+    }, [users.selected?.id]);
 
     return (
         <UsersContext.Provider value={users}>

@@ -16,8 +16,8 @@ export default function AddProject({
     onSubmit?: () => unknown;
     selectAdded?: boolean;
 }) {
-    const { current: currentUser } = useUsers();
-    const { data, add, setCurrent, error } = useProjects();
+    const { selected: currentUser } = useUsers();
+    const { data, add, setSelected: setCurrent, error } = useProjects();
 
     const [name, setName] = useState('');
     const [color, setColor] = useState<Project['color']>(randomColor());

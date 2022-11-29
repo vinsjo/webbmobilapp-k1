@@ -15,15 +15,15 @@ import { PlayButton } from '@/components/buttons/IconButtons';
 import { FaEdit } from 'react-icons/fa';
 
 export default function TimeTrackerDashboard() {
-    const { current: currentProject } = useProjects();
+    const { selected: currentProject } = useProjects();
     const {
-        current: currentTimelog,
-        setCurrent: setCurrentTimelog,
+        selected: currentTimelog,
+        setSelected: setCurrentTimelog,
         add: addTimelog,
     } = useTimelogs();
     const { tasks, currentTask, setCurrentTask } = useTasks(
         useCallback(
-            ({ data, current, setCurrent }) => {
+            ({ data, selected: current, setSelected: setCurrent }) => {
                 return {
                     tasks: !currentProject
                         ? []

@@ -3,7 +3,7 @@ import { useProjects } from '@/context/TimeTrackerContext';
 import { Select } from '@mantine/core';
 
 export default function SelectProject({ label }: { label?: React.ReactNode }) {
-    const { data, current, setCurrent } = useProjects();
+    const { data, selected: current, setSelected: setCurrent } = useProjects();
 
     const selectData = useMemo(() => {
         return data.map(({ id, name, color }) => ({

@@ -1,12 +1,12 @@
 import axios from 'axios';
 import { isArr, isBool, isNum, isObj, isStr } from 'x-is-type';
 import { isProject, isTask, isTimelog, isUser } from './validate';
-import { objectEntries } from '..';
-import { API_URL } from './config';
+import { objectEntries } from '@/utils';
+import { API_URL } from '@/config';
 
 export default function createApiHandler<
     R extends Api.Route,
-    T extends Api.InferTypeFromRoute<R>
+    T extends Api.RouteType<R>
 >(route: R): Api.RequestHandler<T> {
     const baseURL = `${API_URL}/${route}`;
 
@@ -33,7 +33,6 @@ export default function createApiHandler<
             .filter((str) => !!str);
         return !values.length ? '' : `?${values.join('&')}`;
     };
-
     const isValid = (
         route === 'users'
             ? isUser
@@ -59,7 +58,7 @@ export default function createApiHandler<
                 return handleError(err);
             }
         },
-        async post(data: Omit<T, 'id'>) {
+        async post(data) {
             try {
                 const res = await axios.post<unknown>(baseURL, data);
                 if (!isValid(res.data)) {
@@ -70,9 +69,9 @@ export default function createApiHandler<
                 return handleError(err);
             }
         },
-        async patch(id: T['id'], data: Partial<T>) {
+        async patch(data) {
             try {
-                const url = `${baseURL}/${id}`;
+                const url = `${baseURL}/${data.id}`;
                 const res = await axios.patch<unknown>(url, data);
                 if (!isValid(res.data)) {
                     throw new Error(`invalid PATCH response from ${url}`);
@@ -82,7 +81,7 @@ export default function createApiHandler<
                 return handleError(err);
             }
         },
-        async delete(id: T['id']) {
+        async delete(id) {
             try {
                 const res = await axios.delete(`${baseURL}/${id}`);
                 return res.status === 200;

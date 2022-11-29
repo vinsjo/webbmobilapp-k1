@@ -6,20 +6,21 @@ declare namespace TimeTracker {
     type Add<T extends Api.Data> = (data: Omit<T, 'id'>) => Promise<T | null>;
 
     type Update<T extends Api.Data> = (
-        id: T['id'],
-        data: Partial<T>
+        data: { id: T['id'] } & Partial<Omit<T, 'id'>>
     ) => Promise<T | null>;
 
     type Remove<T extends Api.Data> = (id: T['id']) => Promise<T['id'] | null>;
 
-    type Select<T extends Api.Data> = (id: T['id'] | null) => Promise<void>;
+    type Select<T extends Api.Data> = (
+        id: T['id'] | null
+    ) => void | Promise<void>;
 
     interface Context<T extends Api.Data> {
         data: T[];
         loaded: boolean;
         error: string | null;
-        current: T | null;
-        setCurrent: Select<T>;
+        selected: T | null;
+        setSelected: Select<T>;
         load: Load<T>;
         add: Add<T>;
         update: Update<T>;

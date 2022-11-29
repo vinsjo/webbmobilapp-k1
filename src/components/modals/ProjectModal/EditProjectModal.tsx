@@ -14,7 +14,7 @@ export default function EditProjectModal({
 }) {
     const { setSelected, project } = useProjects(
         useCallback(
-            ({ setCurrent: setSelected, data }) => {
+            ({ setSelected: setSelected, data }) => {
                 return {
                     setSelected,
                     project: data.find((p) => p.id === id),

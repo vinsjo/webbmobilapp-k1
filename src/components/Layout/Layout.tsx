@@ -7,7 +7,7 @@ import UserModal from '../modals/UserModal';
 import { useUsers } from '@/context/TimeTrackerContext';
 
 export default function Layout(props: React.PropsWithChildren) {
-    const { loaded, current: currentUser } = useUsers();
+    const { loaded, selected: currentUser } = useUsers();
     const [openUserModal, setOpenUserModal] = useState(!currentUser);
     const { pathname } = useLocation();
     const activePath = useMemo(() => {

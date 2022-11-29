@@ -59,7 +59,7 @@ export default function SelectUser({
     label?: React.ReactNode;
     size?: MantineSize;
 }) {
-    const { data, current, setCurrent } = useUsers();
+    const { data, selected: current, setSelected: setCurrent } = useUsers();
 
     const selectData: SelectItemProps[] = useMemo(() => {
         return data.map(({ id, name }) => ({

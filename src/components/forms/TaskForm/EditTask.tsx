@@ -5,7 +5,7 @@ import TaskForm from './TaskForm';
 
 export default function EditTask({ onSubmit }: { onSubmit?: () => unknown }) {
     const { data, update, current, error, remove } = useTasks(
-        useCallback(({ data, update, current, error, remove }) => {
+        useCallback(({ data, update, selected: current, error, remove }) => {
             return {
                 data: !current
                     ? []
@@ -43,7 +43,7 @@ export default function EditTask({ onSubmit }: { onSubmit?: () => unknown }) {
 
     const handleSubmit = useCallback(async () => {
         if (titleExists || !hasChanged || !current) return;
-        const updated = await update(current.id, { title: input.trim() });
+        const updated = await update({ id: current.id, title: input.trim() });
         if (!updated) return;
         setInput('');
         if (typeof onSubmit === 'function') onSubmit();

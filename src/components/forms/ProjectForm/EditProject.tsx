@@ -10,7 +10,7 @@ export default function EditProject({
     onSubmit?: () => unknown;
 }) {
     const { data, update, current, error, remove } = useProjects(
-        useCallback(({ data, update, current, error, remove }) => {
+        useCallback(({ data, update, selected: current, error, remove }) => {
             return {
                 data: !current ? [] : data.filter((p) => p.id !== current.id),
                 update,
@@ -55,7 +55,7 @@ export default function EditProject({
 
     const handleSubmit = useCallback(async () => {
         if (nameExists || !hasChanged || !current) return;
-        const updated = await update(current.id, changedValues);
+        const updated = await update({ id: current.id, ...changedValues });
         if (!updated) return;
         setName('');
         setColor(defaultColor);

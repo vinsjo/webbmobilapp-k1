@@ -6,11 +6,6 @@ export function rand_int(max: number, min = 0) {
     if (typeof max !== 'number') return 0;
     return Math.floor(Math.random() * (max + 1 - min)) + min;
 }
-export function replaceAtIndex<T = unknown>(arr: T[], index: number, value: T) {
-    if (index < 0) return arr;
-    return [...arr.slice(0, index), value, ...arr.slice(index + 1)];
-}
-
 export function formatDuration(milliseconds: number | null) {
     return typeof milliseconds !== 'number'
         ? '--:--:--'

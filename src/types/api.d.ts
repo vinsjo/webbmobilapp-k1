@@ -1,23 +1,15 @@
 declare namespace Api {
     type Data = User | Project | Task | Timelog;
+    interface Routes {
+        users: User;
+        projects: Project;
+        tasks: Task;
+        timelogs: Timelog;
+    }
 
-    type Route = 'users' | 'projects' | 'tasks' | 'timelogs';
+    type Route = keyof Routes;
 
-    type InferTypeFromRoute<T extends Route> = T extends 'users'
-        ? User
-        : T extends 'projects'
-        ? Project
-        : T extends 'tasks'
-        ? Task
-        : T extends 'timelogs'
-        ? Timelog
-        : never;
-
-    type RouteType<T extends Route> = T extends 'projects'
-        ? Project
-        : T extends 'tasks'
-        ? Task
-        : Timelog;
+    type RouteType<T extends Route> = Routes[T];
 
     type Filter<T extends Data> = Partial<T>;
 
@@ -25,7 +17,9 @@ declare namespace Api {
     interface RequestHandler<T extends Data> {
         get(filter?: Filter<T>): Promise<T[] | null>;
         post(data: Omit<T, 'id'>): Promise<T | null>;
-        patch(id: T['id'], data: Partial<T>): Promise<T | null>;
+        patch(
+            data: { id: T['id'] } & Partial<Omit<T, 'id'>>
+        ): Promise<T | null>;
         delete(id: T['id']): Promise<boolean>;
     }
 

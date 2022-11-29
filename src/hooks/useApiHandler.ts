@@ -1,11 +1,10 @@
 import { useState, useMemo, useCallback, useEffect, useRef } from 'react';
 import { useLocalStorage } from '@mantine/hooks';
-import { replaceAtIndex } from '@/utils';
 import { createApiHandler } from '@/utils/api';
 
 export default function useApiHandler<
     R extends Api.Route,
-    T extends Api.InferTypeFromRoute<R>
+    T extends Api.RouteType<R>
 >(route: R, initialData?: T[]) {
     const handler = useRef<Api.RequestHandler<T>>(createApiHandler(route));
     const [data, setData] = useState<T[]>(initialData || []);
@@ -37,15 +36,11 @@ export default function useApiHandler<
         } finally {
             setLoaded(true);
         }
-        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
 
     const add = useCallback<TimeTracker.Add<T>>(async (data) => {
-        if (!(data instanceof Object) || !Object.keys(data).length) {
-            return null;
-        }
         try {
-            const added = (await handler.current.post(data)) as T | null;
+            const added = await handler.current.post(data);
             if (!added) return null;
             setData((prev) => [...prev, added]);
             return added;
@@ -55,17 +50,13 @@ export default function useApiHandler<
         }
     }, []);
 
-    const update = useCallback<TimeTracker.Update<T>>(async (id, data) => {
-        if (!(data instanceof Object) || !Object.keys(data).length) {
-            return null;
-        }
+    const update = useCallback<TimeTracker.Update<T>>(async (data) => {
         try {
-            const updated = await handler.current.patch(id, data);
+            const updated = await handler.current.patch(data);
             if (!updated) return null;
-            setData((prev) => {
-                const i = prev.findIndex((data) => data.id === id);
-                return replaceAtIndex(prev, i, updated as T);
-            });
+            setData((prev) =>
+                prev.map((p) => (p.id !== data.id ? p : updated))
+            );
             return updated;
         } catch (err) {
             if (typeof err === 'string') setError(err);
@@ -77,7 +68,7 @@ export default function useApiHandler<
         try {
             const success = await handler.current.delete(id);
             if (!success) return null;
-            setData((prev) => prev.filter((data) => data.id !== id));
+            setData((prev) => prev.filter((p) => p.id !== id));
             return id;
         } catch (err) {
             if (typeof err === 'string') setError(err);
@@ -85,18 +76,13 @@ export default function useApiHandler<
         }
     }, []);
 
-    const setSelected = useCallback<TimeTracker.Select<T>>(
-        async (id) => {
-            setSelectedId(id);
-        },
-        [setSelectedId]
-    );
-
     useEffect(() => {
         if (error) console.error(error);
     }, [error]);
 
-    useEffect(() => setError(null), [data]);
+    useEffect(() => {
+        if (data.length) setError(null);
+    }, [data]);
 
     return useMemo<TimeTracker.Context<T>>(
         () => ({
@@ -107,9 +93,19 @@ export default function useApiHandler<
             add,
             update,
             remove,
-            current: selected,
-            setCurrent: setSelected,
+            selected,
+            setSelected: setSelectedId,
         }),
-        [data, error, add, update, remove, load, selected, setSelected, loaded]
+        [
+            data,
+            error,
+            add,
+            update,
+            remove,
+            load,
+            selected,
+            setSelectedId,
+            loaded,
+        ]
     );
 }

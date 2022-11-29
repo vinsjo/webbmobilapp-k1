@@ -1,8 +1,8 @@
 import { defineConfig } from 'vite';
 import { VitePWA } from 'vite-plugin-pwa';
 import react from '@vitejs/plugin-react';
-// import { dependencies } from './package.json';
-// import type { BuildOptions } from 'vite';
+import { dependencies } from './package.json';
+import type { BuildOptions } from 'vite';
 
 // https://vitejs.dev/config/
 export default defineConfig({
@@ -48,24 +48,25 @@ export default defineConfig({
             '@': '/src',
         },
     },
-    build: { minify: true },
+    build: getBuildOptions(),
 });
 
 // based on: https://sambitsahoo.com/blog/vite-code-splitting-that-works.html
-// function getBuildOptions(): BuildOptions {
-//     const manualChunks = {
-//         vendor: ['react', 'react-dom', 'react-router-dom'],
-//     };
-//     Object.keys(dependencies).forEach((key) => {
-//         if (manualChunks.vendor.includes(key)) return;
-//         manualChunks[key] = [key];
-//     });
-//     return {
-//         minify: true,
-//         rollupOptions: {
-//             output: {
-//                 manualChunks,
-//             },
-//         },
-//     };
-// }
+function getBuildOptions(): BuildOptions {
+    const manualChunks = {
+        vendor: ['react', 'react-dom', 'react-router-dom'],
+    };
+    Object.keys(dependencies).forEach((key) => {
+        if (manualChunks.vendor.includes(key)) return;
+        manualChunks[key] = [key];
+    });
+
+    return {
+        minify: true,
+        rollupOptions: {
+            output: {
+                manualChunks,
+            },
+        },
+    };
+}
