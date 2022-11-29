@@ -14,15 +14,10 @@ export default defineConfig({
         react(),
         VitePWA({
             registerType: 'autoUpdate',
+            includeAssets: ['favicon.svg'],
             devOptions: {
                 enabled: true,
             },
-            includeAssets: [
-                'index.html',
-                'favicon.svg',
-                'apple-touch-icon.png',
-                'masked-icon.png',
-            ],
             manifest: {
                 name: 'VinSjo TimeTracker App',
                 short_name: 'VS TimeTracker',
